@@ -13,7 +13,7 @@ struct ContentView: View {
             Image(systemName: "pawprint.fill")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Hello, pata!")
+            Text("Hello, Pata!")
         }
         .padding()
     }
