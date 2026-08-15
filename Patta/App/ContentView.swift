@@ -9,13 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "pawprint.fill")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, Pata!")
-        }
-        .padding()
+        TesteCoreData()
     }
 }
 

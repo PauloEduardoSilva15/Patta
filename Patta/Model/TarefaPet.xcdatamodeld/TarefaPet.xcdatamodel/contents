@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24902" systemVersion="25G76" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
-    <entity name="Pet" representedClassName="Pet" syncable="YES" codeGenerationType="class">
+    <entity name="Pet" representedClassName=".Pet" syncable="YES" codeGenerationType="class">
         <attribute name="cond_med" optional="YES" attributeType="String"/>
         <attribute name="data_nac" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
@@ -11,22 +11,22 @@
         <relationship name="registrosVacina" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="RegistroVacina" inverseName="pet" inverseEntity="RegistroVacina"/>
         <relationship name="tarefas" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Tarefa" inverseName="pet" inverseEntity="Tarefa"/>
     </entity>
-    <entity name="RegistroVacina" representedClassName="RegistroVacina" syncable="YES" codeGenerationType="class">
+    <entity name="RegistroVacina" representedClassName=".RegistroVacina" syncable="YES" codeGenerationType="class">
         <attribute name="dataAplicacao" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="proximaDose" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="registrosVacina" inverseEntity="Pet"/>
-        <relationship name="vacina" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vacina" inverseName="relationship" inverseEntity="Vacina"/>
+        <relationship name="vacina" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vacina" inverseName="registro" inverseEntity="Vacina"/>
     </entity>
-    <entity name="Tarefa" representedClassName="Tarefa" syncable="YES" codeGenerationType="class">
+    <entity name="Tarefa" representedClassName=".Tarefa" syncable="YES" codeGenerationType="class">
         <attribute name="desc" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="titulo" attributeType="String"/>
         <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tarefas" inverseEntity="Pet"/>
     </entity>
-    <entity name="Vacina" representedClassName="Vacina" syncable="YES" codeGenerationType="class">
+    <entity name="Vacina" representedClassName=".Vacina" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="nome" attributeType="String"/>
-        <relationship name="relationship" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="RegistroVacina" inverseName="vacina" inverseEntity="RegistroVacina"/>
+        <relationship name="registro" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="RegistroVacina" inverseName="vacina" inverseEntity="RegistroVacina"/>
     </entity>
 </model>
