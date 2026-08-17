@@ -1,12 +1,23 @@
 
 
 import SwiftUI
+import CoreData
 
 struct Search: View {
     @State var query: String = ""
-        var task: [String] = ["Comida","Passear", "Banho", "Tosa"]
+    
+    @FetchRequest(
+        entity: Pet.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.nome, ascending: true)],
         
-        var namePets: [String] = ["Goku", "Nami", "Totó", "Kratos", "Saitama"]
+    ) var pets: FetchedResults<Pet>
+    @FetchRequest(
+        entity: Tarefa.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Tarefa.titulo, ascending: true)],
+        
+    ) var tasks: FetchedResults<Tarefa>
+    
+    @Environment(\.managedObjectContext) private var viewContext
         
         func sortedFilter(item1: String, item2: String)-> Bool {
             let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
@@ -21,9 +32,29 @@ struct Search: View {
             }
             return true
         }
+    
+        var allItems: [String] {
+            var items: [String] = []
+            
+            // Adicionar nomes dos pets
+            for pet in pets {
+                if let name = pet.nome {
+                    items.append(name)
+                }
+            }
+            
+            // Adicionar nomes das tasks
+            for task in tasks {
+                if let name = task.titulo {
+                    items.append(name)
+                }
+            }
+            
+            return items
+        }
+        
         
         var filteredSearch: [String] {
-            let allItems = task + namePets
             let filter = allItems.filter {$0.localizedCaseInsensitiveContains(query)}
             
             return filter.sorted { item1, item2 in
@@ -55,7 +86,9 @@ struct Search: View {
 }
 
 #Preview {
+    let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
     Search()
+        .environment(\.managedObjectContext, context)
 }
 
 /*
