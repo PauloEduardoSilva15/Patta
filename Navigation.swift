@@ -19,7 +19,7 @@ struct Navigation: View {
                     Task()
                 }*/
                 
-                TesteTarefa(contexto: contexto)
+                TesteTarefa(context: context)
                 
             }
             Tab("Pets", systemImage: "pawprint.fill"){

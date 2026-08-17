@@ -8,21 +8,21 @@
 import SwiftUI
 import CoreData
 
-struct Task:View {
+struct TaskView:View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showSheetTask: Bool = false
     @State var selectedDate = Date()
     
     @FetchRequest(
-        entity: Tarefa.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Tarefa.titulo, ascending: true)],
+        entity: Task.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Task.title, ascending: true)],
         
-    ) var tasks: FetchedResults<Tarefa>
+    ) var tasks: FetchedResults<Task>
     
     var allTasks: [String] {
         var items: [String] = []
         for task in tasks {
-            if let name = task.titulo {
+            if let name = task.title {
                 items.append(name)
             }
         }
@@ -58,6 +58,6 @@ struct Task:View {
 }
 #Preview {
     NavigationStack {
-        Task()
+        TaskView()
     }
 }
