@@ -10,15 +10,16 @@ import SwiftUI
 struct SheetTarefa: View {
     @Environment(\.dismiss) var dismiss
     
-    @ObservedObject var viewModel: TarefaViewModel
+    @Environment(TarefaViewModel.self) var viewModel
     
     var body: some View {
+        @Bindable var viewModelBindable = viewModel
         NavigationStack{
             Form {
                 Section("Informações"){
                     
-                    TextField("Nome da Tarefa", text: $viewModel.titulo)
-                    TextField("Descrição", text: $viewModel.descricao)
+                    TextField("Nome da Tarefa", text: $viewModelBindable.titulo)
+                    TextField("Descrição", text: $viewModelBindable.descricao)
                 }
             }
             .navigationTitle("Nova Tarefa")

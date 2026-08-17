@@ -9,15 +9,13 @@ import SwiftUI
 
 struct TesteTarefa: View {
     
-    @State var mostrarSheetTarefa: Bool = false
-    @StateObject var viewModel: TarefaViewModel
+    @State private var mostrarSheetTarefa: Bool = false
+    @State private var viewModel: TarefaViewModel
     
     @FetchRequest(sortDescriptors: []) var tarefas: FetchedResults<Tarefa>
     
     init(contexto: NSManagedObjectContext) {
-        _viewModel = StateObject(
-            wrappedValue: TarefaViewModel(contexto: contexto)
-        )
+        _viewModel = State(initialValue: TarefaViewModel(contexto: contexto))
     }
     
     var body: some View {
@@ -43,7 +41,8 @@ struct TesteTarefa: View {
                 }
             }
             .sheet(isPresented: $mostrarSheetTarefa) {
-                SheetTarefa(viewModel: viewModel)
+                SheetTarefa()
+                    .environment(viewModel)
             }
         }
     }

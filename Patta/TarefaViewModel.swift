@@ -8,11 +8,11 @@
 import Combine
 import CoreData
 
-@MainActor
-final class TarefaViewModel: ObservableObject {
-    @Published var titulo = ""
-    @Published var descricao = ""
-    @Published var mensagemDeErro: String?
+@Observable
+final class TarefaViewModel {
+    var titulo = ""
+    var descricao = ""
+    var mensagemDeErro: String?
     
     private let contexto: NSManagedObjectContext
     

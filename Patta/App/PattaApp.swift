@@ -10,12 +10,12 @@ import SwiftUI
 
 @main
 struct PattaApp: App {
-    @StateObject private var dataController = DataController.compartilhado
+    @State private var dataController = DataController.compartilhado
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(dataController)
+                .environment(dataController)
                 .environment(\.managedObjectContext, dataController.container.viewContext)
         }
     }

@@ -6,10 +6,10 @@
 //
 
 import CoreData
-import Foundation
 import Combine
 
-class DataController: ObservableObject {
+@Observable
+class DataController {
     static let compartilhado = DataController()
     
     let container: NSPersistentContainer
