@@ -10,7 +10,14 @@ import SwiftUI
 
 @main
 struct PattaApp: App {
-    @State private var dataController = DataController.compartilhado
+    @State private var dataController: DataController
+    @State private var petViewModel: PetViewModel
+    
+    init() {
+        let controller = DataController.compartilhado
+        _dataController = .init(initialValue: controller)
+        _petViewModel = .init(initialValue: PetViewModel(name: "", context: controller.container.viewContext))
+    }
     
     var body: some Scene {
         WindowGroup {

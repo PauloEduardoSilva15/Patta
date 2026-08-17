@@ -56,8 +56,11 @@ class PetViewModel {
         
         let newPet = Pet(context: context)
         
+        newPet.id = UUID()
+        
         insertData(pet: newPet)
         trySaveChanges()
+        clearForm()
     }
     
     func updatePet(_ editingPet: Pet) throws {
@@ -68,6 +71,7 @@ class PetViewModel {
         
         insertData(pet: editingPet)
         trySaveChanges()
+        clearForm()
     }
     
     func deletePet(_ pet: Pet) {
