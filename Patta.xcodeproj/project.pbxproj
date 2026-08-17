@@ -12,6 +12,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0CDD61AD3033884B004EBCC0 /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Patta.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE30AE030329366008C3973 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		3AE30AE230329DD2008C3973 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		E1CCD95E303380E300D2092B /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Patta.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -42,7 +43,7 @@
 				3A835A13302FB2CD00F934FB /* Patta */,
 				3AE30AE030329366008C3973 /* Search.swift */,
 				3AE30AE230329DD2008C3973 /* Navigation.swift */,
-				E1CCD95E303380E300D2092B /* Patta.app */,
+				0CDD61AD3033884B004EBCC0 /* Patta.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -68,7 +69,7 @@
 			packageProductDependencies = (
 			);
 			productName = Patta;
-			productReference = E1CCD95E303380E300D2092B /* Patta.app */;
+			productReference = 0CDD61AD3033884B004EBCC0 /* Patta.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
