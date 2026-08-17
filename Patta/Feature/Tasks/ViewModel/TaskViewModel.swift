@@ -14,6 +14,7 @@ final class TaskViewModel {
     var title = ""
     var description = ""
     var errorMessage: String?
+    var date = Date()
     
     var taskBeingEdited: Task?
 
@@ -31,7 +32,7 @@ final class TaskViewModel {
         self.context = context
     }
     
-    func createTask() -> Bool {
+    func saveTask() -> Bool {
         let treatedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !treatedTitle.isEmpty else {
@@ -48,11 +49,12 @@ final class TaskViewModel {
             
             task = Task(context: context)
             task.id = UUID()
-            task.date = Date()
+            task.date = date
         }
         
         task.title = treatedTitle
         task.desc = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        task.date = date
         
         do {
             try context.save()
@@ -79,6 +81,7 @@ final class TaskViewModel {
         taskBeingEdited = nil
         title = ""
         description = ""
+        date = Date()
         errorMessage = nil
     }
     
@@ -86,6 +89,7 @@ final class TaskViewModel {
         taskBeingEdited = task
         title = task.title ?? ""
         description = task.desc ?? ""
+        date = task.date ?? Date()
         errorMessage = nil
     }
     
@@ -117,5 +121,6 @@ final class TaskViewModel {
         taskBeingEdited = nil
         title = ""
         description = ""
+        date = Date()
     }
 }

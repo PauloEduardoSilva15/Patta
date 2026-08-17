@@ -21,12 +21,16 @@ struct SheetTarefa: View {
                     TextField("Nome da Tarefa", text: $viewModelBindable.title)
                     TextField("Descrição", text: $viewModelBindable.description)
                 }
+                Section("Data"){
+                    DatePicker("Data", selection: $viewModelBindable.date, displayedComponents: .date)
+                }
             }
-            .navigationTitle("Nova Tarefa")
+            .navigationTitle(viewModel.formTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar{
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
+            
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -35,7 +39,7 @@ struct SheetTarefa: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        if viewModel.createTask() {
+                        if viewModel.saveTask() {
                             dismiss()
                         }
                     } label: {
