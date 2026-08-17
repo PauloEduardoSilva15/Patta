@@ -62,7 +62,7 @@ struct SheetAddPet: View {
 
 #Preview {
     
-    let context = DataController.compartilhado.container.viewContext
+    let context = DataController.shared.container.viewContext
     let viewModel = PetViewModel(name: "", context: context)
     
     SheetAddPet()
