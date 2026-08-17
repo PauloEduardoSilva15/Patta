@@ -11,22 +11,17 @@
         <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Tarefa" inverseName="pet" inverseEntity="Tarefa"/>
         <relationship name="vaccineRecords" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="RegistroVacina" inverseName="pet" inverseEntity="RegistroVacina"/>
     </entity>
-    <entity name="RegistroVacina" representedClassName=".RegistroVacina" syncable="YES" codeGenerationType="class">
-        <attribute name="dataAplicacao" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="proximaDose" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="vaccineRecords" inverseEntity="Pet"/>
-        <relationship name="vacina" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vacina" inverseName="registro" inverseEntity="Vacina"/>
     </entity>
-    <entity name="Tarefa" representedClassName=".Tarefa" syncable="YES" codeGenerationType="class">
-        <attribute name="desc" optional="YES" attributeType="String"/>
+    <entity name="Vaccine" representedClassName=".Vaccine" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="titulo" attributeType="String"/>
-        <relationship name="pet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tasks" inverseEntity="Pet"/>
+        <attribute name="title" attributeType="String"/>
+        <relationship name="history" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="VaccineRegistry" inverseName="vacine" inverseEntity="VaccineRegistry"/>
     </entity>
-    <entity name="Vacina" representedClassName=".Vacina" syncable="YES" codeGenerationType="class">
+    <entity name="VaccineRegistry" representedClassName=".VaccineRegistry" syncable="YES" codeGenerationType="class">
+        <attribute name="aplicationDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="nome" attributeType="String"/>
-        <relationship name="registro" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="RegistroVacina" inverseName="vacina" inverseEntity="RegistroVacina"/>
+        <attribute name="nextAplication" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="registrosVacina" inverseEntity="Pet"/>
+        <relationship name="vacine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vaccine" inverseName="history" inverseEntity="Vaccine"/>
     </entity>
 </model>

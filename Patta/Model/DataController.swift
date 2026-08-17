@@ -10,19 +10,19 @@ import Combine
 
 @Observable
 class DataController {
-    static let compartilhado = DataController()
+    static let shared = DataController()
     
     let container: NSPersistentContainer
     
     private init () {
         container = NSPersistentContainer(name: "TarefaPet")
         
-        container.loadPersistentStores { descricao, erro in
-            if let erro = erro {
-                print("Falha ao carregar o banco de dados: \(erro)")
+        container.loadPersistentStores { description, error in
+            if let error = error {
+                print("Falha ao carregar o banco de dados: \(error)")
             }
             
-            print("Core Data carregado em:", descricao.url?.absoluteString ?? "URL desconhecida")
+            print("Core Data carregado em:", description.url?.absoluteString ?? "URL desconhecida")
         }
         
         container.viewContext.automaticallyMergesChangesFromParent = true
@@ -32,7 +32,7 @@ class DataController {
 }
 
 extension DataController {
-    func salvar() throws {
+    func save() throws {
         guard container.viewContext.hasChanges else { return }
         
         do {
@@ -42,12 +42,12 @@ extension DataController {
         }
     }
     
-    func deletar(objeto: NSManagedObject) {
+    func delete(object: NSManagedObject) {
         
-        container.viewContext.delete(objeto)
+        container.viewContext.delete(object)
         
         do {
-           try salvar()
+           try save()
         } catch {
             container.viewContext.rollback()
             print("Falha ao deletar o objeto: \(error.localizedDescription)")
