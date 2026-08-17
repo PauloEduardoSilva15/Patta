@@ -14,7 +14,7 @@ struct PattaApp: App {
     @State private var petViewModel: PetViewModel
     
     init() {
-        let controller = DataController.compartilhado
+        let controller = DataController.shared
         _dataController = .init(initialValue: controller)
         _petViewModel = .init(initialValue: PetViewModel(name: "", context: controller.container.viewContext))
     }

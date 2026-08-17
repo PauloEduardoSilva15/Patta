@@ -1,35 +1,63 @@
 
 
 import SwiftUI
+import CoreData
 
 struct Search: View {
     @State var query: String = ""
-        var task: [String] = ["Comida","Passear", "Banho", "Tosa"]
+    
+    @FetchRequest(
+        entity: Pet.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.nome, ascending: true)],
         
-        var namePets: [String] = ["Goku", "Nami", "Totó", "Kratos", "Saitama"]
+    ) var pets: FetchedResults<Pet>
+    @FetchRequest(
+        entity: Tarefa.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Tarefa.titulo, ascending: true)],
         
-        func sortedFilter(item1: String, item2: String)-> Bool {
-            let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
-            let item2StartsWith = item2.localizedCaseInsensitiveContains(query) && item2.hasPrefix(query.lowercased())
-            
-            
-            if !item1StartsWith && !item2StartsWith {
-                return item1.localizedCaseInsensitiveCompare(item2) == .orderedAscending
+    ) var tasks: FetchedResults<Tarefa>
+    
+    @Environment(\.managedObjectContext) private var viewContext
+        
+    func sortedFilter(item1: String, item2: String)-> Bool {
+        let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
+        let item2StartsWith = item2.localizedCaseInsensitiveContains(query) && item2.hasPrefix(query.lowercased())
+        
+        
+        if !item1StartsWith && !item2StartsWith {
+            return item1.localizedCaseInsensitiveCompare(item2) == .orderedAscending
+        }
+        if !item1StartsWith && item2StartsWith {
+            return false
+        }
+        return true
+    }
+    
+    var allItems: [String] {
+        var items: [String] = []
+        
+        for pet in pets {
+            if let name = pet.nome {
+                items.append(name)
             }
-            if !item1StartsWith && item2StartsWith {
-                return false
+        }
+       
+        for task in tasks {
+            if let name = task.titulo {
+                items.append(name)
             }
-            return true
         }
         
-        var filteredSearch: [String] {
-            let allItems = task + namePets
-            let filter = allItems.filter {$0.localizedCaseInsensitiveContains(query)}
-            
-            return filter.sorted { item1, item2 in
-                sortedFilter(item1: item1.lowercased(), item2: item2.lowercased())
-            }
+        return items
+    }
+        
+    var filteredSearch: [String] {
+        let filter = allItems.filter {$0.localizedCaseInsensitiveContains(query)}
+        
+        return filter.sorted { item1, item2 in
+            sortedFilter(item1: item1.lowercased(), item2: item2.lowercased())
         }
+    }
     
     public var body: some View {
         VStack{
@@ -55,7 +83,9 @@ struct Search: View {
 }
 
 #Preview {
+    let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
     Search()
+        .environment(\.managedObjectContext, context)
 }
 
 /*
