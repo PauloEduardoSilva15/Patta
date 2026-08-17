@@ -18,7 +18,7 @@ struct WeekCalendar: View {
     
     var body: some View {
         VStack(spacing: 10) {
-            Text(selectedDate.formatted(.dateTime.month(.wide).year()))
+            Text(selectedDate.formatted(.dateTime.month(.abbreviated).year().locale(Locale(identifier: "pt_BR"))))
                 .font(.title3.bold())
             
             TabView(selection: $currentWeekOffset) {
