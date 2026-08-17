@@ -25,6 +25,14 @@ struct TesteTarefa: View {
                 Text("Quantidade: \(tasks.count)")
                 ForEach(tasks) { task in
                     taskLine(task)
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                viewModel.prepareToEdit(task)
+                                showTaskSheet.toggle()
+                            } label: {
+                                Label("Editar", systemImage: "pencil")
+                            }
+                        }
                 }
                 .onDelete(perform: deleteTasks)
                 

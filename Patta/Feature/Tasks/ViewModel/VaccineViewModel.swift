@@ -14,7 +14,17 @@ final class VaccineViewModel {
     var title = ""
     var errorMessage: String?
     
+    var vaccineBeingEdited: Vaccine?
+    
     private let context: NSManagedObjectContext
+    
+    var isEditing: Bool {
+        vaccineBeingEdited != nil
+    }
+    
+    var formTitle: String {
+        isEditing ? "Editar vacina" : "Nova vacina"
+    }
     
     init(context: NSManagedObjectContext) {
         self.context = context
@@ -28,10 +38,15 @@ final class VaccineViewModel {
             return false
         }
         
-        let vaccine = Vaccine(context: context)
+        let vaccine: Vaccine
         
+        if let vaccineBeingEdited {
+            vaccine = vaccineBeingEdited
+        } else {
+            vaccine = Vaccine(context: context)
+            vaccine.id = UUID()
+        }
         vaccine.title = titleTreated
-        vaccine.id = UUID()
         
         do {
             try context.save()
@@ -48,24 +63,38 @@ final class VaccineViewModel {
     
     func deleteVaccine(_ vaccine: Vaccine) {
         context.delete(vaccine)
-        saveChanges()
-    }
-    
-    func clearForm() {
-        title = ""
-    }
-    
-    func saveChanges() {
         do {
             try context.save()
+            
+            if vaccineBeingEdited == vaccine {
+                clearForm()
+            }
             errorMessage = nil
         } catch {
             context.rollback()
-            errorMessage = "Não foi possível salvar as alterações: \(error.localizedDescription)"
+            errorMessage = "Não foi possível excluir a vacina: \(error.localizedDescription)"
         }
     }
     
+    func clearForm() {
+        vaccineBeingEdited = nil
+        title = ""
+    }
+    
     func prepareNewVaccine() {
+        vaccineBeingEdited = nil
+        title = ""
+        errorMessage = nil
+    }
+    
+    func prepareToEdit(_ vaccine: Vaccine) {
+        vaccineBeingEdited = vaccine
+        title = vaccine.title ?? "Sem título"
+        errorMessage = nil
+        
+    }
+    
+    func cancelEditing() {
         clearForm()
         errorMessage = nil
     }

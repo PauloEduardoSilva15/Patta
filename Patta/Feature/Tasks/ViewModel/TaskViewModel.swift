@@ -5,8 +5,8 @@
 //  Created by Pedro Canute on 17/08/26.
 //
 
-import Combine
 import CoreData
+import Observation
 
 @MainActor
 @Observable
@@ -15,7 +15,17 @@ final class TaskViewModel {
     var description = ""
     var errorMessage: String?
     
+    var taskBeingEdited: Task?
+
     private let context: NSManagedObjectContext
+    
+    var isEditing: Bool {
+        taskBeingEdited != nil
+    }
+    
+    var formTitle: String {
+        isEditing ? "Editar tarefa" : "Nova tarefa"
+    }
     
     init(context: NSManagedObjectContext) {
         self.context = context
@@ -25,62 +35,86 @@ final class TaskViewModel {
         let treatedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !treatedTitle.isEmpty else {
-            errorMessage = "Digite o título da tarefa"
+            errorMessage = "Digite o título da tarefa."
             return false
         }
         
-        let task = Task(context: context)
+        let task: Task
         
-        task.id = UUID()
+        if let taskBeingEdited {
+            
+            task = taskBeingEdited
+        } else {
+            
+            task = Task(context: context)
+            task.id = UUID()
+            task.date = Date()
+        }
+        
         task.title = treatedTitle
         task.desc = description.trimmingCharacters(in: .whitespacesAndNewlines)
         
         do {
             try context.save()
-
-            print("Tarefa salva com sucesso")
-            print("ID:", task.objectID)
-
+            
             clearForm()
             errorMessage = nil
+            
             return true
         } catch {
             context.rollback()
-
+            
             let error = error as NSError
-
             errorMessage = error.localizedDescription
-
+            
             print("Erro Core Data:", error)
             print("Código:", error.code)
             print("Informações:", error.userInfo)
-
+            
             return false
         }
-        
-    }
-    
-    func deleteTask(_ task: Task) {
-        context.delete(task)
-        saveChanges()
     }
     
     func prepareNewTask() {
+        taskBeingEdited = nil
+        title = ""
+        description = ""
+        errorMessage = nil
+    }
+    
+    func prepareToEdit(_ task: Task) {
+        taskBeingEdited = task
+        title = task.title ?? ""
+        description = task.desc ?? ""
+        errorMessage = nil
+    }
+    
+    func cancelEditing() {
         clearForm()
         errorMessage = nil
     }
     
-    func saveChanges() {
+    func deleteTask(_ task: Task) {
+        context.delete(task)
+        
         do {
             try context.save()
+            
+            if taskBeingEdited?.objectID == task.objectID {
+                clearForm()
+            }
+            
             errorMessage = nil
         } catch {
             context.rollback()
-            errorMessage = "Não foi possível salvar as alterações: \(error.localizedDescription)"
+            
+            errorMessage =
+            "Não foi possível apagar a tarefa: \(error.localizedDescription)"
         }
     }
     
     func clearForm() {
+        taskBeingEdited = nil
         title = ""
         description = ""
     }
