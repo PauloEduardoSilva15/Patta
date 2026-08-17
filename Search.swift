@@ -12,10 +12,10 @@ struct Search: View {
         
     ) var pets: FetchedResults<Pet>
     @FetchRequest(
-        entity: Tarefa.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Tarefa.titulo, ascending: true)],
+        entity: Task.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Task.title, ascending: true)],
         
-    ) var tasks: FetchedResults<Tarefa>
+    ) var tasks: FetchedResults<Task>
     
     @Environment(\.managedObjectContext) private var viewContext
         
@@ -43,7 +43,7 @@ struct Search: View {
         }
        
         for task in tasks {
-            if let name = task.titulo {
+            if let name = task.title {
                 items.append(name)
             }
         }

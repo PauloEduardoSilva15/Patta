@@ -17,7 +17,7 @@ final class TaskViewModel {
     var date = Date()
     
     var taskBeingEdited: Task?
-
+    
     private let context: NSManagedObjectContext
     
     var isEditing: Bool {
@@ -39,17 +39,21 @@ final class TaskViewModel {
             errorMessage = "Digite o título da tarefa."
             return false
         }
-        
         let task: Task
         
         if let taskBeingEdited {
-            
+            guard taskBeingEdited.managedObjectContext === context else {
+                errorMessage =
+                "A tarefa e a ViewModel estão usando contextos diferentes."
+                
+                print("Contextos diferentes")
+                return false
+            }
             task = taskBeingEdited
         } else {
             
             task = Task(context: context)
             task.id = UUID()
-            task.date = date
         }
         
         task.title = treatedTitle

@@ -12,7 +12,7 @@ struct TesteTarefa: View {
     @State private var showTaskSheet: Bool = false
     @State private var viewModel: TaskViewModel
     
-    @FetchRequest(sortDescriptors: []) var tasks: FetchedResults<Task>
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)]) var tasks: FetchedResults<Task>
     
     init(context: NSManagedObjectContext) {
         _viewModel = State(initialValue: TaskViewModel(context: context))
@@ -28,7 +28,7 @@ struct TesteTarefa: View {
                         .swipeActions(edge: .leading) {
                             Button {
                                 viewModel.prepareToEdit(task)
-                                showTaskSheet.toggle()
+                                showTaskSheet = true
                             } label: {
                                 Label("Editar", systemImage: "pencil")
                             }
