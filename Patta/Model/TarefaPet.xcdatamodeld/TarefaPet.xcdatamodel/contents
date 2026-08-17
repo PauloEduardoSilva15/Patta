@@ -22,7 +22,7 @@
         <attribute name="desc" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="titulo" attributeType="String"/>
-        <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tarefas" inverseEntity="Pet"/>
+        <relationship name="pet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tarefas" inverseEntity="Pet"/>
     </entity>
     <entity name="Vacina" representedClassName=".Vacina" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
