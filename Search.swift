@@ -58,31 +58,30 @@ struct Search: View {
     }
     
     public var body: some View {
-        VStack{
-            Text("Pesquisar:")
-                .font(.title)
-            NavigationStack{
+        NavigationStack{
+                    
+            List{
+                ForEach(filteredSearch, id: \.self) { search in
+                    Text(search)
+                }
+                
+                
+                if filteredSearch.isEmpty && !query.isEmpty {
+                    Text("Nenhum resultado com \"\(query)\" foi encontrado")
+                }
                         
-                List{
-                    ForEach(filteredSearch, id: \.self) { search in
-                        Text(search)
-                    }
-                    
-                    
-                    if filteredSearch.isEmpty && !query.isEmpty {
-                        Text("Nenhum resultado com \"\(query)\" foi encontrado")
-                    }
-                            
-                }.searchable(text: $query)
-                .searchDictationBehavior(.inline(activation: .onSelect))
-            }
-        }
+            }.searchable(text: $query)
+            .searchDictationBehavior(.inline(activation: .onSelect))
+        }.navigationTitle("Pesquisar: ")
     }
 }
 
 #Preview {
     let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-    Search()
-        .environment(\.managedObjectContext, context)
+    NavigationStack{
+        Search()
+            .environment(\.managedObjectContext, context)
+    }
+    
 }
 
