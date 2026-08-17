@@ -8,14 +8,14 @@ struct Search: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         entity: Pet.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.nome, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)],
         
     ) var pets: FetchedResults<Pet>
     @FetchRequest(
-        entity: Tarefa.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Tarefa.titulo, ascending: true)],
+        entity: Task.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Task.title, ascending: true)],
         
-    ) var tasks: FetchedResults<Tarefa>
+    ) var tasks: FetchedResults<Task>
     
     func sortedFilter(item1: String, item2: String)-> Bool {
         let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
@@ -35,13 +35,13 @@ struct Search: View {
         var items: [String] = []
         
         for pet in pets {
-            if let name = pet.nome {
+            if let name = pet.name {
                 items.append(name)
             }
         }
        
         for task in tasks {
-            if let name = task.titulo {
+            if let name = task.title {
                 items.append(name)
             }
         }

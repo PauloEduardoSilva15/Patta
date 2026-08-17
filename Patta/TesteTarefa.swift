@@ -9,53 +9,61 @@ import SwiftUI
 
 struct TesteTarefa: View {
     
-    @State private var mostrarSheetTarefa: Bool = false
-    @State private var viewModel: TarefaViewModel
+    @State private var showTaskSheet: Bool = false
+    @State private var viewModel: TaskViewModel
     
-    @FetchRequest(sortDescriptors: []) var tarefas: FetchedResults<Tarefa>
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)]) var tasks: FetchedResults<Task>
     
-    init(contexto: NSManagedObjectContext) {
-        _viewModel = State(initialValue: TarefaViewModel(contexto: contexto))
+    init(context: NSManagedObjectContext) {
+        _viewModel = State(initialValue: TaskViewModel(context: context))
     }
     
     var body: some View {
         NavigationStack {
             
             List{
-                Text("Quantidade: \(tarefas.count)")
-                ForEach(tarefas) { tarefa in
-                    linhaDaTarefa(tarefa)
+                Text("Quantidade: \(tasks.count)")
+                ForEach(tasks) { task in
+                    taskLine(task)
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                viewModel.prepareToEdit(task)
+                                showTaskSheet = true
+                            } label: {
+                                Label("Editar", systemImage: "pencil")
+                            }
+                        }
                 }
-                .onDelete(perform: apagarTarefas)
+                .onDelete(perform: deleteTasks)
                 
             }
             .navigationTitle("Tarefas")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        viewModel.prepararNovaTarefa()
-                        mostrarSheetTarefa.toggle()
+                        viewModel.prepareNewTask()
+                        showTaskSheet.toggle()
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $mostrarSheetTarefa) {
+            .sheet(isPresented: $showTaskSheet) {
                 SheetTarefa()
                     .environment(viewModel)
             }
         }
     }
     
-    private func linhaDaTarefa(_ tarefa: Tarefa) -> some View {
+    private func taskLine(_ task: Task) -> some View {
             HStack {
 
                 VStack(alignment: .leading) {
-                    Text(tarefa.titulo!)
+                    Text(task.title!)
 
-                    if let descricao = tarefa.desc,
-                       !descricao.isEmpty {
-                        Text(descricao)
+                    if let description = task.desc,
+                       !description.isEmpty {
+                        Text(description)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -63,9 +71,9 @@ struct TesteTarefa: View {
             }
         }
 
-        private func apagarTarefas(at offsets: IndexSet) {
-            for indice in offsets {
-                viewModel.apagarTarefa(tarefas[indice])
+        private func deleteTasks(at offsets: IndexSet) {
+            for index in offsets {
+                viewModel.deleteTask(tasks[index])
             }
         }
 }

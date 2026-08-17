@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct Navigation: View {
-    @Environment(\.managedObjectContext) private var contexto
+    @Environment(\.managedObjectContext) private var context
     
     var body: some View {
         
