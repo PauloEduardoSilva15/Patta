@@ -8,13 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		3AE1FCB23033928800C56E87 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE1FCB13033928300C56E87 /* Task.swift */; };
+		3AE1FCD63033A68400C56E87 /* Pets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE1FCD53033A67D00C56E87 /* Pets.swift */; };
 		3AE30AE130329378008C3973 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE30AE030329366008C3973 /* Search.swift */; };
 		3AE30AE330329DDB008C3973 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE30AE230329DD2008C3973 /* Navigation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3AE1FC923033909F00C56E87 /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Patta.app; path = "/Users/paulo/Documents/Patta/build/Debug-iphoneos/Patta.app"; sourceTree = "<absolute>"; };
 		3AE1FCB13033928300C56E87 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		3AE1FCB330339CF700C56E87 /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Patta.app; path = "/Users/paulo/Documents/Patta/build/Debug-iphoneos/Patta.app"; sourceTree = "<absolute>"; };
+		3AE1FCD53033A67D00C56E87 /* Pets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pets.swift; sourceTree = "<group>"; };
 		3AE30AE030329366008C3973 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		3AE30AE230329DD2008C3973 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -45,6 +47,7 @@
 				3AE30AE030329366008C3973 /* Search.swift */,
 				3AE1FCB13033928300C56E87 /* Task.swift */,
 				3AE30AE230329DD2008C3973 /* Navigation.swift */,
+				3AE1FCD53033A67D00C56E87 /* Pets.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -70,7 +73,7 @@
 			packageProductDependencies = (
 			);
 			productName = Patta;
-			productReference = 3AE1FC923033909F00C56E87 /* Patta.app */;
+			productReference = 3AE1FCB330339CF700C56E87 /* Patta.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -125,6 +128,7 @@
 				3AE30AE130329378008C3973 /* Search.swift in Sources */,
 				3AE30AE330329DDB008C3973 /* Navigation.swift in Sources */,
 				3AE1FCB23033928800C56E87 /* Task.swift in Sources */,
+				3AE1FCD63033A68400C56E87 /* Pets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

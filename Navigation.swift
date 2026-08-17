@@ -23,7 +23,9 @@ struct Navigation: View {
                 
             }
             Tab("Pets", systemImage: "pawprint.fill"){
-                                
+                NavigationStack{
+                    Pets()
+                }
             }
             Tab(role: .search){
                 NavigationStack{
