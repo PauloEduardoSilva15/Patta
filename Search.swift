@@ -19,48 +19,45 @@ struct Search: View {
     
     @Environment(\.managedObjectContext) private var viewContext
         
-        func sortedFilter(item1: String, item2: String)-> Bool {
-            let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
-            let item2StartsWith = item2.localizedCaseInsensitiveContains(query) && item2.hasPrefix(query.lowercased())
-            
-            
-            if !item1StartsWith && !item2StartsWith {
-                return item1.localizedCaseInsensitiveCompare(item2) == .orderedAscending
-            }
-            if !item1StartsWith && item2StartsWith {
-                return false
-            }
-            return true
+    func sortedFilter(item1: String, item2: String)-> Bool {
+        let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
+        let item2StartsWith = item2.localizedCaseInsensitiveContains(query) && item2.hasPrefix(query.lowercased())
+        
+        
+        if !item1StartsWith && !item2StartsWith {
+            return item1.localizedCaseInsensitiveCompare(item2) == .orderedAscending
         }
+        if !item1StartsWith && item2StartsWith {
+            return false
+        }
+        return true
+    }
     
-        var allItems: [String] {
-            var items: [String] = []
-            
-            // Adicionar nomes dos pets
-            for pet in pets {
-                if let name = pet.nome {
-                    items.append(name)
-                }
-            }
-            
-            // Adicionar nomes das tasks
-            for task in tasks {
-                if let name = task.titulo {
-                    items.append(name)
-                }
-            }
-            
-            return items
-        }
+    var allItems: [String] {
+        var items: [String] = []
         
-        
-        var filteredSearch: [String] {
-            let filter = allItems.filter {$0.localizedCaseInsensitiveContains(query)}
-            
-            return filter.sorted { item1, item2 in
-                sortedFilter(item1: item1.lowercased(), item2: item2.lowercased())
+        for pet in pets {
+            if let name = pet.nome {
+                items.append(name)
             }
         }
+       
+        for task in tasks {
+            if let name = task.titulo {
+                items.append(name)
+            }
+        }
+        
+        return items
+    }
+        
+    var filteredSearch: [String] {
+        let filter = allItems.filter {$0.localizedCaseInsensitiveContains(query)}
+        
+        return filter.sorted { item1, item2 in
+            sortedFilter(item1: item1.lowercased(), item2: item2.lowercased())
+        }
+    }
     
     public var body: some View {
         VStack{
