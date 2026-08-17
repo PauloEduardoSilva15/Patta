@@ -16,10 +16,48 @@ struct WeekCalendar: View {
     
     private let weekOffsetRange = 0...52
     
+    private func goNextWeek() {
+        if currentWeekOffset < weekOffsetRange.last! {
+            currentWeekOffset += 1
+        }
+    }
+    
+    private func goPreviousWeek() {
+        if currentWeekOffset != 0 {
+            currentWeekOffset -= 1
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 10) {
-            Text(selectedDate.formatted(.dateTime.month(.abbreviated).year().locale(Locale(identifier: "pt_BR"))))
-                .font(.title3.bold())
+            HStack {
+                Text(selectedDate.formatted(.dateTime.month(.abbreviated).locale(Locale(identifier: "pt_BR"))).capitalized + " " + selectedDate.formatted(.dateTime.year()))
+                    .font(.title3.bold())
+                
+                Spacer()
+                
+                HStack(spacing: 40) {
+                    Button {
+                        goPreviousWeek()
+                    }label: {
+                        Image(systemName: "chevron.left")
+                            .font(.title3.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .containerShape(Rectangle())
+                    
+                    Button {
+                        goNextWeek()
+                    }label: {
+                        Image(systemName: "chevron.right")
+                            .font(.title3.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .containerShape(Rectangle())
+                }
+            }
             
             TabView(selection: $currentWeekOffset) {
                 ForEach(weekOffsetRange, id: \.self) { offset in
