@@ -8,7 +8,7 @@ struct Search: View {
     
     @FetchRequest(
         entity: Pet.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.nome, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)],
         
     ) var pets: FetchedResults<Pet>
     @FetchRequest(
@@ -37,7 +37,7 @@ struct Search: View {
         var items: [String] = []
         
         for pet in pets {
-            if let name = pet.nome {
+            if let name = pet.name {
                 items.append(name)
             }
         }

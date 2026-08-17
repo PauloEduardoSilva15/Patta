@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24902" systemVersion="25G72" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24902" systemVersion="25G76" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="Pet" representedClassName=".Pet" syncable="YES" codeGenerationType="class">
         <attribute name="birthdate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="breed" optional="YES" attributeType="String"/>
@@ -8,15 +8,15 @@
         <attribute name="med_cond" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="weight" optional="YES" attributeType="Decimal" defaultValueString="0.0"/>
-        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Tarefa" inverseName="pet" inverseEntity="Tarefa"/>
-        <relationship name="vaccineRecords" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="RegistroVacina" inverseName="pet" inverseEntity="RegistroVacina"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Task" inverseName="pet" inverseEntity="Task"/>
+        <relationship name="vaccineRecords" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="VaccineRegistry" inverseName="pet" inverseEntity="VaccineRegistry"/>
     </entity>
     <entity name="Task" representedClassName=".Task" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="desc" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="title" attributeType="String"/>
-        <relationship name="pet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tarefas" inverseEntity="Pet"/>
+        <relationship name="pet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tasks" inverseEntity="Pet"/>
     </entity>
     <entity name="Vaccine" representedClassName=".Vaccine" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
@@ -27,7 +27,7 @@
         <attribute name="aplicationDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="nextAplication" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="registrosVacina" inverseEntity="Pet"/>
+        <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="vaccineRecords" inverseEntity="Pet"/>
         <relationship name="vacine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vaccine" inverseName="history" inverseEntity="Vaccine"/>
     </entity>
 </model>
