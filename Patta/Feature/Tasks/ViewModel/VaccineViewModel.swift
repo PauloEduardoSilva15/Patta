@@ -1,5 +1,5 @@
 //
-//  VacinaViewModel.swift
+//  VaccineViewModel.swift
 //  Patta
 //
 //  Created by Pedro Canute on 17/08/26.
@@ -10,7 +10,7 @@ import Combine
 
 @MainActor
 @Observable
-final class VacineViewModel {
+final class VaccineViewModel {
     var title = ""
     var errorMessage: String?
     
@@ -20,7 +20,7 @@ final class VacineViewModel {
         self.context = context
     }
     
-    func criarVacina() -> Bool {
+    func createVaccine() -> Bool {
         let titleTreated = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !titleTreated.isEmpty else {
@@ -28,15 +28,15 @@ final class VacineViewModel {
             return false
         }
         
-        let vacine = Vacina(context: context)
+        let vaccine = Vaccine(context: context)
         
-        vacine.title = titleTreated
-        vacine.id = UUID()
+        vaccine.title = titleTreated
+        vaccine.id = UUID()
         
         do {
             try context.save()
             
-            limparFormulario()
+            clearForm()
             errorMessage = nil
             return true
         } catch {
@@ -46,16 +46,16 @@ final class VacineViewModel {
         }
     }
     
-    func apagarVacina(_ vacina: Vacina) {
-        context.delete(vacina)
-        salvarAlteracoes()
+    func deleteVaccine(_ vaccine: Vaccine) {
+        context.delete(vaccine)
+        saveChanges()
     }
     
-    func limparFormulario() {
+    func clearForm() {
         title = ""
     }
     
-    func salvarAlteracoes() {
+    func saveChanges() {
         do {
             try context.save()
             errorMessage = nil
@@ -65,8 +65,8 @@ final class VacineViewModel {
         }
     }
     
-    func prepararNovaVacina() {
-        limparFormulario()
+    func prepareNewVaccine() {
+        clearForm()
         errorMessage = nil
     }
 }

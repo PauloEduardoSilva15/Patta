@@ -10,7 +10,7 @@ import SwiftUI
 struct SheetTarefa: View {
     @Environment(\.dismiss) var dismiss
     
-    @Environment(TarefaViewModel.self) var viewModel
+    @Environment(TaskViewModel.self) var viewModel
     
     var body: some View {
         @Bindable var viewModelBindable = viewModel
@@ -18,8 +18,8 @@ struct SheetTarefa: View {
             Form {
                 Section("Informações"){
                     
-                    TextField("Nome da Tarefa", text: $viewModelBindable.titulo)
-                    TextField("Descrição", text: $viewModelBindable.descricao)
+                    TextField("Nome da Tarefa", text: $viewModelBindable.title)
+                    TextField("Descrição", text: $viewModelBindable.description)
                 }
             }
             .navigationTitle("Nova Tarefa")
@@ -35,13 +35,13 @@ struct SheetTarefa: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        if viewModel.criarTarefa() {
+                        if viewModel.createTask() {
                             dismiss()
                         }
                     } label: {
                         Image(systemName: "checkmark")
                     }
-                    .disabled(viewModel.titulo.isEmpty)
+                    .disabled(viewModel.title.isEmpty)
                 }
             }
             

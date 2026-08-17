@@ -10,7 +10,7 @@ import SwiftUI
 
 @main
 struct PattaApp: App {
-    @State private var dataController = DataController.compartilhado
+    @State private var dataController = DataController.shared
     
     var body: some Scene {
         WindowGroup {
