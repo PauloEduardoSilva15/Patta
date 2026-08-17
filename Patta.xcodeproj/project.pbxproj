@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3AE30AE130329378008C3973 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE30AE030329366008C3973 /* Search.swift */; };
+		3AE30AE330329DDB008C3973 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE30AE230329DD2008C3973 /* Navigation.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		3A835A11302FB2CD00F934FB /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Patta.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AE1FB9B3033803400C56E87 /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Patta.app; path = "/Users/paulo/Documents/Patta/build/Debug-iphoneos/Patta.app"; sourceTree = "<absolute>"; };
+		3AE30AE030329366008C3973 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		3AE30AE230329DD2008C3973 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +40,9 @@
 			isa = PBXGroup;
 			children = (
 				3A835A13302FB2CD00F934FB /* Patta */,
-				3A835A12302FB2CD00F934FB /* Products */,
+				3AE30AE030329366008C3973 /* Search.swift */,
+				3AE30AE230329DD2008C3973 /* Navigation.swift */,
 			);
-			sourceTree = "<group>";
-		};
-		3A835A12302FB2CD00F934FB /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3A835A11302FB2CD00F934FB /* Patta.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -67,7 +67,7 @@
 			packageProductDependencies = (
 			);
 			productName = Patta;
-			productReference = 3A835A11302FB2CD00F934FB /* Patta.app */;
+			productReference = 3AE1FB9B3033803400C56E87 /* Patta.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +95,7 @@
 			mainGroup = 3A835A08302FB2CD00F934FB;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 3A835A12302FB2CD00F934FB /* Products */;
+			productRefGroup = 3A835A08302FB2CD00F934FB;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -119,6 +119,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3AE30AE130329378008C3973 /* Search.swift in Sources */,
+				3AE30AE330329DDB008C3973 /* Navigation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
