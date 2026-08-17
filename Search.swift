@@ -4,7 +4,7 @@ import SwiftUI
 
 struct Search: View {
     @State var query: String = ""
-        var task: [String] = ["comida","passear", "banho", "tosa"]
+        var task: [String] = ["Comida","Passear", "Banho", "Tosa"]
         
         var namePets: [String] = ["Goku", "Nami", "Totó", "Kratos", "Saitama"]
         
@@ -27,7 +27,7 @@ struct Search: View {
             let filter = allItems.filter {$0.localizedCaseInsensitiveContains(query)}
             
             return filter.sorted { item1, item2 in
-                sortedFilter(item1: item1, item2: item2)
+                sortedFilter(item1: item1.lowercased(), item2: item2.lowercased())
             }
         }
     
@@ -41,6 +41,7 @@ struct Search: View {
                     ForEach(filteredSearch, id: \.self) { search in
                         Text(search)
                     }
+                    
                     
                     if filteredSearch.isEmpty && !query.isEmpty {
                         Text("Nenhum resultado com \"\(query)\" foi encontrado")
