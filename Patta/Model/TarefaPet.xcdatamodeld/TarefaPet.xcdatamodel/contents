@@ -21,13 +21,13 @@
     <entity name="Vaccine" representedClassName=".Vaccine" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="title" attributeType="String"/>
-        <relationship name="history" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="VaccineRegistry" inverseName="vacine" inverseEntity="VaccineRegistry"/>
+        <relationship name="history" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="VaccineRegistry" inverseName="vaccine" inverseEntity="VaccineRegistry"/>
     </entity>
     <entity name="VaccineRegistry" representedClassName=".VaccineRegistry" syncable="YES" codeGenerationType="class">
-        <attribute name="aplicationDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="applicationDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="nextAplication" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="pet" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="vaccineRecords" inverseEntity="Pet"/>
-        <relationship name="vacine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vaccine" inverseName="history" inverseEntity="Vaccine"/>
+        <relationship name="vaccine" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vaccine" inverseName="history" inverseEntity="Vaccine"/>
     </entity>
 </model>
