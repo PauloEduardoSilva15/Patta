@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3AE1FD2A3033B80700C56E87 /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Patta.app; path = "/Users/paulo/Documents/Patta/build/Debug-iphoneos/Patta.app"; sourceTree = "<absolute>"; };
+		3AE1FEEC3034D6F200C56E87 /* Patta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Patta.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE30AE230329DD2008C3973 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -39,6 +39,7 @@
 			children = (
 				3A835A13302FB2CD00F934FB /* Patta */,
 				3AE30AE230329DD2008C3973 /* Navigation.swift */,
+				3AE1FEEC3034D6F200C56E87 /* Patta.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,7 +65,7 @@
 			packageProductDependencies = (
 			);
 			productName = Patta;
-			productReference = 3AE1FD2A3033B80700C56E87 /* Patta.app */;
+			productReference = 3AE1FEEC3034D6F200C56E87 /* Patta.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -251,7 +252,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B6MNDN6V4L;
+				DEVELOPMENT_TEAM = TS232U2UZ2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -264,7 +265,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.claudio.patta.Patta;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paulo.patta.Patta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -287,7 +288,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B6MNDN6V4L;
+				DEVELOPMENT_TEAM = TS232U2UZ2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -300,7 +301,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.claudio.patta.Patta;
+				PRODUCT_BUNDLE_IDENTIFIER = com.paulo.patta.Patta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

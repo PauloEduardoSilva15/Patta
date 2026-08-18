@@ -12,7 +12,7 @@ struct TaskView:View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showSheetTask: Bool = false
     @State var selectedDate = Date()
-    
+    let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
     @FetchRequest(
         entity: Task.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Task.title, ascending: true)],
@@ -36,6 +36,7 @@ struct TaskView:View {
                     .padding()
                 
                 Text(Calendar.current.isDateInToday(selectedDate) ? "Hoje:" : selectedDate.formatted(date: .numeric, time: .omitted)+":")
+                    .multilineTextAlignment(.leading)
                     .bold()
                 
                 List(allTasks, id: \.self) { task in
@@ -54,6 +55,13 @@ struct TaskView:View {
                 }
             }
         }
+        
+        .sheet(isPresented: $showSheetTask) {
+            
+            SheetTarefa()
+                .environment(\.managedObjectContext, context)
+        }
+        
     }
 }
 #Preview {

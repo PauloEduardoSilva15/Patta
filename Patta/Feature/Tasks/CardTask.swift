@@ -18,10 +18,8 @@ struct CardTask: View {
                 Image(systemName: taskIcon)
                     .foregroundStyle(.red)
                 Text(taskTitle)
-                if isPriority {
-                    Image(systemName: "star.fill")
-                        .foregroundStyle(.pink)
-                }
+                Image(systemName: "star.fill")
+                    .foregroundStyle(isPriority ? .pink : .clear)
                 
             }
             Button{
