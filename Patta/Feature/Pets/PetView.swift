@@ -38,9 +38,17 @@ struct PetView: View {
                 
                 List {
                     ForEach(pets) { pet in
-                        Text(pet.name ?? "")
+                        PetCard(pet: pet)
+                            .padding(.bottom)
                     }
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 }
+                .listStyle(.plain)
+                .scrollIndicators(.hidden)
+                .environment(\.defaultMinListRowHeight, 0)
+                .padding()
             }
             .sheet(isPresented: $showSheet) {
                 SheetAddPet()

@@ -8,6 +8,7 @@
 import Foundation
 import Observation
 import CoreData
+import _PhotosUI_SwiftUI
 
 enum ValidationError: Error {
     case emptyProperty
@@ -31,14 +32,14 @@ class PetViewModel {
     var petImage: Data?
     var name: String
     var weight: Int?
-    var breed: String?
+    var breed: String
     var birthdate: Date?
-    var medicalConditions: String?
+    var medicalConditions: String
     var errorMessage = ""
     
     private let context: NSManagedObjectContext
     
-    init(petImage: Data? = nil, name: String, weight: Int? = nil, breed: String? = nil, birthdate: Date? = nil, medicalConditions: String? = nil, context: NSManagedObjectContext) {
+    init(petImage: Data? = nil, name: String, weight: Int? = nil, breed: String = "", birthdate: Date? = nil, medicalConditions: String = "", context: NSManagedObjectContext) {
         self.petImage = petImage
         self.name = name
         self.weight = weight
@@ -83,9 +84,9 @@ class PetViewModel {
     private func insertData(pet: Pet) {
         pet.name = name
         pet.weight = NSDecimalNumber(integerLiteral: weight ?? 0)
-        pet.breed = breed ?? nil
-        pet.birthdate = birthdate ?? nil
-        pet.med_cond = medicalConditions ?? nil
+        pet.breed = breed
+        pet.birthdate = birthdate
+        pet.med_cond = medicalConditions
         pet.image = petImage ?? nil
     }
     
@@ -111,13 +112,25 @@ class PetViewModel {
         }
     }
     
+    func loadImage(from image: PhotosPickerItem?) async -> Data? {
+        errorMessage = ""
+        
+        do {
+            return try await image?.loadTransferable(type: Data.self)
+        } catch {
+            errorMessage = "Não foi possível carregar a foto. Tente novamente."
+        }
+        
+        return nil
+    }
+    
     private func clearForm() {
         name = ""
         weight = nil
         petImage = nil
-        breed = nil
+        breed = ""
         birthdate = nil
-        medicalConditions = nil
+        medicalConditions = ""
         errorMessage = ""
     }
 }

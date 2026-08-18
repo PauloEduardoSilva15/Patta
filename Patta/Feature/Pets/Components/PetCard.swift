@@ -6,13 +6,92 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct PetCard: View {
+    
+    let pet: Pet
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+            Button {
+                
+            }label: {
+                ZStack(alignment: .bottom) {
+                    if pet.image == nil {
+                        Color.accentColor
+                    } else {
+                        if let image = pet.image, let uiImage = UIImage(data: image) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 205)
+                        }
+                    }
+                    
+                    HStack {
+                        Image(systemName: "pawprint.fill")
+                            .font(.system(size: 30))
+                            .padding(.trailing, 5)
+                        
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(pet.name ?? "")
+                                .font(.title.bold())
+                            
+                            HStack {
+                                if (pet.breed != nil || pet.breed != "") && pet.birthdate != nil {
+                                    Text(pet.breed ?? "")
+                                    
+                                    Circle()
+                                        .frame(width: 5, height: 5)
+                                        .clipShape(Circle())
+                                    
+                                    Text("\(getAge(birthdate: pet.birthdate ?? Date.now)) anos")
+                                } else if (pet.breed != nil || pet.breed != "") && pet.birthdate == nil {
+                                    Text(pet.breed ?? "")
+                                } else {
+                                    Text("\(getAge(birthdate: pet.birthdate ?? Date.now)) anos")
+                                }
+                            }
+                            .font(.body)
+                            
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right.circle.fill")
+                            .font(.system(size: 25))
+                            .foregroundStyle(.button)
+                            .symbolRenderingMode(.monochrome)
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
+                    .background(.ultraThinMaterial)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
+    }
+    
+    private func getAge(birthdate: Date) -> String {
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: birthdate, to: Date())
+        return String(ageComponents.year!)
     }
 }
 
 #Preview {
-    PetCard()
+    let context = DataController.shared.container.viewContext
+    let pet = Pet(context: context)
+    
+    pet.name = "Toto"
+    pet.breed = "Beagle"
+    let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
+    pet.birthdate = myPetBirthdate
+    
+    if let uiImage = UIImage(named: "ImageTest") {
+        pet.image = uiImage.pngData()
+    }
+    
+    return PetCard(pet: pet)
 }
