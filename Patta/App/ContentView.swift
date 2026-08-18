@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var contexto
     var body: some View {
-        TesteTarefa(contexto: contexto)
+        Navigation()
     }
 }
 

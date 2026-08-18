@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct Navigation: View {
+    @Environment(\.managedObjectContext) private var context
+    
     var body: some View {
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
-                                
+                TesteTarefa(context: context)
             }
             Tab("Pets", systemImage: "pawprint.fill"){
                                 
@@ -25,7 +28,8 @@ struct Navigation: View {
     
 }
 
-
 #Preview {
     Navigation()
 }
+
+
