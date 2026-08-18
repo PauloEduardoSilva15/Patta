@@ -31,7 +31,6 @@ struct TaskSheet: View {
                             Text($0.title)
                         }
                     }
-//                    .tint(.accent)
                     
                 }
                 
