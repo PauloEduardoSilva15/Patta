@@ -18,6 +18,7 @@ struct CardTask: View {
                 Image(systemName: taskIcon)
                     .foregroundStyle(.red)
                 Text(taskTitle)
+                    .frame(width: 100)
                 Image(systemName: "star.fill")
                     .foregroundStyle(isPriority ? .pink : .clear)
                 

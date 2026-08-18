@@ -15,15 +15,11 @@ struct Navigation: View {
         
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
-                /*NavigationStack{
-                    Task()
-                }*/
-                
-                TesteTarefa(context: context)
-                
+                NavigationStack{
+                    TaskView()
+                }
             }
             Tab("Pets", systemImage: "pawprint.fill"){
-                
             }
             Tab(role: .search){
                 NavigationStack{

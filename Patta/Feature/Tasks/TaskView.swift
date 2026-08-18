@@ -11,20 +11,19 @@ import CoreData
 struct TaskView:View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showSheetTask: Bool = false
+    @State private var showSheetFilter: Bool = false
     @State var selectedDate = Date()
     let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
     @FetchRequest(
         entity: Task.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Task.title, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)],
         
     ) var tasks: FetchedResults<Task>
     
-    var allTasks: [String] {
-        var items: [String] = []
+    var allTasks: [Task] {
+        var items: [Task] = []
         for task in tasks {
-            if let name = task.title {
-                items.append(name)
-            }
+            items.append(task)
         }
         return items
     }
@@ -39,30 +38,52 @@ struct TaskView:View {
                     .multilineTextAlignment(.leading)
                     .bold()
                 
+                
+                
                 List(allTasks, id: \.self) { task in
-                    //CardTask(taskTitle: task, taskIcon: <#T##String#>, isMarked: <#T##Bool#>, isPriority: <#T##Bool#>)
+                    CardTask(taskTitle: task.title ?? "aaa", taskIcon: "heart", isMarked: false, isPriority: task.isPriority)
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                
+                            } label: {
+                                Label("Editar", systemImage: "pencil")
+                            }
+                        }
+                    
                 }
             }
             
         }
         .navigationTitle("Tarefa")
         .toolbar {
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showSheetFilter.toggle()
+                } label: {
+                    Image(systemName: "line.horizontal.3.decrease")
+                }.buttonStyle(.glassProminent)
+                
+                
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     showSheetTask.toggle()
                 } label: {
                     Image(systemName: "plus")
-                }
+                }.buttonStyle(.glassProminent)
             }
         }
         
         .sheet(isPresented: $showSheetTask) {
-            
-            SheetTarefa()
-                .environment(\.managedObjectContext, context)
+        }
+        .sheet(isPresented: $showSheetFilter) {
+            TaskFilter()
         }
         
     }
+    
+
 }
 #Preview {
     NavigationStack {
