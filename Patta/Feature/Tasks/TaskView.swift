@@ -35,11 +35,11 @@ struct TaskView:View {
                 WeekCalendar(selectedDate: $selectedDate)
                     .padding()
                 
-                Text(Calendar.current.isDateInToday(selectedDate) ? "Hoje" : selectedDate.formatted(date: .numeric, time: .omitted))
+                Text(Calendar.current.isDateInToday(selectedDate) ? "Hoje:" : selectedDate.formatted(date: .numeric, time: .omitted)+":")
                     .bold()
                 
                 List(allTasks, id: \.self) { task in
-                    Text(task)
+                    //CardTask(taskTitle: task, taskIcon: <#T##String#>, isMarked: <#T##Bool#>, isPriority: <#T##Bool#>)
                 }
             }
             
