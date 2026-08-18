@@ -12,10 +12,15 @@
         <relationship name="vaccineRecords" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="VaccineRegistry" inverseName="pet" inverseEntity="VaccineRegistry"/>
     </entity>
     <entity name="Task" representedClassName=".Task" syncable="YES" codeGenerationType="class">
+        <attribute name="category" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="desc" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isPriority" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isRecurring" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="title" attributeType="String"/>
+        <attribute name="usesCustomDate" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="pet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pet" inverseName="tasks" inverseEntity="Pet"/>
     </entity>
     <entity name="Vaccine" representedClassName=".Vaccine" syncable="YES" codeGenerationType="class">
