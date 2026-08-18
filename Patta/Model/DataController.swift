@@ -30,28 +30,3 @@ class DataController {
         
     }
 }
-
-extension DataController {
-    func save() throws {
-        guard container.viewContext.hasChanges else { return }
-        
-        do {
-            try container.viewContext.save()
-        } catch {
-            print("Falha ao salvar o contexto: \(error.localizedDescription)")
-        }
-    }
-    
-    func delete(object: NSManagedObject) {
-        
-        container.viewContext.delete(object)
-        
-        do {
-           try save()
-        } catch {
-            container.viewContext.rollback()
-            print("Falha ao deletar o objeto: \(error.localizedDescription)")
-        }
-    }
-}
-
