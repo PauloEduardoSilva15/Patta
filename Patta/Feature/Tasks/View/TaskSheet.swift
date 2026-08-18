@@ -11,6 +11,7 @@ struct TaskSheet: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(TaskViewModel.self) var taskViewModel
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)]) var pets: FetchedResults<Pet>
     
     var body: some View {
         @Bindable var taskViewModel = taskViewModel
@@ -21,7 +22,16 @@ struct TaskSheet: View {
                 TextField("Descrição", text: $taskViewModel.description)
                 
                 Section {
-                    Text("Pet")
+                    Picker(selection: $taskViewModel.selectedPet, label: Text("Pets")) {
+                        
+                        Text("Todos")
+                            .tag(nil as Pet?)
+                        
+                        ForEach(pets, id: \.self) { pet in
+                            Text(pet.name ?? "Pet sem nome")
+                                .tag(Optional(pet))
+                        }
+                    }
                 }
                 
                 Section {
@@ -95,8 +105,12 @@ struct TaskSheet: View {
 #Preview {
     let dataController = DataController.shared
     let context = dataController.container.viewContext
-    
-    TaskSheet()
+    let pet1 = Pet(context: context)
+    pet1.name = "Goku"
+    let pet2 = Pet(context: context)
+    pet2.name = "Nami"
+   
+    return TaskSheet()
         .environment(TaskViewModel(context: context))
         .environment(\.managedObjectContext, context)
 }
