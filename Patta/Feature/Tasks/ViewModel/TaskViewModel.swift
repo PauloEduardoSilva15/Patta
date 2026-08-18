@@ -29,7 +29,7 @@ final class TaskViewModel {
     }
     
     var formTitle: String {
-        isEditing ? "Editar tarefa" : "Nova tarefa"
+        isEditing ? "Editar Tarefa" : "Nova Tarefa"
     }
     
     init(context: NSManagedObjectContext) {
@@ -135,7 +135,6 @@ final class TaskViewModel {
             errorMessage = nil
         } catch {
             context.rollback()
-            
             errorMessage = "Não foi possível apagar a tarefa: \(error.localizedDescription)"
         }
     }
@@ -150,5 +149,52 @@ final class TaskViewModel {
         isPriority = false
         isRecurring = false
         errorMessage = nil
+    }
+    
+    private func nextDailyDate(after scheduledDate: Date, relativeTo now: Date) -> Date? {
+        let calendar = Calendar.current
+        var nextDate = scheduledDate
+        
+        repeat {
+            guard let calculatedDate = calendar.date(byAdding: .day, value: 1, to: nextDate) else {
+                return nil
+            }
+            nextDate = calculatedDate
+        } while nextDate <= now
+        
+        return nextDate
+    }
+    
+    func completeTask(_ task: Task) {
+        
+        guard task.managedObjectContext === context else {
+            errorMessage = "A tarefa e a ViewModel estão usando contextos diferentes."
+            return
+        }
+        
+        let now = Date()
+        
+        if task.isRecurring {
+            let currentDate = task.date ?? now
+            
+            guard let nextDate = nextDailyDate(after: currentDate, relativeTo: now) else {
+                errorMessage = "Não foi possível calcular a próxima data."
+                return
+            }
+            
+            task.date = nextDate
+            task.isComplete = false
+        } else {
+            task.isComplete = true
+            task.completedAt = now
+        }
+        
+        do {
+            try context.save()
+            errorMessage = nil
+        } catch {
+            context.rollback()
+            errorMessage = "Não foi possível marcar a tarefa como concluída: \(error.localizedDescription)"
+        }
     }
 }
