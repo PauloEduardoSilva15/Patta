@@ -29,7 +29,7 @@ final class TaskViewModel {
     }
     
     var formTitle: String {
-        isEditing ? "Editar tarefa" : "Nova tarefa"
+        isEditing ? "Editar Tarefa" : "Nova Tarefa"
     }
     
     init(context: NSManagedObjectContext) {

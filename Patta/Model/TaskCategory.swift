@@ -29,6 +29,7 @@ enum TaskCategory: String, CaseIterable, Identifiable {
         case .vacinacao:
             return "Vacinações"
         case .acompanhamentoMedico:
+            return "Acompanhamento Médico"
         }
     }
     
