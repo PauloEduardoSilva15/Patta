@@ -49,7 +49,7 @@ struct TesteTarefa: View {
                 }
             }
             .sheet(isPresented: $showTaskSheet) {
-                SheetTarefa()
+                TaskSheet()
                     .environment(viewModel)
             }
         }
