@@ -131,6 +131,9 @@ struct SheetAddPet: View {
             .scrollDismissesKeyboard(.interactively)
             .animation(.snappy, value: willSetBirthdate)
         }
+        .onDisappear {
+            viewModel.clearForm()
+        }
     }
 }
 

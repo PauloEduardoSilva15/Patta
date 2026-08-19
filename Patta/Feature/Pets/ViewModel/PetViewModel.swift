@@ -49,6 +49,12 @@ class PetViewModel {
         self.context = context
     }
     
+    func getAge(birthdate: Date) -> String {
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: birthdate, to: Date())
+        return String(ageComponents.year!)
+    }
+    
     func addNewPet() throws {
         
         guard !name.isEmpty else {
@@ -124,7 +130,7 @@ class PetViewModel {
         return nil
     }
     
-    private func clearForm() {
+    func clearForm() {
         name = ""
         weight = nil
         petImage = nil

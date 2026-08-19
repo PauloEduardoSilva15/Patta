@@ -25,9 +25,9 @@ struct CompletedTasks: View {
         NavigationStack {
             List {
                 ForEach(completedTasks) { task in
-                    LineTask(task: task) {
+                    LineTask(task: task, onComplete: {
                         viewModel.completeTask(task)
-                    }
+                    } ) { TaskDetails()}
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                     .listRowInsets(

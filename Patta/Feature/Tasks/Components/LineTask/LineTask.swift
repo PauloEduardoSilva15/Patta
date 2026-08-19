@@ -8,12 +8,12 @@
 import CoreData
 import SwiftUI
 
-struct LineTask: View {
+struct LineTask<Destination: View>: View {
     
     @ObservedObject var task: Task
-    @State private var isShowingTaskSheet = false
     
     let onComplete: () -> Void
+    let destination: () -> Destination
     
     private var petName: String {
         if task.appliesToAllPets {
@@ -24,70 +24,100 @@ struct LineTask: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
-            Circle()
-                .fill(.photoGray)
-                .frame(width: 65, height: 65)
-                .overlay {
-                    Image(systemName: "pawprint.fill")
-                        .foregroundStyle(.accent)
-                        .font(.title)
-                }
+        HStack(spacing: 0) {
             
-            VStack (alignment: .leading ,spacing: 8){
-                Text(task.title ?? "Título da tarefa")
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
-                    .allowsTightening(true)
-                    .fixedSize(horizontal: false, vertical: true)
-                
-                Capsule()
-                    .fill(.blue)
-                    .frame(width: 70, height: 25)
-                    .overlay {
-                        Text(petName)
-                            .font(.footnote)
+            NavigationLink {
+                destination()
+            } label: {
+                HStack(spacing: 12) {
+                    Circle()
+                        .fill(.photoGray)
+                        .frame(width: 65, height: 65)
+                        .overlay {
+                            Image(systemName: "pawprint.fill")
+                                .foregroundStyle(.accent)
+                                .font(.title)
+                        }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(task.title ?? "Título da tarefa")
+                            .font(.body)
                             .fontWeight(.medium)
-                            .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.75)
+                            .allowsTightening(true)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        Capsule()
+                            .fill(.blue)
+                            .frame(width: 70, height: 25)
+                            .overlay {
+                                Text(petName)
+                                    .font(.footnote)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.white)
+                            }
                     }
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                .padding(.trailing, 12)
             }
+            .navigationLinkIndicatorVisibility(.hidden)
+            .buttonStyle(.plain)
             
-            Spacer()
-            
-            Button(action: onComplete){
-                
-                Image(systemName: task.isComplete ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 25))
-                    .foregroundStyle(.accent)
-                    .frame(width: 44, height: 44)
-                
+            Button(action: onComplete) {
+                Image(
+                    systemName: task.isComplete
+                    ? "checkmark.circle.fill"
+                    : "circle"
+                )
+                .font(.system(size: 25))
+                .foregroundStyle(.accent)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
-        .frame(maxWidth:.infinity)
+        .frame(maxWidth: .infinity)
         .frame(height: 100)
         .padding(.horizontal, 8)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(uiColor: .secondarySystemGroupedBackground))
+                .fill(
+                    Color(
+                        uiColor: .secondarySystemGroupedBackground
+                    )
+                )
         }
     }
 }
+
 #Preview {
     let task: Task = {
         let context = DataController.shared.container.viewContext
         let task = Task(context: context)
-        task.title = "Dar comida e depois ir no mercado comprar tapetinho"
+        
+        task.title = """
+        Dar comida e depois ir no mercado comprar tapetinho
+        """
+        
         task.appliesToAllPets = true
+        
         return task
     }()
     
-    LineTask(task: task) {}
+    NavigationStack {
+        LineTask(
+            task: task,
+            onComplete: {}
+        ) {
+            TaskDetails()
+        }
         .padding(8)
         .background {
             Color(.background)
-            
         }
+    }
 }
