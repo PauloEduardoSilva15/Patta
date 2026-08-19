@@ -10,7 +10,7 @@ import CoreData
 
 struct TaskView:View {
     @State private var viewModel: TaskViewModel
-    @State private var showSheetTask: Bool = false
+    @State private var showTaskSheet: Bool = false
     @State private var showSheetFilter: Bool = false
     @State var selectedDate = Date()
     init(context: NSManagedObjectContext) {
@@ -18,17 +18,42 @@ struct TaskView:View {
     }
     @FetchRequest(
         entity: Task.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Task.id, ascending: true)],
         
     ) var tasks: FetchedResults<Task>
     
+    @FetchRequest(
+        entity: Pet.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)],
+        
+    ) var pets: FetchedResults<Pet>
     
+    var allPets: [Pet]{
+        var items: [Pet] = []
+        for pet in pets {
+            items.append(pet)
+        }
+        return items
+    }
     
     
     var allTasks: [Task] {
         var items: [Task] = []
         for task in tasks {
             items.append(task)
+        }
+        return items
+    }
+    
+    var allTasksinDay: [Task]{
+        var items: [Task] = []
+        let calendar = Calendar.current
+        for task in allTasks{
+            let taskDate = task.date ?? Date()
+            if calendar.isDate(taskDate, inSameDayAs: selectedDate){
+                items.append(task)
+            }
+            
         }
         return items
     }
@@ -45,11 +70,19 @@ struct TaskView:View {
                 
                 
                 
-                List(allTasks, id: \.self) { task in
-                    
+                List(allTasksinDay, id: \.self) { task in
                     LineTask(task: task){
                         
-                    }
+                    } .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button (role: .destructive){
+                                viewModel.deleteTask(task)
+                            } label: {
+                                Label("Deletar", systemImage: "trash")
+                            }
+                        }
                 }
             }
             
@@ -62,20 +95,21 @@ struct TaskView:View {
                     showSheetFilter.toggle()
                 } label: {
                     Image(systemName: "line.horizontal.3.decrease")
-                }.buttonStyle(.glassProminent)
+                }.buttonStyle(.glass)
                 
                 
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    showSheetTask.toggle()
+                    showTaskSheet.toggle()
                 } label: {
                     Image(systemName: "plus")
                 }.buttonStyle(.glassProminent)
+                
             }
         }
         
-        .sheet(isPresented: $showSheetTask) {
+        .sheet(isPresented: $showTaskSheet) {
             NavigationStack{
                 TaskSheet()
                     .environment(viewModel)
@@ -83,9 +117,7 @@ struct TaskView:View {
             
                 
         }
-        .sheet(isPresented: $showSheetFilter) {
-            TaskFilter()
-        }
+        
         
     }
     

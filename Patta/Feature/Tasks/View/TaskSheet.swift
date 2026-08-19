@@ -34,15 +34,6 @@ struct TaskSheet: View {
                     }
                 }
                 
-                Section {
-                    
-                    Picker(selection: $taskViewModel.selectedCategory, label: Text("Categoria")) {
-                        ForEach(TaskCategory.allCases, id: \.self) {
-                            Text($0.title)
-                        }
-                    }
-                    
-                }
                 
                 Section {
                     Toggle("Agendar Tarefa", isOn: $taskViewModel.usesCustomDate)
