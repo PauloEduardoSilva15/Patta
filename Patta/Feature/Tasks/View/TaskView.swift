@@ -71,8 +71,8 @@ struct TaskView:View {
                 
                 
                 List(allTasksinDay, id: \.self) { task in
-                    LineTask(task: task){
-                        
+                    LineTask(task: task,onComplete: {}){
+                        TaskDetails()
                     } .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
