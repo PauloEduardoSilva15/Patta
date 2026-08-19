@@ -17,10 +17,14 @@ struct Navigation: View {
                 TesteTarefa()
             }
             Tab("Pets", systemImage: "pawprint.fill"){
-                PetView()
+                NavigationStack {
+                    PetView()
+                }
             }
             Tab(role: .search){
-                Search()
+                NavigationStack{
+                    Search()
+                }
             }
         }
     }

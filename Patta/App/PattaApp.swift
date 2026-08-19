@@ -25,8 +25,10 @@ struct PattaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(dataController)
                 .environment(taskViewModel)
-                   .environment(\.managedObjectContext, dataController.container.viewContext)
+                .environment(petViewModel)
+                .environment(\.managedObjectContext, dataController.container.viewContext)
         }
     }
 }

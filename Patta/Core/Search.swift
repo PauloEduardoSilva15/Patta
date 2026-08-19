@@ -5,7 +5,7 @@ import CoreData
 
 struct Search: View {
     @State var query: String = ""
-    
+    @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         entity: Pet.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)],
@@ -17,8 +17,6 @@ struct Search: View {
         
     ) var tasks: FetchedResults<Task>
     
-    @Environment(\.managedObjectContext) private var viewContext
-        
     func sortedFilter(item1: String, item2: String)-> Bool {
         let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
         let item2StartsWith = item2.localizedCaseInsensitiveContains(query) && item2.hasPrefix(query.lowercased())
@@ -60,38 +58,32 @@ struct Search: View {
     }
     
     public var body: some View {
-        VStack{
-            Text("Pesquisar:")
-                .font(.title)
-            NavigationStack{
+        NavigationStack{
+            Text("Aqui você encontra tudo que precisar!")
+                .multilineTextAlignment(.leading)
+            List{
+                ForEach(filteredSearch, id: \.self) { search in
+                    Text(search)
+                }
+                
+                
+                if filteredSearch.isEmpty && !query.isEmpty {
+                    Text("Nenhum resultado com \"\(query)\" foi encontrado")
+                }
                         
-                List{
-                    ForEach(filteredSearch, id: \.self) { search in
-                        Text(search)
-                    }
-                    
-                    
-                    if filteredSearch.isEmpty && !query.isEmpty {
-                        Text("Nenhum resultado com \"\(query)\" foi encontrado")
-                    }
-                            
-                }.searchable(text: $query)
-                .searchDictationBehavior(.inline(activation: .onSelect))
-            }
-        }
+            }.searchable(text: $query)
+            .searchDictationBehavior(.inline(activation: .onSelect))
+        }.navigationTitle("Pesquisar")
+            
     }
 }
 
 #Preview {
     let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-    Search()
-        .environment(\.managedObjectContext, context)
+    NavigationStack{
+        Search()
+            .environment(\.managedObjectContext, context)
+    }
+    
 }
 
-/*
- Obsv para po grupo: O código contém uma aplicação do sistema de busca
- para isso ele usa a .searcheable junto para filtrar as palavras que vão aparecer na tela como um outro algoritimo que procura as palavras que começam com o que você escreveu na tabbar
-    a função localizedCaseInsensitiveContains permite localizar com case sensitive
- 
- 
- */
