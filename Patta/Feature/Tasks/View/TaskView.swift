@@ -92,7 +92,7 @@ struct TaskView:View {
                 
                 
                 
-                List(allTasksinDay, id: \.self) { task in
+                List(allTaskInPet, id: \.self) { task in
                     LineTask(task: task, onOpenDetails: {
                         viewModel.prepareToEdit(task)
                         showTaskSheet = true
