@@ -16,6 +16,7 @@ final class TaskViewModel {
     var errorMessage: String?
     var date = Date()
     var usesCustomDate = false
+    var selectedPet: Pet?
     var selectedCategory: TaskCategory = .alimentacao
     var isPriority = false
     var isRecurring = false
@@ -64,6 +65,15 @@ final class TaskViewModel {
         
         task.title = treatedTitle
         task.desc = description.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if let selectedPet {
+            guard selectedPet.managedObjectContext === context else {
+                errorMessage = "O pet e a ViewModel estão usando contextos diferentes."
+                return false
+            }
+        }
+        task.appliesToAllPets = selectedPet == nil
+        task.pet = selectedPet
         task.usesCustomDate = usesCustomDate
         
         if usesCustomDate {
@@ -107,6 +117,12 @@ final class TaskViewModel {
             return
         }
         
+        if task.appliesToAllPets {
+            selectedPet = nil
+        } else {
+            selectedPet = task.pet
+        }
+        
         taskBeingEdited = task
         title = task.title ?? ""
         description = task.desc ?? ""
@@ -143,6 +159,7 @@ final class TaskViewModel {
         taskBeingEdited = nil
         title = ""
         description = ""
+        selectedPet = nil
         date = Date()
         usesCustomDate = false
         selectedCategory = .alimentacao

@@ -12,7 +12,6 @@ struct Navigation: View {
     @Environment(\.managedObjectContext) private var context
     
     var body: some View {
-        
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
                 NavigationStack{
@@ -20,6 +19,7 @@ struct Navigation: View {
                 }
             }
             Tab("Pets", systemImage: "pawprint.fill"){
+                PetView()
             }
             Tab(role: .search){
                 NavigationStack{
