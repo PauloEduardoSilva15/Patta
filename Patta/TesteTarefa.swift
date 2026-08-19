@@ -20,22 +20,36 @@ struct TesteTarefa: View {
     
     var body: some View {
         NavigationStack {
-            
             List{
-                Text("Quantidade: \(tasks.count)")
                 ForEach(tasks) { task in
-                    taskLine(task)
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                viewModel.prepareToEdit(task)
-                                showTaskSheet = true
-                            } label: {
-                                Label("Editar", systemImage: "pencil")
-                            }
+                    LineTask(task: task, onComplete: {
+                        viewModel.completeTask(task)
+                    })
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button {
+                            viewModel.prepareToEdit(task)
+                            showTaskSheet.toggle()
+                        } label: {
+                            Label("Ver detalhes", systemImage: "info")
                         }
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button (role: .destructive){
+                            viewModel.deleteTask(task)
+                        } label: {
+                            Label("Deletar", systemImage: "trash")
+                        }
+                    }
                 }
-                .onDelete(perform: deleteTasks)
-                
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background {
+                Color(.background)
+                    .ignoresSafeArea(edges: .all)
             }
             .navigationTitle("Tarefas")
             .toolbar {
@@ -56,27 +70,32 @@ struct TesteTarefa: View {
     }
     
     private func taskLine(_ task: Task) -> some View {
-            HStack {
-
-                VStack(alignment: .leading) {
-                    Text(task.title!)
-
-                    if let description = task.desc,
-                       !description.isEmpty {
-                        Text(description)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+        HStack {
+            
+            VStack(alignment: .leading) {
+                Text(task.title!)
+                
+                if let description = task.desc,
+                   !description.isEmpty {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
-
-        private func deleteTasks(at offsets: IndexSet) {
-            for index in offsets {
-                viewModel.deleteTask(tasks[index])
-            }
+    }
+    
+    private func deleteTasks(at offsets: IndexSet) {
+        for index in offsets {
+            viewModel.deleteTask(tasks[index])
         }
+    }
 }
 #Preview {
-//    TesteTarefa()
+    let dataController = DataController.shared
+    let context = dataController.container.viewContext
+    
+    TesteTarefa(context: context)
+        .environment(\.managedObjectContext, context)
+    
 }
