@@ -13,6 +13,8 @@ struct PattaApp: App {
     @State private var dataController: DataController
     @State private var petViewModel: PetViewModel
     @State private var taskViewModel: TaskViewModel
+    @State private var vaccineRegistryViewModel: VaccineRegistryViewModel
+    @State private var vaccineViewModel: VaccineViewModel
     
     init() {
         let controller = DataController.shared
@@ -20,6 +22,8 @@ struct PattaApp: App {
         _dataController = .init(initialValue: controller)
         _petViewModel = .init(initialValue: PetViewModel(name: "", context: context))
         _taskViewModel = .init(initialValue: TaskViewModel(context: context))
+        _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(context: context))
+        _vaccineViewModel = .init(initialValue: VaccineViewModel(context: context))
     }
     
     var body: some Scene {
@@ -27,6 +31,8 @@ struct PattaApp: App {
             ContentView()
                 .environment(dataController)
                 .environment(petViewModel)
+                .environment(vaccineViewModel)
+                .environment(vaccineRegistryViewModel)
                 .environment(\.managedObjectContext, dataController.container.viewContext)
         }
     }

@@ -14,6 +14,15 @@ struct FocusedPetView: View {
     let viewModel: PetViewModel
     
     @State private var selectedTab: PetTab = .info
+    @State private var openSheet = false
+    
+    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
+    
+    init(pet: Pet, viewModel: PetViewModel) {
+        self.pet = pet
+        self.viewModel = viewModel
+        _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet))
+    }
     
     var body: some View {
         ZStack {
@@ -39,7 +48,14 @@ struct FocusedPetView: View {
                         if selectedTab == .info {
                             PetInformationView(pet: pet, viewModel: viewModel)
                         } else {
-                            
+                            if registries.isEmpty {
+                                Text("Não há vacinas registradas.")
+                                    .padding(.vertical, 30)
+                            } else {
+                                ForEach(registries) { registry in
+                                    VaccineCardHistory(vaccineRegistry: registry)
+                                }
+                            }
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -48,6 +64,24 @@ struct FocusedPetView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            if selectedTab == .vaccines {
+                VStack(alignment: .trailing) {
+                    Button {
+                        openSheet.toggle()
+                    }label: {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    }
+                    .buttonStyle(.plain)
+                    .frame(width: 44, height: 44)
+                    .glassEffect(.regular.tint(.accent).interactive())
+                }
+                .padding(.vertical, 40)
+                .padding(.horizontal, 40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -59,6 +93,9 @@ struct FocusedPetView: View {
             }
         }
         .toolbar(.hidden, for: .tabBar)
+        .sheet(isPresented: $openSheet) {
+            VaccineRegistrySheet(pet: pet)
+        }
     }
 }
 
