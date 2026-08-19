@@ -25,7 +25,7 @@ struct PendingTasks: View {
                 ForEach(tasks) { task in
                     LineTask(task: task, onComplete: {
                         viewModel.completeTask(task)
-                    })
+                    } ) { TaskDetails()}
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
@@ -48,25 +48,13 @@ struct PendingTasks: View {
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            .background {
-                Color(.background)
-                    .ignoresSafeArea(edges: .all)
-            }
-            .navigationTitle("Tarefas")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.prepareNewTask()
-                        showTaskSheet.toggle()
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-            .sheet(isPresented: $showTaskSheet) {
-                TaskSheet()
-                    .environment(viewModel)
-            }
+            
         }
     }
+}
+#Preview {
+    let dataController = DataController.shared
+    let context = dataController.container.viewContext
+    
+    PendingTasks(context:  context )
 }

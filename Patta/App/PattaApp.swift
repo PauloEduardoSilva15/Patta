@@ -12,11 +12,14 @@ import SwiftUI
 struct PattaApp: App {
     @State private var dataController: DataController
     @State private var petViewModel: PetViewModel
+    @State private var taskViewModel: TaskViewModel
     
     init() {
         let controller = DataController.shared
+        let context = controller.container.viewContext
         _dataController = .init(initialValue: controller)
-        _petViewModel = .init(initialValue: PetViewModel(name: "", context: controller.container.viewContext))
+        _petViewModel = .init(initialValue: PetViewModel(name: "", context: context))
+        _taskViewModel = .init(initialValue: TaskViewModel(context: context))
     }
     
     var body: some Scene {
