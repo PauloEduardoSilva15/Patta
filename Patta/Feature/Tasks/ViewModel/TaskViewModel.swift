@@ -17,7 +17,6 @@ final class TaskViewModel {
     var date = Date()
     var usesCustomDate = false
     var selectedPet: Pet?
-    var selectedCategory: TaskCategory = .alimentacao
     var isPriority = false
     var isRecurring = false
     
@@ -83,7 +82,6 @@ final class TaskViewModel {
             
         }
         
-        task.taskCategory = selectedCategory
         task.isPriority = isPriority
         task.isRecurring = isRecurring
         
@@ -128,7 +126,6 @@ final class TaskViewModel {
         description = task.desc ?? ""
         date = task.date ?? Date()
         usesCustomDate = task.usesCustomDate
-        selectedCategory = task.taskCategory ?? .alimentacao
         isPriority = task.isPriority
         isRecurring = task.isRecurring
         errorMessage = nil
@@ -162,7 +159,6 @@ final class TaskViewModel {
         selectedPet = nil
         date = Date()
         usesCustomDate = false
-        selectedCategory = .alimentacao
         isPriority = false
         isRecurring = false
         errorMessage = nil
