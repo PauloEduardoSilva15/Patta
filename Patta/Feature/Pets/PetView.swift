@@ -37,7 +37,7 @@ struct PetView: View {
             
             List {
                 ForEach(pets) { pet in
-                    PetCard(pet: pet)
+                    PetCard(pet: pet, viewModel: viewModel)
                         .padding(.bottom)
                 }
                 .listRowInsets(EdgeInsets())
