@@ -19,6 +19,7 @@ struct PetCard: View {
                 ZStack(alignment: .bottom) {
                     if pet.image == nil {
                         Color.accentColor
+                            .frame(height: 205)
                     } else {
                         if let image = pet.image, let uiImage = UIImage(data: image) {
                             Image(uiImage: uiImage)
@@ -39,7 +40,7 @@ struct PetCard: View {
                                 .font(.title.bold())
                             
                             HStack {
-                                if (pet.breed != nil || pet.breed != "") && pet.birthdate != nil {
+                                if !(pet.breed ?? "").isEmpty && pet.birthdate != nil {
                                     Text(pet.breed ?? "")
                                     
                                     Circle()
@@ -47,7 +48,7 @@ struct PetCard: View {
                                         .clipShape(Circle())
                                     
                                     Text("\(getAge(birthdate: pet.birthdate ?? Date.now)) anos")
-                                } else if (pet.breed != nil || pet.breed != "") && pet.birthdate == nil {
+                                } else if !(pet.breed ?? "").isEmpty && pet.birthdate == nil {
                                     Text(pet.breed ?? "")
                                 } else {
                                     Text("\(getAge(birthdate: pet.birthdate ?? Date.now)) anos")
