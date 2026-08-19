@@ -14,9 +14,7 @@ struct Navigation: View {
     var body: some View {
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
-                NavigationStack{
-                    TesteTarefa(context: context)
-                }
+//                TesteTarefa(context: context)
             }
             Tab("Pets", systemImage: "pawprint.fill"){
                 PetView()
