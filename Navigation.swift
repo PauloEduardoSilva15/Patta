@@ -15,6 +15,10 @@ struct Navigation: View {
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
 //                TesteTarefa(context: context)
+                NavigationStack{
+                    TaskView(context: context)
+                }
+                
             }
             Tab("Pets", systemImage: "pawprint.fill"){
                 PetView()

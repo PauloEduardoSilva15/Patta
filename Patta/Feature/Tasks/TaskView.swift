@@ -47,15 +47,8 @@ struct TaskView:View {
                 
                 List(allTasks, id: \.self) { task in
                     
-                    if task.date == selectedDate{
-                        CardTask(taskTitle: task.title ?? "Tarefa Sem Nome", taskIcon: "heart", isMarked: false, isPriority: task.isPriority)
-                            .swipeActions(edge: .leading) {
-                                Button {
-                                    
-                                } label: {
-                                    Label("Editar", systemImage: "pencil")
-                                }
-                            }
+                    LineTask(task: task){
+                        
                     }
                 }
             }
@@ -98,3 +91,5 @@ struct TaskView:View {
     
 
 }
+
+
