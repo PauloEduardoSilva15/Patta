@@ -13,6 +13,7 @@ struct TaskView:View {
     @State private var showTaskSheet: Bool = false
     @State private var showSheetFilter: Bool = false
     @State var selectedDate = Date()
+    @State var selectedPet: Pet?
     init(context: NSManagedObjectContext) {
         _viewModel = State(initialValue: TaskViewModel(context: context))
     }
@@ -37,6 +38,8 @@ struct TaskView:View {
     }
     
     
+    
+    
     var allTasks: [Task] {
         var items: [Task] = []
         for task in tasks {
@@ -58,6 +61,25 @@ struct TaskView:View {
         return items
     }
     
+    var allTaskInPet: [Task]{
+        var items: [Task] = []
+        
+        if selectedPet == nil {
+            for task in allTasksinDay{
+                items.append(task)
+            }
+            return items
+        }
+        for task in allTasksinDay{
+            if task.pet == selectedPet{
+                items.append(task)
+            }
+            
+        }
+        return items
+    }
+    
+    
     var body: some View {
         NavigationStack{
             VStack {
@@ -70,7 +92,7 @@ struct TaskView:View {
                 
                 
                 
-                List(allTasksinDay, id: \.self) { task in
+                List(allTaskInPet, id: \.self) { task in
                     LineTask(task: task,onComplete: {}){
                         TaskDetails()
                     } .listRowSeparator(.hidden)
@@ -89,14 +111,36 @@ struct TaskView:View {
         }
         .navigationTitle("Tarefa")
         .toolbar {
-            
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showSheetFilter.toggle()
-                } label: {
+                Menu{
+                    Button{
+                        selectedPet = nil
+                    }label: {
+                        HStack{
+                            Text("Todos")
+                            if(selectedPet == nil){
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                    ForEach(allPets, id: \.self){ pet in
+                        Button{
+                            selectedPet = pet
+                        }label: {
+                            HStack{
+                                Text((pet.name ?? "Sem Nome"))
+                                if selectedPet != nil && selectedPet == pet {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            
+                            
+                        }
+                        
+                    }
+                }label: {
                     Image(systemName: "line.horizontal.3.decrease")
                 }.buttonStyle(.glass)
-                
                 
             }
             ToolbarItem(placement: .navigationBarTrailing) {
