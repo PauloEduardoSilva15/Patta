@@ -14,15 +14,10 @@ struct Navigation: View {
     var body: some View {
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
-<<<<<<< HEAD
 //                TesteTarefa(context: context)
                 NavigationStack{
                     TaskView(context: context)
                 }
-                
-=======
-                TesteTarefa(context: context)
->>>>>>> Dev
             }
             Tab("Pets", systemImage: "pawprint.fill"){
                 NavigationStack {
