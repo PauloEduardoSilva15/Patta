@@ -9,16 +9,21 @@ import SwiftUI
 import CoreData
 
 struct TaskView:View {
-    @Environment(\.managedObjectContext) private var viewContext
+    @State private var viewModel: TaskViewModel
     @State private var showSheetTask: Bool = false
     @State private var showSheetFilter: Bool = false
     @State var selectedDate = Date()
-    let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+    init(context: NSManagedObjectContext) {
+        _viewModel = State(initialValue: TaskViewModel(context: context))
+    }
     @FetchRequest(
         entity: Task.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)],
         
     ) var tasks: FetchedResults<Task>
+    
+    
+    
     
     var allTasks: [Task] {
         var items: [Task] = []
@@ -80,8 +85,7 @@ struct TaskView:View {
         .sheet(isPresented: $showSheetTask) {
             NavigationStack{
                 TaskSheet()
-                    .environment(TaskViewModel(context: context))
-                    .environment(\.managedObjectContext, context)
+                    .environment(viewModel)
             }
             
                 
@@ -93,9 +97,4 @@ struct TaskView:View {
     }
     
 
-}
-#Preview {
-    NavigationStack {
-        TaskView()
-    }
 }

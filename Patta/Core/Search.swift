@@ -59,7 +59,8 @@ struct Search: View {
     
     public var body: some View {
         NavigationStack{
-                    
+            Text("Aqui você encontra tudo que precisar!")
+                .multilineTextAlignment(.leading)
             List{
                 ForEach(filteredSearch, id: \.self) { search in
                     Text(search)
@@ -72,7 +73,8 @@ struct Search: View {
                         
             }.searchable(text: $query)
             .searchDictationBehavior(.inline(activation: .onSelect))
-        }.navigationTitle("Pesquisar: ")
+        }.navigationTitle("Pesquisar")
+            
     }
 }
 

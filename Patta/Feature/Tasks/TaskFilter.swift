@@ -27,30 +27,14 @@ struct TaskFilter: View {
         
         return items
     }
-    
-    @State var selectCategory: TaskCategory?
     @State var isPriority: Bool = false
     @State var selectPet: Pet?
     var body: some View {
         NavigationStack{
             Form {
-                Section{
-                    Picker("Categoria", selection: $selectCategory){
-                        Text("Todas").tag(TaskCategory.allCases)
-                        Text("Alimentação").tag(TaskCategory.alimentacao)
-                        Text("Medicação").tag(TaskCategory.medicamento)
-                        Text("Higiene").tag(TaskCategory.higiene)
-                        Text("Vacinações").tag(TaskCategory.vacinacao)
-                        Text("Acompanhamento Médico").tag(TaskCategory.acompanhamentoMedico)
-                    }
-                }
                 
                 Section{
-                    Toggle("Tarefa Prioritária", isOn: $isPriority)
-                }
-                
-                Section{
-                    Picker("Pet", selection: $selectCategory){
+                    Picker("Pet", selection: $selectPet){
                         ForEach(allItems, id: \.self){ pet in
                             Text(pet).tag(pet)
                         }
