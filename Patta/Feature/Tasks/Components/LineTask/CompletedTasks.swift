@@ -11,23 +11,20 @@ import SwiftUI
 struct CompletedTasks: View {
 
     @State private var showTaskSheet = false
-    @State private var viewModel: TaskViewModel
+    @Environment(TaskViewModel.self) private var viewModel
 
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Task.completedAt,ascending: false)], predicate: NSPredicate(format: "isComplete == YES"),animation: .default) private var completedTasks: FetchedResults<Task>
-
-    init(context: NSManagedObjectContext) {
-        _viewModel = State(
-            initialValue: TaskViewModel(context: context)
-        )
-    }
 
     var body: some View {
         NavigationStack {
             List {
                 ForEach(completedTasks) { task in
-                    LineTask(task: task, onComplete: {
+                    LineTask(task: task, onOpenDetails: {
+                        viewModel.prepareToEdit(task)
+                        showTaskSheet = true
+                    }, onComplete: {
                         viewModel.completeTask(task)
-                    } ) { TaskDetails()}
+                    })
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                     .listRowInsets(
@@ -75,7 +72,6 @@ struct CompletedTasks: View {
             }
             .sheet(isPresented: $showTaskSheet) {
                 TaskSheet()
-                    .environment(viewModel)
             }
         }
     }
@@ -84,6 +80,7 @@ struct CompletedTasks: View {
 #Preview {
     let dataController = DataController.shared
     let context = dataController.container.viewContext
+    let taskViewModel = TaskViewModel(context: context)
     let _ = {
         let task = Task(context: context)
         let pet = Pet(context: context)
@@ -96,6 +93,10 @@ struct CompletedTasks: View {
         task.isComplete = true
     }()
 
-    CompletedTasks(context: context)
-        .environment(\.managedObjectContext, context)
+    CompletedTasks()
+        .environment(taskViewModel)
+        .environment(
+            \.managedObjectContext,
+            context
+        )
 }
