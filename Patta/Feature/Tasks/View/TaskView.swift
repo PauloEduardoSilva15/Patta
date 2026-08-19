@@ -71,9 +71,12 @@ struct TaskView:View {
                 
                 
                 List(allTasksinDay, id: \.self) { task in
-                    LineTask(task: task,onComplete: {}){
-                        TaskDetails()
-                    } .listRowSeparator(.hidden)
+                    LineTask(task: task, onOpenDetails: {
+                        viewModel.prepareToEdit(task)
+                        showTaskSheet = true
+                    }, onComplete: {
+                        viewModel.completeTask(task)
+                    }) .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -123,5 +126,3 @@ struct TaskView:View {
     
 
 }
-
-
