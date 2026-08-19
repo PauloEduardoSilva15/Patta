@@ -41,15 +41,17 @@ struct TaskView:View {
                 
                 
                 List(allTasks, id: \.self) { task in
-                    CardTask(taskTitle: task.title ?? "aaa", taskIcon: "heart", isMarked: false, isPriority: task.isPriority)
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                
-                            } label: {
-                                Label("Editar", systemImage: "pencil")
-                            }
-                        }
                     
+                    if task.date == selectedDate{
+                        CardTask(taskTitle: task.title ?? "Tarefa Sem Nome", taskIcon: "heart", isMarked: false, isPriority: task.isPriority)
+                            .swipeActions(edge: .leading) {
+                                Button {
+                                    
+                                } label: {
+                                    Label("Editar", systemImage: "pencil")
+                                }
+                            }
+                    }
                 }
             }
             
@@ -76,6 +78,13 @@ struct TaskView:View {
         }
         
         .sheet(isPresented: $showSheetTask) {
+            NavigationStack{
+                TaskSheet()
+                    .environment(TaskViewModel(context: context))
+                    .environment(\.managedObjectContext, context)
+            }
+            
+                
         }
         .sheet(isPresented: $showSheetFilter) {
             TaskFilter()
