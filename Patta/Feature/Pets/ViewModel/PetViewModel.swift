@@ -124,7 +124,7 @@ class PetViewModel {
         return nil
     }
     
-    private func clearForm() {
+    func clearForm() {
         name = ""
         weight = nil
         petImage = nil
