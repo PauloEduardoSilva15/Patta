@@ -23,6 +23,7 @@ struct PattaApp: App {
         WindowGroup {
             ContentView()
                 .environment(dataController)
+                .environment(petViewModel)
                 .environment(\.managedObjectContext, dataController.container.viewContext)
         }
     }

@@ -16,43 +16,40 @@ struct PetView: View {
     @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                HStack {
-                    Text("Pets")
-                        .font(.title.bold())
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        showSheet.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.title.weight(.medium))
-                    }
-                    .buttonStyle(.plain)
-                    .frame(width: 44, height: 44)
-                    .glassEffect(.regular.tint(.accentColor).interactive())
-                }
-                .padding()
+        VStack {
+            HStack {
+                Text("Pets")
+                    .font(.title.bold())
                 
-                List {
-                    ForEach(pets) { pet in
-                        PetCard(pet: pet)
-                            .padding(.bottom)
-                    }
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
+                Spacer()
+                
+                Button(action: {
+                    showSheet.toggle()
+                }) {
+                    Image(systemName: "plus")
+                        .font(.title.weight(.medium))
                 }
-                .listStyle(.plain)
-                .scrollIndicators(.hidden)
-                .environment(\.defaultMinListRowHeight, 0)
-                .padding()
+                .buttonStyle(.plain)
+                .frame(width: 44, height: 44)
+                .glassEffect(.regular.tint(.accentColor).interactive())
             }
-            .sheet(isPresented: $showSheet) {
-                SheetAddPet()
+            .padding()
+            
+            List {
+                ForEach(pets) { pet in
+                    PetCard(pet: pet, viewModel: viewModel)
+                        .padding(.bottom)
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
+            .listStyle(.plain)
+            .environment(\.defaultMinListRowHeight, 0)
+            .padding()
+        }
+        .sheet(isPresented: $showSheet) {
+            SheetAddPet()
         }
     }
 }

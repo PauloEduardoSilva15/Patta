@@ -17,7 +17,9 @@ struct Navigation: View {
 //                TesteTarefa(context: context)
             }
             Tab("Pets", systemImage: "pawprint.fill"){
-                PetView()
+                NavigationStack {
+                    PetView()
+                }
             }
             Tab(role: .search){
                 Search()
