@@ -52,7 +52,7 @@ final class VaccineRegistryViewModel {
         errorMessage = nil
     }
     
-    func saveRegistry() -> Bool {
+    func saveRegistry(pet: Pet) -> Bool {
         
         guard let selectedVaccine else {
             errorMessage = "Selecione uma vacina"
@@ -82,6 +82,10 @@ final class VaccineRegistryViewModel {
         }
         vaccineRegistry.vaccine = selectedVaccine
         vaccineRegistry.applicationDate = applicationDate
+        
+        if !(pet.vaccineRecords?.contains(vaccineRegistry) ?? false) {
+            pet.vaccineRecords = NSSet(object: vaccineRegistry)
+        }
         
         do {
             try context.save()
