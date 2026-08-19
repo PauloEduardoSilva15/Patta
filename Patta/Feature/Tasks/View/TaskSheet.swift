@@ -35,16 +35,6 @@ struct TaskSheet: View {
                 }
                 
                 Section {
-                    
-                    Picker(selection: $taskViewModel.selectedCategory, label: Text("Categoria")) {
-                        ForEach(TaskCategory.allCases, id: \.self) {
-                            Text($0.title)
-                        }
-                    }
-                    
-                }
-                
-                Section {
                     Toggle("Agendar Tarefa", isOn: $taskViewModel.usesCustomDate)
                         .tint(.accent)
                     if taskViewModel.usesCustomDate {
@@ -70,8 +60,29 @@ struct TaskSheet: View {
                 }
                 
                 Section {
-                    Toggle("Recorrência", isOn: $taskViewModel.isRecurring)
-                        .tint(.accent)
+                    Toggle("Repetir diariamente", isOn:$taskViewModel.isRecurring)
+                    .tint(.accent)
+
+                    if taskViewModel.isRecurring {
+                        Label("Recorrência diária", systemImage: "repeat")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    }
+                } header: {
+                    Text("Recorrência")
+                } footer: {
+                    if taskViewModel.isRecurring {
+                        Text(
+                            """
+                            Quando esta tarefa for concluída, ela será \
+                            reagendada automaticamente para o próximo dia.
+                            """
+                        )
+                    } else {
+                        Text(
+                            "Ative esta opção para repetir a tarefa todos os dias."
+                        )
+                    }
                 }
             }
             .navigationTitle(taskViewModel.formTitle)

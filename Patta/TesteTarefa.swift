@@ -10,13 +10,8 @@ import SwiftUI
 struct TesteTarefa: View {
     @State var selection = 0
     @State var showTaskSheet = false
-    @State private var viewModel:TaskViewModel
-    @Environment(\.managedObjectContext) private var context
-   
-    init(context: NSManagedObjectContext) {
-        _viewModel = State(initialValue: TaskViewModel(context: context))
-    }
-    
+    @Environment(TaskViewModel.self) private var viewModel
+  
     var body: some View {
         NavigationStack {
             VStack {
@@ -31,14 +26,14 @@ struct TesteTarefa: View {
                 
                 switch selection {
                 case 0:
-                    PendingTasks(context: context)
+                    PendingTasks()
                 case 1:
-                    CompletedTasks(context: context)
+                    CompletedTasks()
                 default:
-                    PendingTasks(context: context)
+                    PendingTasks()
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 8)
             .navigationTitle("Tarefas")
             .background {
                 Color(.background)
@@ -64,8 +59,12 @@ struct TesteTarefa: View {
 #Preview {
     let dataController = DataController.shared
     let context = dataController.container.viewContext
-    
-    TesteTarefa(context: context)
-        .environment(\.managedObjectContext, context)
-    
+    let taskViewModel = TaskViewModel(context: context)
+
+    TesteTarefa()
+        .environment(taskViewModel)
+        .environment(
+            \.managedObjectContext,
+            context
+        )
 }
