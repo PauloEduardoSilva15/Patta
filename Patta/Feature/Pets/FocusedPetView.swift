@@ -9,22 +9,18 @@ import SwiftUI
 import CoreData
 
 struct FocusedPetView: View {
-
+    
+    @Environment(VaccineRegistryViewModel.self) private var vaccineRegistryViewModel
+    
     let pet: Pet
     let viewModel: PetViewModel
     
     @State private var selectedTab: PetTab = .info
-    @State private var openSheet = false
-    
-    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
-    
-    init(pet: Pet, viewModel: PetViewModel) {
-        self.pet = pet
-        self.viewModel = viewModel
-        _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet))
-    }
     
     var body: some View {
+        
+        @Bindable var vaccineViewModelBind = vaccineRegistryViewModel
+        
         ZStack {
             if let image = pet.image, let UIImage = UIImage(data: image) {
                 GeometryReader { geo in
@@ -40,35 +36,20 @@ struct FocusedPetView: View {
             VStack {
                 
                 Spacer()
-                    VStack(alignment: .leading, spacing: 0) {
-                        
-                        PetSegmentedControl(selectedTab: $selectedTab)
-                            .padding(.bottom, 10)
-                        
-                        if selectedTab == .info {
-                            PetInformationView(pet: pet, viewModel: viewModel)
-                        } else {
-                            if registries.isEmpty {
-                                Text("Não há vacinas registradas.")
-                                    .padding(.vertical, 30)
-                            } else {
-                                ScrollView {
-                                    ForEach(registries) { registry in
-                                        VaccineCardHistory(vaccineRegistry: registry)
-                                            .padding(12)
-                                        
-                                        if registry != registries.last {
-                                            Divider()
-                                        }
-                                    }
-                                }
-                                .frame(maxHeight: 320)
-                            }
-                        }
+                VStack(alignment: .leading, spacing: 0) {
+                    
+                    PetSegmentedControl(selectedTab: $selectedTab)
+                        .padding(.bottom, 10)
+                    
+                    if selectedTab == .info {
+                        PetInformationView(pet: pet, viewModel: viewModel)
+                    } else {
+                        VaccineListView(pet: pet)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -76,15 +57,18 @@ struct FocusedPetView: View {
             if selectedTab == .vaccines {
                 VStack(alignment: .trailing) {
                     Button {
-                        openSheet.toggle()
+                        vaccineRegistryViewModel.prepareNewRegistry()
+                        vaccineRegistryViewModel.activePetForSheet = pet
                     }label: {
                         Image(systemName: "plus")
                             .font(.title2)
                             .fontWeight(.semibold)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                            .glassEffect(.regular.tint(.accent).interactive())
                     }
                     .buttonStyle(.plain)
-                    .frame(width: 44, height: 44)
-                    .glassEffect(.regular.tint(.accent).interactive())
+                    .zIndex(1)
                 }
                 .padding(.vertical, 40)
                 .padding(.horizontal, 40)
@@ -93,17 +77,14 @@ struct FocusedPetView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    
+                NavigationLink {
+                    EditPetView(pet: pet, viewModel: viewModel)
                 }label: {
                     Text("Editar")
                 }
             }
         }
         .toolbar(.hidden, for: .tabBar)
-        .sheet(isPresented: $openSheet) {
-            VaccineRegistrySheet(pet: pet)
-        }
     }
 }
 
@@ -134,6 +115,38 @@ struct PetInformationView: View {
         Text((pet.med_cond ?? "").isEmpty ? "Condições Médicas" : pet.med_cond ?? "")
             .foregroundStyle((pet.med_cond ?? "").isEmpty ? .secondary : .primary)
             .padding(12)
+    }
+}
+
+struct VaccineListView: View {
+    let pet: Pet
+    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
+    
+    init(pet: Pet) {
+        self.pet = pet
+        _registries = FetchRequest(
+            sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)],
+            predicate: NSPredicate(format: "pet == %@", pet)
+        )
+    }
+    
+    var body: some View {
+        if registries.isEmpty {
+            Text("Não há vacinas registradas.")
+                .padding(.vertical, 30)
+        } else {
+            ScrollView {
+                ForEach(registries) { registry in
+                    VaccineCardHistory(vaccineRegistry: registry)
+                        .padding(12)
+                    
+                    if registry != registries.last {
+                        Divider()
+                    }
+                }
+            }
+            .frame(maxHeight: 320)
+        }
     }
 }
 

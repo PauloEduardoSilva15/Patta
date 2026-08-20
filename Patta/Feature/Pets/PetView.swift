@@ -11,11 +11,16 @@ import CoreData
 struct PetView: View {
     
     @Environment(PetViewModel.self) private var viewModel: PetViewModel
+    @Environment(VaccineRegistryViewModel.self) private var registryViewModel
+    
     @State private var showSheet: Bool = false
     
     @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
     
     var body: some View {
+        
+        @Bindable var registryViewModelBind = registryViewModel
+        
         VStack {
             HStack {
                 Text("Pets")
@@ -50,6 +55,9 @@ struct PetView: View {
         }
         .sheet(isPresented: $showSheet) {
             SheetAddPet()
+        }
+        .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
+            VaccineRegistrySheet(pet: pet)
         }
     }
 }

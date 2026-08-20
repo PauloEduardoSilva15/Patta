@@ -17,6 +17,8 @@ final class VaccineRegistryViewModel {
     var selectedVaccine: Vaccine?
     var errorMessage: String?
     
+    var activePetForSheet: Pet?
+    
     var isEditing: Bool {
         registryBeingEdited != nil
     }
@@ -85,18 +87,14 @@ final class VaccineRegistryViewModel {
         
         vaccineRegistry.pet = pet
         
-        if !(pet.vaccineRecords?.contains(vaccineRegistry) ?? false) {
-            pet.vaccineRecords = NSSet(object: vaccineRegistry)
-        }
-        
         do {
             try context.save()
-            prepareNewRegistry()
             
             return true
         } catch {
             context.rollback()
-            
+            let nsError = error as NSError
+            print("Erro Core Data: \(nsError), \(nsError.userInfo)")
             errorMessage = "Não foi possível salvar o registro: \(error.localizedDescription)"
             return false
         }

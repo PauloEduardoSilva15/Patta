@@ -46,7 +46,7 @@ struct VaccineRegistrySheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(role: .cancel) {
-                        dismiss()
+                        registryViewModel.activePetForSheet = nil
                     }
                 }
                 
@@ -57,19 +57,24 @@ struct VaccineRegistrySheet: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .confirm) {
+                        
+                        guard registryViewModel.selectedVaccine != nil else {
+                            registryViewModel.errorMessage = "Selecione uma vacina"
+                            return
+                        }
+                        
                         if registryViewModel.saveRegistry(pet: pet) {
-                            dismiss()
+                            registryViewModel.activePetForSheet = nil
                         }
                     }
                 }
             }
         }
-        .onAppear {
-            registryViewModel.prepareNewRegistry()
-        }
         .onChange(of: registryViewModel.errorMessage ?? "") { _,error in
-            errorMessage = error
-            showAlert = true
+            if !error.isEmpty {
+                errorMessage = error
+                showAlert = true
+            }
         }
         .alert(isPresented: $showAlert) {
             Alert(
