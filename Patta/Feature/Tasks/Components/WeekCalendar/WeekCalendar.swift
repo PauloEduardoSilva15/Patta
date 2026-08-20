@@ -66,6 +66,7 @@ struct WeekCalendar: View {
                         selectedDate: $selectedDate
                     )
                     .padding(.horizontal, 4)
+                    .tag(offset)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))

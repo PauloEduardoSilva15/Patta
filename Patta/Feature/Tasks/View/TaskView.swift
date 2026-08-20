@@ -9,14 +9,13 @@ import SwiftUI
 import CoreData
 
 struct TaskView:View {
-    @State private var viewModel: TaskViewModel
+    @Environment(TaskViewModel.self) private var viewModel
     @State private var showTaskSheet: Bool = false
     @State private var showSheetFilter: Bool = false
     @State var selectedDate = Date()
     @State var selectedPet: Pet?
-    init(context: NSManagedObjectContext) {
-        _viewModel = State(initialValue: TaskViewModel(context: context))
-    }
+    @State var selectedTab = 0
+    
     @FetchRequest(
         entity: Task.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Task.id, ascending: true)],
@@ -37,136 +36,134 @@ struct TaskView:View {
         return items
     }
     
-    
-    
-    
-    var allTasks: [Task] {
-        var items: [Task] = []
-        for task in tasks {
-            items.append(task)
-        }
-        return items
-    }
-    
-    var allTasksinDay: [Task]{
-        var items: [Task] = []
+    private var tasksFilteredByDateAndPet: [Task] {
         let calendar = Calendar.current
-        for task in allTasks{
-            let taskDate = task.date ?? Date()
-            if calendar.isDate(taskDate, inSameDayAs: selectedDate){
-                items.append(task)
-            }
-            
-        }
-        return items
-    }
-    
-    var allTaskInPet: [Task]{
-        var items: [Task] = []
         
-        if selectedPet == nil {
-            for task in allTasksinDay{
-                items.append(task)
-            }
-            return items
-        }
-        for task in allTasksinDay{
-            if task.pet == selectedPet{
-                items.append(task)
+        return tasks.filter { task in
+            guard let taskDate = task.date else {
+                return false
             }
             
+            guard calendar.isDate(
+                taskDate,
+                inSameDayAs: selectedDate
+            ) else {
+                return false
+            }
+            
+            guard let selectedPet else {
+                return true
+            }
+            
+            return task.appliesToAllPets || task.pet?.objectID == selectedPet.objectID
         }
-        return items
     }
     
+    private var pendingTasks: [Task] {
+        tasksFilteredByDateAndPet
+            .filter { !$0.isComplete }
+            .sorted {
+                ($0.date ?? .distantFuture) < ($1.date ?? .distantFuture)
+            }
+    }
     
-    var body: some View {
-        NavigationStack{
-            VStack {
-                WeekCalendar(selectedDate: $selectedDate)
-                    .padding()
-                
-                Text(Calendar.current.isDateInToday(selectedDate) ? "Hoje:" : selectedDate.formatted(date: .numeric, time: .omitted)+":")
-                    .multilineTextAlignment(.leading)
-                    .bold()
-                
-                
-                
-                List(allTaskInPet, id: \.self) { task in
-                    LineTask(task: task, onOpenDetails: {
-                        viewModel.prepareToEdit(task)
-                        showTaskSheet = true
-                    }, onComplete: {
-                        viewModel.completeTask(task)
-                    }) .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button (role: .destructive){
-                                viewModel.deleteTask(task)
-                            } label: {
-                                Label("Deletar", systemImage: "trash")
-                            }
-                        }
+    private var completedTasks: [Task] {
+        tasksFilteredByDateAndPet
+            .filter { $0.isComplete }
+            .sorted {
+                ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast)
+            }
+    }
+    
+    private var isPetFilterActive: Bool {
+        selectedPet != nil
+    }
+
+    private var petFilterButton: some View {
+        Menu {
+            Picker("Pets", selection: $selectedPet) {
+                Text("Todos")
+                    .tag(nil as Pet?)
+
+                ForEach(allPets, id: \.objectID) { pet in
+                    Text(pet.name ?? "Sem Nome")
+                        .tag(Optional(pet))
                 }
             }
+            .pickerStyle(.inline)
+        } label: {
+            Label("Filtrar por pet", systemImage: "line.horizontal.3.decrease")
+            .labelStyle(.iconOnly)
+            .foregroundStyle(isPetFilterActive ? Color.blue : Color.primary)
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+    }
+    
+    private var petFilterMenu: some View {
+        petFilterButton
+    }
+    
+    var body: some View {
+        VStack {
+            WeekCalendar(selectedDate: $selectedDate)
+                .padding(.horizontal,12)
             
+            
+            Picker("Tarefas agendadas", selection: $selectedTab) {
+                Text("Pendentes")
+                    .tag(0)
+                Text("Concluídas")
+                    .tag(1)
+            }
+            .pickerStyle(.segmented)
+            .padding(12)
+            
+            switch selectedTab {
+            case 0:
+                PendingTasks(tasks: pendingTasks)
+                
+            case 1:
+                CompletedTasks(tasks: completedTasks)
+                
+            default:
+                PendingTasks(tasks: pendingTasks)
+            }
+        }
+        .background {
+            Color(.background)
+                .ignoresSafeArea()
         }
         .navigationTitle("Tarefa")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Menu{
-                    Button{
-                        selectedPet = nil
-                    }label: {
-                        HStack{
-                            Text("Todos")
-                            if(selectedPet == nil){
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                    ForEach(allPets, id: \.self){ pet in
-                        Button{
-                            selectedPet = pet
-                        }label: {
-                            HStack{
-                                Text((pet.name ?? "Sem Nome"))
-                                if selectedPet != nil && selectedPet == pet {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                            
-                            
-                        }
-                        
-                    }
-                }label: {
-                    Image(systemName: "line.horizontal.3.decrease")
-                }.buttonStyle(.glass)
-                
+                petFilterMenu
             }
+              
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    showTaskSheet.toggle()
+                    viewModel.prepareNewTask()
+                    showTaskSheet = true
                 } label: {
                     Image(systemName: "plus")
                 }.buttonStyle(.glassProminent)
-                
             }
         }
-        
         .sheet(isPresented: $showTaskSheet) {
             NavigationStack{
                 TaskSheet()
                     .environment(viewModel)
             }
-            
-                
         }
-        
-        
     }
+}
+#Preview {
     
-
+    let dataController = DataController.shared
+    let context = dataController.container.viewContext
+    let taskViewModel = TaskViewModel(context: context)
+    
+    TaskView()
+        .environment(taskViewModel)
+        .environment(\.managedObjectContext, context)
 }

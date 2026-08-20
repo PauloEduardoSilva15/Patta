@@ -15,7 +15,7 @@ struct Navigation: View {
         TabView{
             Tab("Tarefas", systemImage: "calendar"){
                 NavigationStack {
-                    TaskView(context: context)
+                    TaskView()
                     
                 }
             }
