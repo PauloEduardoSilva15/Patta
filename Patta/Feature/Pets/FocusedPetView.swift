@@ -52,9 +52,17 @@ struct FocusedPetView: View {
                                 Text("Não há vacinas registradas.")
                                     .padding(.vertical, 30)
                             } else {
-                                ForEach(registries) { registry in
-                                    VaccineCardHistory(vaccineRegistry: registry)
+                                ScrollView {
+                                    ForEach(registries) { registry in
+                                        VaccineCardHistory(vaccineRegistry: registry)
+                                            .padding(12)
+                                        
+                                        if registry != registries.last {
+                                            Divider()
+                                        }
+                                    }
                                 }
+                                .frame(maxHeight: 320)
                             }
                         }
                     }

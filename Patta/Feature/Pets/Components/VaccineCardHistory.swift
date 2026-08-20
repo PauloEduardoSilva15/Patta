@@ -17,8 +17,8 @@ struct VaccineCardHistory: View {
             Image(systemName: "syringe")
                 .font(.title)
             
-            VStack {
-                Text(vaccineRegistry.vaccine?.title ?? "")
+            VStack(alignment: .leading) {
+                Text("Vacina \(vaccineRegistry.vaccine?.title ?? "")")
                     .font(.body.bold())
                 
                 Text(vaccineRegistry.applicationDate?.formatted(date: .numeric, time: .omitted) ?? "")
