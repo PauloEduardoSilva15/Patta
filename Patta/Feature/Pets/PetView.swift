@@ -17,48 +17,49 @@ struct PetView: View {
     
     @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
     
+    let columns = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
+    
     var body: some View {
         
         @Bindable var registryViewModelBind = registryViewModel
         
-        VStack {
-            HStack {
-                Text("Pets")
-                    .font(.title.bold())
-                
-                Spacer()
-                
-                Button(action: {
-                    showSheet.toggle()
-                }) {
-                    Image(systemName: "plus")
-                        .font(.title.weight(.medium))
-                }
-                .buttonStyle(.plain)
-                .frame(width: 44, height: 44)
-                .glassEffect(.regular.tint(.accentColor).interactive())
-            }
-            .padding()
+        ZStack {
             
-            List {
-                ForEach(pets) { pet in
-                    PetCard(pet: pet, viewModel: viewModel)
-                        .padding(.bottom)
+            Color.background
+                .ignoresSafeArea()
+            
+            VStack {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(pets) { pet in
+                            PetCard(pet: pet, viewModel: viewModel)
+                                .frame(height: 180)
+                        }
+                    }
+                    .padding()
                 }
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
             }
-            .listStyle(.plain)
-            .environment(\.defaultMinListRowHeight, 0)
-            .padding()
+            .sheet(isPresented: $showSheet) {
+                SheetAddPet()
+            }
+            .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
+                VaccineRegistrySheet(pet: pet)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        showSheet.toggle()
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                    .buttonStyle(.glassProminent)
+                }
+            }
         }
-        .sheet(isPresented: $showSheet) {
-            SheetAddPet()
-        }
-        .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
-            VaccineRegistrySheet(pet: pet)
-        }
+        .navigationTitle("Pets")
     }
 }
 
@@ -66,8 +67,10 @@ struct PetView: View {
     
     let context = DataController.shared.container.viewContext
     let viewModel = PetViewModel(name: "", context: context)
+    let registryViewModel = VaccineRegistryViewModel(context: context)
     
     PetView()
         .environment(viewModel)
+        .environment(registryViewModel)
         .environment(\.managedObjectContext, context)
 }
