@@ -92,9 +92,10 @@ struct TaskView:View {
             }
             .pickerStyle(.inline)
         } label: {
-            Label("Filtrar por pet", systemImage: "line.horizontal.3.decrease")
-            .labelStyle(.iconOnly)
+            Label("Filtrar", systemImage: isPetFilterActive ? "pawprint.fill": "pawprint")
+                .labelStyle(.titleAndIcon)
             .foregroundStyle(isPetFilterActive ? Color.blue : Color.primary)
+            .padding(6)
         }
         .menuStyle(.button)
         .buttonStyle(.plain)
@@ -146,6 +147,7 @@ struct TaskView:View {
                     showTaskSheet = true
                 } label: {
                     Image(systemName: "plus")
+                        .foregroundStyle(.white)
                 }.buttonStyle(.glassProminent)
             }
         }

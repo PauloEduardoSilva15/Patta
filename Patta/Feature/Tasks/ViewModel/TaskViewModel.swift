@@ -135,7 +135,7 @@ final class TaskViewModel {
         resetForm()
     }
     
-    func deleteTask(_ task: Task) {
+    func deleteTask(_ task: Task) -> Bool {
         context.delete(task)
         
         do {
@@ -146,9 +146,11 @@ final class TaskViewModel {
             }
             
             errorMessage = nil
+            return true
         } catch {
             context.rollback()
             errorMessage = "Não foi possível apagar a tarefa: \(error.localizedDescription)"
+            return false
         }
     }
     
