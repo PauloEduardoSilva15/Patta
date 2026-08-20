@@ -14,9 +14,7 @@ struct PetCard: View {
     let viewModel: PetViewModel
     
     var body: some View {
-        NavigationLink {
-            FocusedPetView(pet: pet, viewModel: viewModel)
-        }label: {
+        NavigationLink(value: PetRoute.detail(pet)) {
             ZStack(alignment: .bottom) {
                 if pet.image == nil {
                     Color.accentColor
