@@ -33,7 +33,9 @@ struct CompletedTasks: View {
                     allowsFullSwipe: true
                 ) {
                     Button(role: .destructive) {
-                        viewModel.deleteTask(task)
+                        if viewModel.deleteTask(task) {
+                            print("Deleted")
+                        }
                     } label: {
                         Label(
                             "Deletar",
