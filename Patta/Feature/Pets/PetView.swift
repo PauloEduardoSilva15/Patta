@@ -17,6 +17,11 @@ struct PetView: View {
     
     @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
     
+    let columns = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
+    
     var body: some View {
         
         @Bindable var registryViewModelBind = registryViewModel
@@ -40,18 +45,15 @@ struct PetView: View {
             }
             .padding()
             
-            List {
-                ForEach(pets) { pet in
-                    PetCard(pet: pet, viewModel: viewModel)
-                        .padding(.bottom)
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 10) {
+                    ForEach(pets) { pet in
+                        PetCard(pet: pet, viewModel: viewModel)
+                            .frame(height: 180)
+                    }
                 }
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                .padding()
             }
-            .listStyle(.plain)
-            .environment(\.defaultMinListRowHeight, 0)
-            .padding()
         }
         .sheet(isPresented: $showSheet) {
             SheetAddPet()
@@ -66,8 +68,10 @@ struct PetView: View {
     
     let context = DataController.shared.container.viewContext
     let viewModel = PetViewModel(name: "", context: context)
+    let registryViewModel = VaccineRegistryViewModel(context: context)
     
     PetView()
         .environment(viewModel)
+        .environment(registryViewModel)
         .environment(\.managedObjectContext, context)
 }
