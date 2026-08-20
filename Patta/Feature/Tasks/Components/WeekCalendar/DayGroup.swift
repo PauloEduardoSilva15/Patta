@@ -17,14 +17,14 @@ struct DayGroup: View {
             
             Text(date.formatted(.dateTime.weekday(.abbreviated).locale(Locale(identifier: "pt-BR"))))
                 .font(.caption2)
-                .foregroundStyle(isSelected ? .primary : .secondary)
+                .foregroundStyle(isSelected ? .white : .secondary)
             
             Spacer()
             
             if isSelected {
                 Text(date.formatted(.dateTime.day()))
                     .font(.headline)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Text(date.formatted(.dateTime.day()))
@@ -35,14 +35,21 @@ struct DayGroup: View {
             }
         }
         .padding(.vertical, 10)
-        .background(RoundedRectangle(cornerRadius: 5).foregroundStyle(.quinary).brightness(isSelected ? 0.5 : 0))
         .overlay {
-            if isSelected {
-                RoundedRectangle(cornerRadius: 5).stroke(.primary, lineWidth: 1)
-            }
-            
             if isToday && !isSelected {
-                RoundedRectangle(cornerRadius: 5).stroke(.tint, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(.tint, lineWidth: 1)
+            }
+        }
+        .background {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 5)
+                    .foregroundStyle(.accent)
+                
+            } else {
+                
+            RoundedRectangle(cornerRadius:  5)
+                    .fill(.quinary)
             }
         }
     }
