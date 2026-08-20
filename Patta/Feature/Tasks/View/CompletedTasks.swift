@@ -22,7 +22,7 @@ struct CompletedTasks: View {
                     viewModel.prepareToEdit(task)
                     showTaskSheet = true
                 }, onComplete: {
-                    viewModel.completeTask(task)
+                    viewModel.toggleTaskCompletion(task)
                 })
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
@@ -47,37 +47,8 @@ struct CompletedTasks: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-//        .background {
-//            Color(.background)
-//                .ignoresSafeArea()
-//        }
         .sheet(isPresented: $showTaskSheet) {
             TaskSheet()
         }
     }
 }
-
-
-//#Preview {
-//    let dataController = DataController.shared
-//    let context = dataController.container.viewContext
-//    let taskViewModel = TaskViewModel(context: context)
-//    let _ = {
-//        let task = Task(context: context)
-//        let pet = Pet(context: context)
-//        pet.name = "Nami"
-//        
-//        task.title = "Dar Zenrelia"
-//        task.date = Date()
-//        task.pet = pet
-//        task.appliesToAllPets = false
-//        task.isComplete = true
-//    }()
-//    
-//    CompletedTasks()
-//        .environment(taskViewModel)
-//        .environment(
-//            \.managedObjectContext,
-//             context
-//        )
-//}

@@ -72,7 +72,7 @@ class PetViewModel {
     
     func updatePet(_ editingPet: Pet) throws {
         
-        guard context.hasChanges else { return }
+//        guard context.hasChanges else { return }
         
         guard !name.isEmpty else { throw ValidationError.emptyProperty }
         

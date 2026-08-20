@@ -180,36 +180,46 @@ final class TaskViewModel {
         return nextDate
     }
     
-    func completeTask(_ task: Task) {
-        
+    func toggleTaskCompletion(_ task: Task) {
         guard task.managedObjectContext === context else {
             errorMessage = "A tarefa e a ViewModel estão usando contextos diferentes."
             return
         }
-        
+
         let now = Date()
-        
-        if task.isRecurring {
-            let currentDate = task.date ?? now
+
+        if task.isComplete {
+            task.isComplete = false
+            task.completedAt = nil
+
+        } else if task.isRecurring {
             
+            let currentDate = task.date ?? now
+
             guard let nextDate = nextDailyDate(after: currentDate, relativeTo: now) else {
                 errorMessage = "Não foi possível calcular a próxima data."
                 return
             }
-            
+
             task.date = nextDate
             task.isComplete = false
+            task.completedAt = nil
+
         } else {
+            
             task.isComplete = true
             task.completedAt = now
         }
-        
+
         do {
             try context.save()
             errorMessage = nil
         } catch {
             context.rollback()
-            errorMessage = "Não foi possível marcar a tarefa como concluída: \(error.localizedDescription)"
+            errorMessage = "Não foi possível atualizar a tarefa: \(error.localizedDescription)"
         }
     }
+    
+  
+    
 }
