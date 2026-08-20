@@ -15,6 +15,8 @@ struct PetView: View {
     
     @State private var showSheet: Bool = false
     
+    @State private var navPath = [PetRoute]()
+    
     @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
     
     let columns = [
@@ -24,42 +26,55 @@ struct PetView: View {
     
     var body: some View {
         
-        @Bindable var registryViewModelBind = registryViewModel
-        
-        ZStack {
+        NavigationStack(path: $navPath) {
+            @Bindable var registryViewModelBind = registryViewModel
             
-            Color.background
-                .ignoresSafeArea()
-            
-            VStack {
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(pets) { pet in
-                            PetCard(pet: pet, viewModel: viewModel)
-                                .frame(height: 180)
+            ZStack {
+                
+                Color.background
+                    .ignoresSafeArea()
+                
+                VStack {
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(pets) { pet in
+                                NavigationLink(value: PetRoute.detail(pet)) {
+                                    PetCard(pet: pet, viewModel: viewModel)
+                                        .frame(height: 180)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        .padding()
                     }
-                    .padding()
+                }
+                .sheet(isPresented: $showSheet) {
+                    SheetAddPet()
+                }
+                .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
+                    VaccineRegistrySheet(pet: pet)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: {
+                            showSheet.toggle()
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                        .buttonStyle(.glassProminent)
+                    }
                 }
             }
-            .sheet(isPresented: $showSheet) {
-                SheetAddPet()
-            }
-            .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
-                VaccineRegistrySheet(pet: pet)
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        showSheet.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                    .buttonStyle(.glassProminent)
+            .navigationTitle("Pets")
+            .navigationDestination(for: PetRoute.self) { route in
+                switch route {
+                case .detail(let petToView):
+                    FocusedPetView(pet: petToView, viewModel: viewModel, navPath: $navPath)
+                case .edit(let petToEdit):
+                    EditPetView(pet: petToEdit, viewModel: viewModel, navPath: $navPath)
                 }
             }
         }
-        .navigationTitle("Pets")
     }
 }
 

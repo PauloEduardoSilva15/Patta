@@ -16,6 +16,7 @@ struct FocusedPetView: View {
     let viewModel: PetViewModel
     
     @State private var selectedTab: PetTab = .info
+    @Binding var navPath: [PetRoute]
     
     var body: some View {
         
@@ -77,9 +78,7 @@ struct FocusedPetView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                NavigationLink {
-                    EditPetView(pet: pet, viewModel: viewModel)
-                }label: {
+                NavigationLink(value: PetRoute.edit(pet)) {
                     Text("Editar")
                 }
             }
@@ -151,6 +150,7 @@ struct VaccineListView: View {
 }
 
 #Preview {
+    @Previewable @State var navPath: [PetRoute] = []
     let context = DataController.shared.container.viewContext
     let pet = Pet(context: context)
     
@@ -165,5 +165,6 @@ struct VaccineListView: View {
     
     let viewModel = PetViewModel(name: "", context: context)
     
-    return FocusedPetView(pet: pet, viewModel: viewModel)
+    return FocusedPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+        .environment(VaccineRegistryViewModel(context: context))
 }

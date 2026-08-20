@@ -11,7 +11,6 @@ import PhotosUI
 
 struct EditPetView: View {
     
-    @Environment(\.dismiss) private var dismiss
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     
     let pet: Pet
@@ -20,13 +19,16 @@ struct EditPetView: View {
     @State private var selectedImage: PhotosPickerItem?
     @State private var vaccineRegistryTitle: [String] = []
     @State private var vaccineRegistryDate: [Date] = []
+    @State private var confirmDelete: Bool = false
+    @Binding var navPath: [PetRoute]
     
     @FetchRequest private var registries: FetchedResults<VaccineRegistry>
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Vaccine.title, ascending: true)]) private var vaccines: FetchedResults<Vaccine>
     
-    init(pet: Pet, viewModel: PetViewModel) {
+    init(pet: Pet, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
         self.pet = pet
         self.viewModel = viewModel
+        _navPath = navPath
         _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet))
     }
     
@@ -34,8 +36,7 @@ struct EditPetView: View {
         
         @Bindable var viewModelBind = viewModel
         @Bindable var registryViewModelBind = registryViewModel
-        
-        NavigationStack {
+
             ZStack(alignment: .bottom) {
                 if let image = viewModel.petImage, let UIImage = UIImage(data: image) {
                     GeometryReader { geo in
@@ -50,7 +51,7 @@ struct EditPetView: View {
                 
                 Color.clear
                     .ignoresSafeArea()
-
+                
                 ScrollView {
                     VStack {
                         PhotosPicker(selection: $selectedImage, matching: .images) {
@@ -120,36 +121,69 @@ struct EditPetView: View {
                         .padding()
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
                         
+                        
                         VStack(alignment: .leading, spacing: 0) {
                             Text("Vacinas:")
                                 .font(.headline)
                                 .padding(.bottom, 10)
                             
-                            ForEach(registries) { registry in
-                                Picker("Vacina", selection: $registryViewModelBind.selectedVaccine) {
-                                    Text("Selecione uma vacina")
-                                        .tag(Vaccine?.none)
-                                    
-                                    ForEach(vaccines) { vaccine in
-                                        Text(vaccine.title ?? "")
-                                            .tag(Optional(vaccine))
+                            if !registries.isEmpty {
+                                
+                                ForEach(registries) { registry in
+                                    Picker("Vacina", selection: $registryViewModelBind.selectedVaccine) {
+                                        Text("Selecione uma vacina")
+                                            .tag(Vaccine?.none)
+                                        
+                                        ForEach(vaccines) { vaccine in
+                                            Text(vaccine.title ?? "")
+                                                .tag(Optional(vaccine))
+                                        }
                                     }
+                                    .padding(12)
+                                    
+                                    Divider()
+                                    
+                                    DatePicker("Data",
+                                               selection: Binding(
+                                                get: { viewModelBind.birthdate ?? Date.now },
+                                                set: { viewModelBind.birthdate = $0 }
+                                               ),
+                                               in: ...Date.now, displayedComponents: .date)
+                                    .padding(12)
                                 }
-                                .padding(12)
-                                
-                                Divider()
-                                
-                                DatePicker("Data",
-                                           selection: Binding(
-                                            get: { viewModelBind.birthdate ?? Date.now },
-                                            set: { viewModelBind.birthdate = $0 }
-                                           ),
-                                           in: ...Date.now, displayedComponents: .date)
-                                .padding(12)
+                            } else {
+                                Text("Não há vacinas registradas. \n\nCadastre uma nova vacina na aba de \"Histórico de Vacinas\"")
+                                    .padding(.top, 20)
+                                    .padding(.leading, 20)
                             }
                         }
                         .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+                        
+                        Button {
+                            confirmDelete = true
+                        }label: {
+                            Label("Excluir Pet", systemImage: "trash.fill")
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .glassEffect(.regular.interactive())
+                        }
+                        .confirmationDialog("Deseja realmente excluir o pet?", isPresented: $confirmDelete, titleVisibility: .visible) {
+                            Button("Deletar", role: .destructive) {
+                                viewModel.deletePet(pet)
+                                
+                                navPath.removeAll()
+                            }
+                            
+                            Button("Cancelar", role: .cancel) {
+                                confirmDelete = false
+                            }
+                        } message: {
+                            Text("Essa ação não pode ser desfeita!")
+                        }
                     }
                     .padding()
                 }
@@ -161,7 +195,7 @@ struct EditPetView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(role: .cancel) {
                         viewModel.clearForm()
-                        dismiss()
+                        navPath.removeLast()
                     }
                 }
                 
@@ -172,20 +206,20 @@ struct EditPetView: View {
                 }
             }
             .navigationBarBackButtonHidden(true)
-        }
-        .onAppear() {
-            if let petImage = pet.image {
-                viewModel.petImage = petImage
-                viewModel.name = pet.name ?? ""
-                viewModel.breed = pet.breed ?? ""
-                viewModel.medicalConditions = pet.med_cond ?? ""
-                viewModel.birthdate = pet.birthdate ?? Date.now
+            .onAppear() {
+                if let petImage = pet.image {
+                    viewModel.petImage = petImage
+                    viewModel.name = pet.name ?? ""
+                    viewModel.breed = pet.breed ?? ""
+                    viewModel.medicalConditions = pet.med_cond ?? ""
+                    viewModel.birthdate = pet.birthdate ?? Date.now
+                }
             }
-        }
     }
 }
 
 #Preview {
+    @Previewable @State var navPath: [PetRoute] = []
     let context = DataController.shared.container.viewContext
     let pet = Pet(context: context)
     
@@ -200,6 +234,6 @@ struct EditPetView: View {
     
     let viewModel = PetViewModel(name: "", context: context)
     
-    return EditPetView(pet: pet, viewModel: viewModel)
+    return EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
         .environment(VaccineRegistryViewModel(context: context))
 }
