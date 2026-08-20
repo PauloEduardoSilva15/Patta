@@ -18,62 +18,65 @@ struct VaccineRegistrySheet: View {
     
     let pet: Pet
     
+    @State private var errorMessage = ""
+    @State private var showAlert = false
+    
     var body: some View {
         
         @Bindable var registryViewModelBind = registryViewModel
         
-        VStack(spacing: 0) {
-            
-            HStack {
-                Button {
-                    dismiss()
-                }label: {
-                    Image(systemName: "xmark")
-                        .font(.body.weight(.semibold))
+        NavigationStack {
+            VStack(spacing: 0) {
+                Form {
+                    Picker("Vacina", selection: $registryViewModelBind.selectedVaccine) {
+                        Text("Selecione uma vacina")
+                            .tag(Vaccine?.none)
+                        
+                        ForEach(vaccines) { vaccine in
+                            Text(vaccine.title ?? "")
+                                .tag(Optional(vaccine))
+                        }
+                    }
+                    
+                    DatePicker("Data",
+                               selection: $registryViewModelBind.applicationDate,
+                               in: ...Date.now, displayedComponents: .date)
                 }
-                .buttonStyle(.plain)
-                .frame(width: 44, height: 44)
-                .glassEffect(.regular)
-                
-                Spacer()
-                
-                Text("Nova Vacina")
-                    .font(.headline)
-                
-                Spacer()
-                
-                Button {
-                    if registryViewModel.saveRegistry(pet: pet) {
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) {
                         dismiss()
                     }
-                }label: {
-                    Image(systemName: "checkmark")
-                        .font(.body.weight(.semibold))
-                }
-                .buttonStyle(.plain)
-                .frame(width: 44, height: 44)
-                .glassEffect(.regular.tint(.accent).interactive())
-            }
-            .padding()
-            
-            Form {
-                Picker(registryViewModel.selectedVaccine?.title ?? "Vacina", selection: $registryViewModelBind.selectedVaccine) {
-                    Text("Selecione uma vacina")
-                        .tag(Vaccine?.none)
-                    
-                    ForEach(vaccines) { vaccine in
-                        Text(vaccine.title ?? "")
-                            .tag(Optional(vaccine))
-                    }
                 }
                 
-                DatePicker("Data",
-                           selection: $registryViewModelBind.applicationDate,
-                           in: ...Date.now, displayedComponents: .date)
+                ToolbarItem(placement: .principal) {
+                    Text("Nova Vacina")
+                        .font(.headline)
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .confirm) {
+                        if registryViewModel.saveRegistry(pet: pet) {
+                            dismiss()
+                        }
+                    }
+                }
             }
         }
         .onAppear {
             registryViewModel.prepareNewRegistry()
+        }
+        .onChange(of: registryViewModel.errorMessage ?? "") { _,error in
+            errorMessage = error
+            showAlert = true
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Erro"),
+                message: Text(errorMessage),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }

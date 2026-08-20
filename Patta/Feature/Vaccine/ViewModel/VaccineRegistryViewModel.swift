@@ -83,6 +83,8 @@ final class VaccineRegistryViewModel {
         vaccineRegistry.vaccine = selectedVaccine
         vaccineRegistry.applicationDate = applicationDate
         
+        vaccineRegistry.pet = pet
+        
         if !(pet.vaccineRecords?.contains(vaccineRegistry) ?? false) {
             pet.vaccineRecords = NSSet(object: vaccineRegistry)
         }
