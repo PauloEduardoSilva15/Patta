@@ -12,6 +12,7 @@ struct TaskSheet: View {
     @Environment(\.dismiss) var dismiss
     @Environment(TaskViewModel.self) var taskViewModel
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)]) var pets: FetchedResults<Pet>
+    @State private var isShowingDeleteConfirmation = false
     
     var body: some View {
         @Bindable var taskViewModel = taskViewModel
@@ -45,28 +46,24 @@ struct TaskSheet: View {
                 
                 Section {
                     Toggle(isOn: $taskViewModel.isPriority) {
-                        HStack(spacing: 8) {
-                            Text("Tarefa Prioritária")
-                            
-                            Image(systemName: "pawprint.fill")
-                                .foregroundStyle(.red)
-                                .accessibilityHidden(true)
-                        }
+                        
+                        Text("Tarefa Prioritária")
+                        
                     }
                     .tint(.accent)
                     
                 } footer: {
-                    Text("Use esta opção para destacar tarefas importantes")
+                    Text("Use esta opção para destacar tarefas importantes.")
                 }
                 
                 Section {
                     Toggle("Repetir diariamente", isOn:$taskViewModel.isRecurring)
-                    .tint(.accent)
-
+                        .tint(.accent)
+                    
                     if taskViewModel.isRecurring {
                         Label("Recorrência diária", systemImage: "repeat")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 } header: {
                     Text("Recorrência")
@@ -82,6 +79,24 @@ struct TaskSheet: View {
                         Text(
                             "Ative esta opção para repetir a tarefa todos os dias."
                         )
+                    }
+                }
+                if let task = taskViewModel.taskBeingEdited {
+                    Section {
+                        Button("Deletar Tarefa", role: .destructive) {
+                            isShowingDeleteConfirmation = true
+                        }
+                    }
+                    .confirmationDialog("Deletar tarefa?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
+                        Button("Deletar Tarefa", role: .destructive) {
+                            if taskViewModel.deleteTask(task) {
+                                dismiss()
+                            }
+                        }
+                        
+                        Button("Cancelar", role: .cancel) { }
+                    } message: {
+                        Text("Esta ação não pode ser desfeita.")
                     }
                 }
             }
@@ -120,7 +135,7 @@ struct TaskSheet: View {
     pet1.name = "Goku"
     let pet2 = Pet(context: context)
     pet2.name = "Nami"
-   
+    
     return TaskSheet()
         .environment(TaskViewModel(context: context))
         .environment(\.managedObjectContext, context)
