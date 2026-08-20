@@ -6,6 +6,9 @@ import CoreData
 struct Search: View {
     @State var query: String = ""
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(TaskViewModel.self) private var viewTaskModel
+    @Environment(PetViewModel.self) private var viewModel: PetViewModel
+   
     @FetchRequest(
         entity: Pet.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)],
@@ -16,6 +19,49 @@ struct Search: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Task.title, ascending: true)],
         
     ) var tasks: FetchedResults<Task>
+    
+    @State var showTaskSheet: Bool = false
+    @State var showPetSheet: Bool = false
+    
+    var allTasks: [Task] {
+        var items: [Task] = []
+        for task in tasks {
+            items.append(task)
+        }
+        return items
+    }
+    var allPets: [Pet] {
+        var items: [Pet] = []
+        for pet in pets {
+            items.append(pet)
+        }
+        return items
+    }
+    
+    
+    var allTasksTitle: [String] {
+        var items: [String] = []
+        for task in tasks {
+            if let name = task.title {
+                items.append(name)
+            }
+        }
+        return items
+    }
+    
+    var allPetsTitle: [String] {
+        var items: [String] = []
+        for pet in pets {
+            if let name = pet.name {
+                items.append(name)
+            }
+        }
+        return items
+    }
+    
+ 
+    
+    
     
     func sortedFilter(item1: String, item2: String)-> Bool {
         let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
@@ -57,33 +103,49 @@ struct Search: View {
         }
     }
     
+
     public var body: some View {
         NavigationStack{
             Text("Aqui você encontra tudo que precisar!")
                 .multilineTextAlignment(.leading)
             List{
                 ForEach(filteredSearch, id: \.self) { search in
-                    Text(search)
+                    if allTasksTitle.contains(search) {
+                        Button{
+                            allTasks.forEach { task in
+                                if task.title == search {
+                                    viewTaskModel.prepareToEdit(task)
+                                }
+                                
+                            }
+                            showTaskSheet.toggle()
+                        }label: {
+                            LineSearch(search: search)
+                        }
+                    }
                 }
                 
                 
                 if filteredSearch.isEmpty && !query.isEmpty {
                     Text("Nenhum resultado com \"\(query)\" foi encontrado")
                 }
+                
+                
                         
             }.searchable(text: $query)
             .searchDictationBehavior(.inline(activation: .onSelect))
+            .sheet(isPresented: $showTaskSheet) {
+                NavigationStack{
+                    TaskSheet()
+                }
+            }
+            
         }.navigationTitle("Pesquisar")
+            
+        
             
     }
 }
 
-#Preview {
-    let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-    NavigationStack{
-        Search()
-            .environment(\.managedObjectContext, context)
-    }
-    
-}
+
 
