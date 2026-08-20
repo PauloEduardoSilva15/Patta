@@ -29,17 +29,17 @@ struct SheetAddPet: View {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 200, height: 200)
+                                .frame(width: 150, height: 150)
                                 .clipShape(Circle())
                         } else {
                             ZStack {
                                 
                                 Circle()
                                     .fill(.accent)
-                                    .frame(width: 200, height: 200)
+                                    .frame(width: 150, height: 150)
                                 
                                 Image(systemName: "photo")
-                                    .font(.system(size: 80))
+                                    .font(.system(size: 50))
                             }
                         }
                         

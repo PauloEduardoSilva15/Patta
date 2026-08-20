@@ -49,7 +49,7 @@ struct FocusedPetView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)

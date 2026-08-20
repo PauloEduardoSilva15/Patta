@@ -118,7 +118,7 @@ struct EditPetView: View {
                                 .padding(12)
                         }
                         .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
                         
                         VStack(alignment: .leading, spacing: 0) {
                             Text("Vacinas:")
@@ -149,7 +149,7 @@ struct EditPetView: View {
                             }
                         }
                         .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
                     }
                     .padding()
                 }

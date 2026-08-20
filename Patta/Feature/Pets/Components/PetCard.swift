@@ -68,7 +68,7 @@ struct PetCard: View {
                 .padding(.horizontal, 5)
                 .padding(.vertical, 5)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.ultraThinMaterial)
+                .background(.regularMaterial)
             }
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
