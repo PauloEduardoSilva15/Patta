@@ -11,6 +11,7 @@ import PhotosUI
 
 struct EditPetView: View {
     
+    @Environment(\.managedObjectContext) private var context
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     
     let pet: Pet
@@ -130,7 +131,7 @@ struct EditPetView: View {
                             if !registries.isEmpty {
                                 
                                 ForEach(registries) { registry in
-                                    Picker("Vacina", selection: $registryViewModelBind.selectedVaccine) {
+                                    Picker("Vacina", selection: Binding(get: { registry.vaccine }, set: { registry.vaccine = $0 })) {
                                         Text("Selecione uma vacina")
                                             .tag(Vaccine?.none)
                                         
@@ -144,10 +145,7 @@ struct EditPetView: View {
                                     Divider()
                                     
                                     DatePicker("Data",
-                                               selection: Binding(
-                                                get: { viewModelBind.birthdate ?? Date.now },
-                                                set: { viewModelBind.birthdate = $0 }
-                                               ),
+                                               selection: Binding(get: { registry.applicationDate ?? Date.now }, set: { registry.applicationDate = $0 }),
                                                in: ...Date.now, displayedComponents: .date)
                                     .padding(12)
                                 }
@@ -168,6 +166,7 @@ struct EditPetView: View {
                                 .font(.body.weight(.medium))
                                 .foregroundStyle(.red)
                                 .frame(maxWidth: .infinity)
+                                .contentShape(Rectangle())
                                 .padding(.vertical, 10)
                                 .glassEffect(.regular.interactive())
                         }
@@ -193,15 +192,21 @@ struct EditPetView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(role: .cancel) {
+                    Button("Cancelar", role: .cancel) {
+                        context.rollback()
                         viewModel.clearForm()
                         navPath.removeLast()
                     }
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .confirm) {
-                        
+                    Button("Salvar", role: .confirm) {
+                        do {
+                            try viewModel.updatePet(pet)
+                            navPath.removeLast()
+                        } catch {
+                            print("Erro ao salvar: \(error)")
+                        }
                     }
                 }
             }
@@ -209,11 +214,13 @@ struct EditPetView: View {
             .onAppear() {
                 if let petImage = pet.image {
                     viewModel.petImage = petImage
-                    viewModel.name = pet.name ?? ""
-                    viewModel.breed = pet.breed ?? ""
-                    viewModel.medicalConditions = pet.med_cond ?? ""
-                    viewModel.birthdate = pet.birthdate ?? Date.now
                 }
+                
+                viewModel.name = pet.name ?? ""
+                viewModel.breed = pet.breed ?? ""
+                viewModel.medicalConditions = pet.med_cond ?? ""
+                viewModel.birthdate = pet.birthdate ?? Date.now
+                viewModel.weight = pet.weight?.intValue
             }
     }
 }
@@ -235,5 +242,6 @@ struct EditPetView: View {
     let viewModel = PetViewModel(name: "", context: context)
     
     return EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+        .environment(\.managedObjectContext, context)
         .environment(VaccineRegistryViewModel(context: context))
 }
