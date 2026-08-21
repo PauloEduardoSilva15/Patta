@@ -16,6 +16,7 @@ struct EditPetView: View {
     
     let pet: Pet
     let viewModel: PetViewModel
+    @Environment(\.dismiss) private var dismiss
     
     @State private var selectedImage: PhotosPickerItem?
     @State private var vaccineRegistryTitle: [String] = []
@@ -201,14 +202,14 @@ struct EditPetView: View {
                 Button("Cancelar", role: .cancel) {
                     context.rollback()
                     viewModel.cancelEditing()
-                    navPath.removeLast()
+                    dismiss()
                 }
             }
             
             ToolbarItem(placement: .confirmationAction) {
                 Button(role: .confirm) {
                     if viewModel.savePet() {
-                        navPath.removeLast()
+                        dismiss()
                     }
                 } label: {
                     Text("Salvar")
@@ -293,3 +294,4 @@ private struct EditPetPreview: View {
         return pet
     }
 }
+

@@ -3,11 +3,18 @@
 import SwiftUI
 import CoreData
 
+
+
+
 struct Search: View {
     @State var query: String = ""
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(TaskViewModel.self) private var viewTaskModel
     @Environment(PetViewModel.self) private var viewModel: PetViewModel
+    
+    @State private var navPath: [PetRoute] = []
+    @State private var selectedPet: Pet?
+    @State private var showEditPet = false
    
     @FetchRequest(
         entity: Pet.entity(),
@@ -62,7 +69,6 @@ struct Search: View {
  
     
     
-    
     func sortedFilter(item1: String, item2: String)-> Bool {
         let item1StartsWith = item1.localizedCaseInsensitiveContains(query) && item1.hasPrefix(query.lowercased())
         let item2StartsWith = item2.localizedCaseInsensitiveContains(query) && item2.hasPrefix(query.lowercased())
@@ -111,22 +117,31 @@ struct Search: View {
             List{
                 ForEach(filteredSearch, id: \.self) { search in
                     if allTasksTitle.contains(search) {
-                        Button{
+                        Button {
                             allTasks.forEach { task in
                                 if task.title == search {
                                     viewTaskModel.prepareToEdit(task)
                                 }
                             }
                             showTaskSheet.toggle()
-                        }label: {
-                            LineSearch(search: search)
+                        } label: {
+                            LineSearch(search: search + " Task")
                         }
                     }
                     if allPetsName.contains(search) {
-                        
-                        LineSearch(search: search)
+                        NavigationLink(destination: {
+                            if let pet = allPets.first(where: { $0.name == search }) {
+                                EditPetView(
+                                    pet: pet,
+                                    viewModel: viewModel,
+                                    navPath: $navPath
+                                )
+                            }
+                        }) {
+                            Text(search + " Pet")
+                        }.foregroundStyle(.accent)
                     }
-                    
+    
                     
                 }
                 
@@ -151,6 +166,4 @@ struct Search: View {
             
     }
 }
-
-
 
