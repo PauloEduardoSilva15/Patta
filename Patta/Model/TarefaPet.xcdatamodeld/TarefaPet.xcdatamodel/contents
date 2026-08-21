@@ -3,6 +3,7 @@
     <entity name="Pet" representedClassName=".Pet" syncable="YES" codeGenerationType="class">
         <attribute name="birthdate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="breed" optional="YES" attributeType="String"/>
+        <attribute name="color" attributeType="String" defaultValueString="petAzul"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="image" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="med_cond" optional="YES" attributeType="String"/>

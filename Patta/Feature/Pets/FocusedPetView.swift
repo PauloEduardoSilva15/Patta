@@ -89,7 +89,7 @@ struct FocusedPetView: View {
 
 struct PetInformationView: View {
     
-    let pet: PetModel
+    @ObservedObject var pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
@@ -114,11 +114,35 @@ struct PetInformationView: View {
         Text((pet.medicalConditions ?? "").isEmpty ? "Condições Médicas" : pet.medicalConditions ?? "")
             .foregroundStyle((pet.medicalConditions ?? "").isEmpty ? .secondary : .primary)
             .padding(12)
+        
+        Divider()
+
+        HStack {
+            Text("Cor")
+
+            Spacer()
+
+            Circle()
+                .fill(
+                    PetColorPalette.color(
+                        for: pet.color
+                    )
+                )
+                .frame(width: 24, height: 24)
+
+            Text(
+                PetColorPalette.title(
+                    for: pet.color
+                )
+            )
+        }
+        .padding(12)
+        .accessibilityElement(children: .combine)
     }
 }
 
 struct VaccineListView: View {
-    let pet: PetModel
+    @ObservedObject var pet: PetModel
     @FetchRequest private var registries: FetchedResults<VaccineRegistry>
     
     init(pet: PetModel) {

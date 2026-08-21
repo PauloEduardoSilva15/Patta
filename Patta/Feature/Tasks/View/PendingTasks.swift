@@ -44,7 +44,7 @@ struct PendingTasks: View {
                                 viewModel.prepareToEdit(task)
                                 showTaskSheet = true
                             }, onComplete: {
-                                viewModel.completeTask(task)
+                                viewModel.toggleTaskCompletion(task)
                             })
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
@@ -71,7 +71,7 @@ struct PendingTasks: View {
                                 viewModel.prepareToEdit(task)
                                 showTaskSheet = true
                             }, onComplete: {
-                                viewModel.completeTask(task)
+                                viewModel.toggleTaskCompletion(task)
                             })
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
@@ -97,20 +97,5 @@ struct PendingTasks: View {
         .sheet(isPresented: $showTaskSheet) {
             TaskSheet()
         }
-        
     }
-    
 }
-
-//#Preview {
-//    let dataController = DataController.shared
-//    let context = dataController.container.viewContext
-//    let taskViewModel = TaskViewModel(context: context)
-//
-//    PendingTasks()
-//        .environment(taskViewModel)
-//        .environment(
-//            \.managedObjectContext,
-//             context
-//        )
-//}
