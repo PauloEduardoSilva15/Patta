@@ -10,8 +10,9 @@ import SwiftUI
 struct LineSearch: View {
     var search: String
     var body: some View {
-        HStack(spacing: 200){
+        HStack{
             Text(search)
+            Spacer()
             Image(systemName: "chevron.right")
         }
     }

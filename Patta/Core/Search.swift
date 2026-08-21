@@ -49,7 +49,7 @@ struct Search: View {
         return items
     }
     
-    var allPetsTitle: [String] {
+    var allPetsName: [String] {
         var items: [String] = []
         for pet in pets {
             if let name = pet.name {
@@ -116,13 +116,18 @@ struct Search: View {
                                 if task.title == search {
                                     viewTaskModel.prepareToEdit(task)
                                 }
-                                
                             }
                             showTaskSheet.toggle()
                         }label: {
                             LineSearch(search: search)
                         }
                     }
+                    if allPetsName.contains(search) {
+                        
+                        LineSearch(search: search)
+                    }
+                    
+                    
                 }
                 
                 
