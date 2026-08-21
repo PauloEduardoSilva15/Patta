@@ -18,6 +18,7 @@ final class CoreDataPetRepository: PetRepositoryProtocol {
     
     func fetchAll() throws -> [PetModel] {
         let request = Pet.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Pet.name, ascending: true)]
         return try context.fetch(request).map(mapToModel)
     }
     

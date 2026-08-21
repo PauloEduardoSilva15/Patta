@@ -118,28 +118,22 @@ struct PetInformationView: View {
 }
 
 struct VaccineListView: View {
-    let pet: PetModel
-    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
     
-    init(pet: PetModel) {
-        self.pet = pet
-        _registries = FetchRequest(
-            sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)],
-            predicate: NSPredicate(format: "pet == %@", pet as! CVarArg)
-        )
-    }
+    @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
+    
+    let pet: PetModel
     
     var body: some View {
-        if registries.isEmpty {
+        if vaccineRegistryListStore.vaccineRegistries.isEmpty {
             Text("Não há vacinas registradas.")
                 .padding(.vertical, 30)
         } else {
             ScrollView {
-                ForEach(registries) { registry in
+                ForEach(vaccineRegistryListStore.vaccineRegistries) { registry in
                     VaccineCardHistory(vaccineRegistry: registry)
                         .padding(12)
                     
-                    if registry != registries.last {
+                    if registry != vaccineRegistryListStore.vaccineRegistries.last {
                         Divider()
                     }
                 }
@@ -166,7 +160,9 @@ struct VaccineListView: View {
     let repository = CoreDataPetRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
+    let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
+    let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
     
     FocusedPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
-        .environment(VaccineRegistryViewModel(context: context))
+        .environment(VaccineRegistryViewModel(store: vaccineRegistryStore))
 }

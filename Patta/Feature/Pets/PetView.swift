@@ -81,9 +81,11 @@ struct PetView: View {
     
     let context = DataController.shared.container.viewContext
     let repository = CoreDataPetRepository(context: context)
+    let vaccineRepository = CoreDataVaccineRegistryRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
-    let registryViewModel = VaccineRegistryViewModel(context: context)
+    let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRepository)
+    let registryViewModel = VaccineRegistryViewModel(store: vaccineRegistryStore)
     
     PetView()
         .environment(viewModel)
