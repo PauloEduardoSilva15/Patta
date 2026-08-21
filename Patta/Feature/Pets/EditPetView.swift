@@ -30,11 +30,14 @@ struct EditPetView: View {
         return calendar
     }
     
-    init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
+    init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>, isDismiss: Bool) {
         self.pet = pet
         self.viewModel = viewModel
         _navPath = navPath
+        self.isDimmiss = isDismiss
     }
+    
+    @State var isDimmiss: Bool
     
     var body: some View {
         
@@ -231,6 +234,10 @@ struct EditPetView: View {
                     ) {
                         Button("Deletar", role: .destructive) {
                             if viewModel.deletePet(id: pet.id) {
+                                if isDimmiss{
+                                    dismiss()
+                                    return
+                                }
                                 navPath.removeAll()
                             }
                         }
@@ -294,7 +301,7 @@ struct EditPetView: View {
     let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
     let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
     
-    EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+    EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath, isDismiss: false)
         .environment(VaccineRegistryViewModel(store: vaccineRegistryStore))
         .environment(vaccineRegistryStore)
         .environment(vaccineStore)

@@ -131,10 +131,18 @@ struct Search: View {
                     if allPetsName.contains(search) {
                         NavigationLink(destination: {
                             if let pet = allPets.first(where: { $0.name == search }) {
+                                let petModel = PetModel(
+                                    id: pet.id ?? UUID(),
+                                    name: pet.name ?? "",
+                                    breed: pet.breed ?? "",
+                                    birthdate: pet.birthdate,
+                                    image: pet.image
+                                )
                                 EditPetView(
-                                    pet: pet,
+                                    pet: petModel,
                                     viewModel: viewModel,
-                                    navPath: $navPath
+                                    navPath: $navPath,
+                                    isDismiss: true
                                 )
                             }
                         }) {
