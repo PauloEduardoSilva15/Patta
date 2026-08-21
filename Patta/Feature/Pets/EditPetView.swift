@@ -13,7 +13,7 @@ struct EditPetView: View {
     
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
-    @Environment(VaccineListStore.self) private var vaccineListStore
+
     
     let pet: PetModel
     let viewModel: PetViewModel
@@ -38,7 +38,6 @@ struct EditPetView: View {
     var body: some View {
         
         @Bindable var viewModelBind = viewModel
-        @Bindable var registryViewModelBind = registryViewModel
         
         ZStack(alignment: .bottom) {
             if let image = viewModel.petImage, let uiImage = UIImage(data: image) {
@@ -141,42 +140,77 @@ struct EditPetView: View {
                         Text("Vacinas:")
                             .font(.headline)
                             .padding(.bottom, 10)
-                        
-                        if !vaccineRegistryListStore.vaccineRegistries.isEmpty {
-                            ForEach(vaccineRegistryListStore.vaccineRegistries) { registry in
-                                Picker("Vacina", selection: $registryViewModelBind.selectedVaccine) {
-                                    Text("Selecione uma vacina")
-                                        .tag(VaccineModel?.none)
-                                    
-                                    ForEach(vaccineListStore.vaccines) { vaccine in
-                                        Text(vaccine.title)
-                                            .tag(Optional(vaccine))
-                                    }
-                                }
-                                .padding(12)
-                                
-                                Divider()
-                                
-                                DatePicker(
-                                    "Data",
-                                    selection: Binding(
-                                        get: { registry.applicationDate ?? Date.now },
-                                        set: { registryViewModelBind.applicationDate = $0 }
-                                    ),
-                                    in: ...Date.now,
-                                    displayedComponents: .date
-                                )
-                                .padding(12)
-                            }
+
+                        if vaccineRegistryListStore.vaccineRegistries.isEmpty {
+                            Text(
+                                """
+                                Não há vacinas registradas.
+
+                                Cadastre uma nova vacina na aba \
+                                "Histórico de Vacinas".
+                                """
+                            )
+                            .foregroundStyle(.secondary)
+                            .padding(.vertical, 20)
                         } else {
-                            Text("Não há vacinas registradas. \n\nCadastre uma nova vacina na aba de \"Histórico de Vacinas\"")
-                                .padding(.top, 20)
-                                .padding(.leading, 20)
+                            ForEach(
+                                vaccineRegistryListStore.vaccineRegistries
+                            ) { registry in
+                                Button {
+                                    registryViewModel.prepareForEditing(
+                                        registry: registry
+                                    )
+
+                                    registryViewModel.activePetForSheet = pet
+                                } label: {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 5) {
+                                            Text(registry.vaccine.title)
+                                                .foregroundStyle(.primary)
+
+                                            Text(
+                                                registry.applicationDate?
+                                                    .formatted(
+                                                        date: .abbreviated,
+                                                        time: .omitted
+                                                    )
+                                                ?? "Data não informada"
+                                            )
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                        }
+
+                                        Spacer()
+
+                                        Image(systemName: "chevron.right")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .padding(12)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+
+                                if registry.id !=
+                                    vaccineRegistryListStore
+                                        .vaccineRegistries
+                                        .last?
+                                        .id {
+
+                                    Divider()
+                                }
+                            }
                         }
                     }
                     .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .leading
+                    )
+                    .background(
+                        .regularMaterial,
+                        in: RoundedRectangle(cornerRadius: 20)
+                    )
+                   
                     
                     Button {
                         confirmDelete = true
