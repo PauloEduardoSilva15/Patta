@@ -8,6 +8,11 @@
 import SwiftUI
 import CoreData
 
+enum PetRoute: Hashable {
+    case detail(Pet)
+    case edit(Pet)
+}
+
 struct Navigation: View {
     @Environment(\.managedObjectContext) private var context
     
@@ -20,9 +25,7 @@ struct Navigation: View {
                 }
             }
             Tab("Pets", systemImage: "pawprint.fill"){
-                NavigationStack {
-                    PetView()
-                }
+                PetView()
             }
             Tab(role: .search){
                 NavigationStack{

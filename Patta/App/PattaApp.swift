@@ -20,7 +20,7 @@ struct PattaApp: App {
         let controller = DataController.shared
         let context = controller.container.viewContext
         _dataController = .init(initialValue: controller)
-        _petViewModel = .init(initialValue: PetViewModel(name: "", context: context))
+        _petViewModel = .init(initialValue: PetViewModel(context: context))
         _taskViewModel = .init(initialValue: TaskViewModel(context: context))
         _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(context: context))
         _vaccineViewModel = .init(initialValue: VaccineViewModel(context: context))

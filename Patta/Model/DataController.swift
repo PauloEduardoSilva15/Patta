@@ -17,18 +17,29 @@ class DataController {
     private init () {
         container = NSPersistentContainer(name: "TarefaPet")
         
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                print("Falha ao carregar o banco de dados: \(error)")
+        container.loadPersistentStores { [weak self] description, error in
+            if let nsError = error as NSError? {
+                fatalError(
+                    """
+                    Não foi possível abrir o Core Data.
+
+                    Código: \(nsError.code)
+                    Descrição: \(nsError.localizedDescription)
+                    Detalhes: \(nsError.userInfo)
+                    """
+                )
             }
-            self.seedDefaultVaccines()
-            
-            print("Core Data carregado em:", description.url?.absoluteString ?? "URL desconhecida")
+
+            print(
+                "Core Data carregado em:",
+                description.url?.absoluteString ?? "URL desconhecida"
+            )
+
+            self?.seedDefaultVaccines()
         }
-        
+
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        
     }
     
     private func seedDefaultVaccines() {

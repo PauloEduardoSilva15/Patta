@@ -15,49 +15,66 @@ struct PetView: View {
     
     @State private var showSheet: Bool = false
     
+    @State private var navPath = [PetRoute]()
+    
     @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
+    
+    let columns = [
+        GridItem(.flexible(), spacing: 5),
+        GridItem(.flexible(), spacing: 5)
+    ]
     
     var body: some View {
         
-        @Bindable var registryViewModelBind = registryViewModel
-        
-        VStack {
-            HStack {
-                Text("Pets")
-                    .font(.title.bold())
-                
-                Spacer()
-                
-                Button(action: {
-                    showSheet.toggle()
-                }) {
-                    Image(systemName: "plus")
-                        .font(.title.weight(.medium))
-                }
-                .buttonStyle(.plain)
-                .frame(width: 44, height: 44)
-                .glassEffect(.regular.tint(.accentColor).interactive())
-            }
-            .padding()
+        NavigationStack(path: $navPath) {
+            @Bindable var registryViewModelBind = registryViewModel
             
-            List {
-                ForEach(pets) { pet in
-                    PetCard(pet: pet, viewModel: viewModel)
-                        .padding(.bottom)
+            ZStack {
+                
+                Color.background
+                    .ignoresSafeArea()
+                
+                VStack {
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(pets) { pet in
+                                NavigationLink(value: PetRoute.detail(pet)) {
+                                    PetCard(pet: pet, viewModel: viewModel)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding()
+                    }
                 }
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                .sheet(isPresented: $showSheet) {
+                    SheetAddPet()
+                }
+                .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
+                    VaccineRegistrySheet(pet: pet)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: {
+                            viewModel.prepareNewPet()
+                            showSheet = true
+                        }) {
+                            Image(systemName: "plus")
+                                .foregroundStyle(.white)
+                        }
+                        .buttonStyle(.glassProminent)
+                    }
+                }
             }
-            .listStyle(.plain)
-            .environment(\.defaultMinListRowHeight, 0)
-            .padding()
-        }
-        .sheet(isPresented: $showSheet) {
-            SheetAddPet()
-        }
-        .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
-            VaccineRegistrySheet(pet: pet)
+            .navigationTitle("Pets")
+            .navigationDestination(for: PetRoute.self) { route in
+                switch route {
+                case .detail(let petToView):
+                    FocusedPetView(pet: petToView, viewModel: viewModel, navPath: $navPath)
+                case .edit(let petToEdit):
+                    EditPetView(pet: petToEdit, viewModel: viewModel, navPath: $navPath)
+                }
+            }
         }
     }
 }
@@ -65,9 +82,11 @@ struct PetView: View {
 #Preview {
     
     let context = DataController.shared.container.viewContext
-    let viewModel = PetViewModel(name: "", context: context)
+    let viewModel = PetViewModel(context: context)
+    let registryViewModel = VaccineRegistryViewModel(context: context)
     
     PetView()
         .environment(viewModel)
+        .environment(registryViewModel)
         .environment(\.managedObjectContext, context)
 }

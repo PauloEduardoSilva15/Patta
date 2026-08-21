@@ -10,87 +10,97 @@ import CoreData
 
 struct PetCard: View {
     
-    let pet: Pet
+    @ObservedObject var pet: Pet
     let viewModel: PetViewModel
     
     var body: some View {
-        NavigationLink {
-            FocusedPetView(pet: pet, viewModel: viewModel)
-        }label: {
-            ZStack(alignment: .bottom) {
-                if pet.image == nil {
-                    Color.accentColor
-                        .frame(height: 205)
-                } else {
-                    if let image = pet.image, let uiImage = UIImage(data: image) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 205)
-                    }
-                }
+        Group {
+            if let imageData = pet.image,
+               let uiImage = UIImage(data: imageData) {
                 
-                HStack {
-                    Image(systemName: "pawprint.fill")
-                        .font(.system(size: 30))
-                        .padding(.trailing, 5)
-                    
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(pet.name ?? "")
-                            .font(.title.bold())
-                        
-                        HStack {
-                            if !(pet.breed ?? "").isEmpty && pet.birthdate != nil {
-                                Text(pet.breed ?? "")
-                                
-                                Circle()
-                                    .frame(width: 5, height: 5)
-                                    .clipShape(Circle())
-                                
-                                Text("\(viewModel.getAge(birthdate: pet.birthdate ?? Date.now)) anos")
-                            } else if !(pet.breed ?? "").isEmpty && pet.birthdate == nil {
-                                Text(pet.breed ?? "")
-                            } else {
-                                Text("\(viewModel.getAge(birthdate: pet.birthdate ?? Date.now)) anos")
-                            }
-                        }
-                        .font(.body)
-                        
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.right.circle.fill")
-                        .font(.system(size: 25))
-                        .foregroundStyle(.button)
-                        .symbolRenderingMode(.monochrome)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
-                .background(.ultraThinMaterial)
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                
+            } else {
+                Color(pet.color ?? PetViewModel.defaultColorName)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
-        .buttonStyle(.plain)
-        .navigationLinkIndicatorVisibility(.hidden)
+        .frame(maxWidth: .infinity)
+        .frame(height: 210)
+        .clipped()
+        .overlay(alignment: .bottom) {
+            HStack(spacing: 8) {
+                Image(systemName: "pawprint.fill")
+                    .font(.system(size: 18))
+                    .frame(width: 24)
+                
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(pet.name ?? "Pet sem nome")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                        .frame( maxWidth: .infinity, alignment: .leading)
+                    
+                    HStack(spacing: 5) {
+                        if let breed = pet.breed,
+                           !breed.isEmpty {
+                            Text(breed)
+                                .lineLimit(1)
+                        }
+                        
+                        if let breed = pet.breed,
+                           !breed.isEmpty,
+                           pet.birthdate != nil {
+                            
+                            Circle()
+                                .frame(width: 4, height: 4)
+                        }
+                        
+                        if let birthdate = pet.birthdate {
+                            Text(
+                                "\(viewModel.getAge(birthdate: birthdate)) anos"
+                            )
+                            .lineLimit(1)
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                .layoutPriority(1)
+            }
+            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(.regularMaterial)
+        }
+        .clipShape(
+            RoundedRectangle(cornerRadius: 10)
+        )
     }
 }
-
 #Preview {
-    let context = DataController.shared.container.viewContext
-    let pet = Pet(context: context)
+    PetCardPreview()
+}
+
+private struct PetCardPreview: View {
+    private let context = DataController.shared.container.viewContext
     
-    pet.name = "Toto"
-    pet.breed = "Beagle"
-    let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    pet.birthdate = myPetBirthdate
-    
-    if let uiImage = UIImage(named: "ImageTest") {
-        pet.image = uiImage.pngData()
+    var body: some View {
+        PetCard(pet: makePet(), viewModel: PetViewModel(context: context))
     }
     
-    let viewModel = PetViewModel(name: "", context: context)
-    
-    return PetCard(pet: pet, viewModel: viewModel)
+    private func makePet() -> Pet {
+        let pet = Pet(context: context)
+        pet.name = "Toto"
+        pet.breed = "Beagle"
+        pet.birthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
+        
+        if let uiImage = UIImage(named: "ImageTest") {
+            pet.image = uiImage.pngData()
+        }
+        
+        return pet
+    }
 }
