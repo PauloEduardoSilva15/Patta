@@ -63,12 +63,6 @@ struct EditPetView: View {
                                 .padding()
                                 .glassEffect(.regular.interactive())
                             
-                            if let errorMessage = viewModel.errorMessage,
-                               !errorMessage.isEmpty {
-                                Text(errorMessage)
-                                    .foregroundStyle(.red)
-                                    .bold()
-                            }
                         }
                         .padding(.bottom, 20)
                     }
