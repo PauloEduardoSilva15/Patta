@@ -15,4 +15,5 @@ struct PetModel: Identifiable, Equatable, Hashable {
     var birthdate: Date?
     var medicalConditions: String?
     var image: Data?
+    var color: String? = PetColorPalette.defaultAssetName
 }

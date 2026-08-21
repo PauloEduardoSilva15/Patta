@@ -89,7 +89,7 @@ struct FocusedPetView: View {
 
 struct PetInformationView: View {
     
-    @ObservedObject var pet: PetModel
+    let pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
@@ -142,12 +142,6 @@ struct PetInformationView: View {
 }
 
 struct VaccineListView: View {
-<<<<<<< HEAD
-=======
-    @ObservedObject var pet: PetModel
-    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
->>>>>>> Dev
-    
     @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
     
     let pet: PetModel

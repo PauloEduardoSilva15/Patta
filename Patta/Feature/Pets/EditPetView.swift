@@ -11,7 +11,6 @@ import PhotosUI
 
 struct EditPetView: View {
     
-    @Environment(\.managedObjectContext) private var context
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
     @Environment(VaccineListStore.self) private var vaccineListStore
@@ -20,15 +19,8 @@ struct EditPetView: View {
     let viewModel: PetViewModel
     
     @State private var selectedImage: PhotosPickerItem?
-    @State private var vaccineRegistryTitle: [String] = []
-    @State private var vaccineRegistryDate: [Date] = []
     @State private var confirmDelete: Bool = false
     @Binding var navPath: [PetRoute]
-    
-<<<<<<< HEAD
-=======
-    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Vaccine.title, ascending: true)]) private var vaccines: FetchedResults<Vaccine>
     
     private let portugueseBrazilLocale = Locale(identifier: "pt_BR")
     private var portugueseBrazilCalendar: Calendar {
@@ -36,8 +28,7 @@ struct EditPetView: View {
         calendar.locale = portugueseBrazilLocale
         return calendar
     }
-  
->>>>>>> Dev
+    
     init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
         self.pet = pet
         self.viewModel = viewModel
@@ -50,9 +41,9 @@ struct EditPetView: View {
         @Bindable var registryViewModelBind = registryViewModel
         
         ZStack(alignment: .bottom) {
-            if let image = viewModel.petImage, let UIImage = UIImage(data: image) {
+            if let image = viewModel.petImage, let uiImage = UIImage(data: image) {
                 GeometryReader { geo in
-                    Image(uiImage: UIImage)
+                    Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFill()
                         .frame(maxWidth: geo.size.width)
@@ -68,15 +59,14 @@ struct EditPetView: View {
                 VStack {
                     PhotosPicker(selection: $selectedImage, matching: .images) {
                         VStack(spacing: 20) {
-                            
                             Text("Adicionar Imagem")
                                 .fontWeight(.medium)
                                 .padding()
                                 .glassEffect(.regular.interactive())
                             
-<<<<<<< HEAD
-                            if viewModel.errorMessage != "" {
-                                Text(viewModel.errorMessage)
+                            if let errorMessage = viewModel.errorMessage,
+                               !errorMessage.isEmpty {
+                                Text(errorMessage)
                                     .foregroundStyle(.red)
                                     .bold()
                             }
@@ -91,9 +81,7 @@ struct EditPetView: View {
                         }
                     }
                     
-                    
                     VStack(alignment: .leading, spacing: 0) {
-                        
                         Text("Informações Gerais:")
                             .font(.headline)
                             .padding(.bottom, 10)
@@ -103,12 +91,15 @@ struct EditPetView: View {
                         
                         Divider()
                         
-                        DatePicker("Data de Nascimento",
-                                   selection: Binding(
-                                    get: { viewModelBind.birthdate ?? Date.now },
-                                    set: { viewModelBind.birthdate = $0 }
-                                   ),
-                                   in: ...Date.now, displayedComponents: .date)
+                        DatePicker(
+                            "Data de Nascimento",
+                            selection: Binding(
+                                get: { viewModelBind.birthdate ?? Date.now },
+                                set: { viewModelBind.birthdate = $0 }
+                            ),
+                            in: ...Date.now,
+                            displayedComponents: .date
+                        )
                         .padding(12)
                         
                         Divider()
@@ -120,48 +111,6 @@ struct EditPetView: View {
                                 Text("kg")
                                     .foregroundStyle(.secondary)
                             }
-=======
-                        }
-                        .padding(.bottom, 20)
-                    }
-                    .buttonStyle(.plain)
-                    .onChange(of: selectedImage) { _, newImage in
-                        Swift.Task {
-                            let data = await viewModel.loadImage(from: newImage)
-                            viewModel.petImage = data
-                        }
-                    }
-                    
-                    
-                    VStack(alignment: .leading, spacing: 0) {
-                        
-                        Text("Informações Gerais:")
-                            .font(.headline)
-                            .padding(.bottom, 10)
-                        
-                        TextField("Nome", text: $viewModelBind.name)
-                            .padding(12)
-                        
-                        Divider()
-                        
-                        DatePicker("Data de Nascimento",
-                                   selection: Binding(
-                                    get: { viewModelBind.birthdate ?? Date.now },
-                                    set: { viewModelBind.birthdate = $0 }
-                                   ),
-                                   in: ...Date.now, displayedComponents: .date)
-                        .padding(12)
-                        
-                        Divider()
-                        
-                        TextField("Peso", value: $viewModelBind.weight, format: .number)
-                            .keyboardType(.decimalPad)
-                            .padding(12)
-                            .overlay(alignment: .trailing) {
-                                Text("kg")
-                                    .foregroundStyle(.secondary)
-                            }
->>>>>>> Dev
                         
                         Divider()
                         
@@ -176,8 +125,6 @@ struct EditPetView: View {
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
                     
-<<<<<<< HEAD
-=======
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Cor do pet:")
                             .font(.headline)
@@ -188,20 +135,14 @@ struct EditPetView: View {
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        .regularMaterial,
-                        in: RoundedRectangle(cornerRadius: 20)
-                    )
->>>>>>> Dev
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
                     
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Vacinas:")
                             .font(.headline)
                             .padding(.bottom, 10)
                         
-<<<<<<< HEAD
                         if !vaccineRegistryListStore.vaccineRegistries.isEmpty {
-                            
                             ForEach(vaccineRegistryListStore.vaccineRegistries) { registry in
                                 Picker("Vacina", selection: $registryViewModelBind.selectedVaccine) {
                                     Text("Selecione uma vacina")
@@ -216,22 +157,16 @@ struct EditPetView: View {
                                 
                                 Divider()
                                 
-                                DatePicker("Data",
-                                           selection: Binding(
-                                            get: { viewModelBind.birthdate ?? Date.now },
-                                            set: { viewModelBind.birthdate = $0 }
-                                           ),
-                                           in: ...Date.now, displayedComponents: .date)
-                                .padding(12)
-=======
-                        if !registries.isEmpty {
-                            
-                            ForEach(registries) { registry in
-                                EditableVaccineRegistryRow(
-                                    registry: registry,
-                                    vaccines: Array(vaccines)
+                                DatePicker(
+                                    "Data",
+                                    selection: Binding(
+                                        get: { registry.applicationDate ?? Date.now },
+                                        set: { registryViewModelBind.applicationDate = $0 }
+                                    ),
+                                    in: ...Date.now,
+                                    displayedComponents: .date
                                 )
->>>>>>> Dev
+                                .padding(12)
                             }
                         } else {
                             Text("Não há vacinas registradas. \n\nCadastre uma nova vacina na aba de \"Histórico de Vacinas\"")
@@ -245,73 +180,22 @@ struct EditPetView: View {
                     
                     Button {
                         confirmDelete = true
-                    }label: {
+                    } label: {
                         Label("Excluir Pet", systemImage: "trash.fill")
                             .font(.body.weight(.medium))
                             .foregroundStyle(.red)
                             .frame(maxWidth: .infinity)
-<<<<<<< HEAD
-                            .padding(.vertical, 10)
-                            .glassEffect(.regular.interactive())
-                    }
-                    .confirmationDialog("Deseja realmente excluir o pet?", isPresented: $confirmDelete, titleVisibility: .visible) {
-                        Button("Deletar", role: .destructive) {
-                            viewModel.deletePet(id: pet.id)
-                            
-                            navPath.removeAll()
-                        }
-                        
-                        Button("Cancelar", role: .cancel) {
-                            confirmDelete = false
-                        }
-                    } message: {
-                        Text("Essa ação não pode ser desfeita!")
-                    }
-                }
-                .padding()
-            }
-            .padding(0)
-            .frame(maxHeight: 420)
-            .scrollIndicators(.hidden)
-        }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button(role: .cancel) {
-                    viewModel.clearForm()
-                    navPath.removeLast()
-                }
-            }
-            
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Salvar", role: .confirm) {
-                    do {
-                        try viewModel.updatePet(id: pet.id)
-                        navPath.removeLast()
-                    } catch {
-                        print("Erro ao salvar: \(error)")
-                    }
-                }
-            }
-        }
-        .navigationBarBackButtonHidden(true)
-        .onAppear() {
-            if let petImage = pet.image {
-                viewModel.petImage = petImage
-                viewModel.name = pet.name
-                viewModel.breed = pet.breed ?? ""
-                viewModel.medicalConditions = pet.medicalConditions ?? ""
-                viewModel.birthdate = pet.birthdate ?? Date.now
-            }
-        }
-=======
                             .contentShape(Rectangle())
                             .padding(.vertical, 10)
                             .glassEffect(.regular.interactive())
                     }
-                    .confirmationDialog("Deseja realmente excluir o pet?", isPresented: $confirmDelete, titleVisibility: .visible) {
+                    .confirmationDialog(
+                        "Deseja realmente excluir o pet?",
+                        isPresented: $confirmDelete,
+                        titleVisibility: .visible
+                    ) {
                         Button("Deletar", role: .destructive) {
                             if viewModel.deletePet(id: pet.id) {
-                                
                                 navPath.removeAll()
                             }
                         }
@@ -334,14 +218,13 @@ struct EditPetView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancelar", role: .cancel) {
-                    context.rollback()
                     viewModel.cancelEditing()
                     navPath.removeLast()
                 }
             }
             
             ToolbarItem(placement: .confirmationAction) {
-                Button(role: .confirm) {
+                Button {
                     if viewModel.savePet() {
                         navPath.removeLast()
                     }
@@ -355,51 +238,8 @@ struct EditPetView: View {
         .onAppear {
             viewModel.prepareToEdit(pet)
         }
->>>>>>> Dev
     }
 }
-
-private struct EditableVaccineRegistryRow: View {
-    @ObservedObject var registry: VaccineRegistry
-    
-    let vaccines: [Vaccine]
-    
-    private var selectedVaccine: Binding<Vaccine?> {
-        Binding(
-            get: { registry.vaccine },
-            set: { registry.vaccine = $0 }
-        )
-    }
-    
-    private var applicationDate: Binding<Date> {
-        Binding(
-            get: { registry.applicationDate ?? Date.now },
-            set: { registry.applicationDate = $0 }
-        )
-    }
-    
-    var body: some View {
-        Picker("Vacina", selection: selectedVaccine) {
-            Text("Selecione uma vacina")
-                .tag(Vaccine?.none)
-            
-            ForEach(vaccines) { vaccine in
-                Text(vaccine.title ?? "")
-                    .tag(Optional(vaccine))
-            }
-        }
-        .padding(12)
-        
-        Divider()
-        
-        DatePicker("Data",
-                   selection: applicationDate,
-                   in: ...Date.now, displayedComponents: .date)
-        .padding(12)
-    }
-}
-
-
 
 #Preview {
     @Previewable @State var navPath: [PetRoute] = []
@@ -409,18 +249,18 @@ private struct EditableVaccineRegistryRow: View {
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
     let birthdate = myPetBirthdate
     
-    if let uiImage = UIImage(named: "ImageTest") {
-        let image = uiImage.pngData()
-    }
-    
     let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
     
     let repository = CoreDataPetRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
+    let vaccineRepository = CoreDataVaccineRepository(context: context)
+    let vaccineStore = VaccineListStore(repository: vaccineRepository)
     let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
     let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
     
     EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
         .environment(VaccineRegistryViewModel(store: vaccineRegistryStore))
+        .environment(vaccineRegistryStore)
+        .environment(vaccineStore)
 }
