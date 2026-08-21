@@ -44,19 +44,22 @@ struct VaccineRegistrySheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(role: .cancel) {
+                    Button("Cancelar", role: .cancel) {
+                        registryViewModel.cancelEditing()
                         registryViewModel.activePetForSheet = nil
                     }
                 }
-                
+
                 ToolbarItem(placement: .principal) {
-                    Text("Nova Vacina")
+                    Text(registryViewModel.formTitle)
                         .font(.headline)
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .confirm) {
-                        if registryViewModel.saveRegistry(petId: pet.id) {
+                    Button("Salvar") {
+                        if registryViewModel.saveRegistry(
+                            petId: pet.id
+                        ) {
                             registryViewModel.activePetForSheet = nil
                         }
                     }

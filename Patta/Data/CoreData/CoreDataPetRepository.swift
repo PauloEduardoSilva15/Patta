@@ -55,6 +55,7 @@ final class CoreDataPetRepository: PetRepositoryProtocol {
         pet.birthdate = model.birthdate
         pet.med_cond = model.medicalConditions
         pet.image = model.image
+        pet.color = PetColorPalette.normalizedAssetName(model.color)
     }
     
     func mapToModel(_ pet: Pet) -> PetModel {
@@ -65,7 +66,8 @@ final class CoreDataPetRepository: PetRepositoryProtocol {
             breed: pet.breed ?? "",
             birthdate: pet.birthdate ?? Date(),
             medicalConditions: pet.med_cond ?? "",
-            image: pet.image
+            image: pet.image,
+            color: PetColorPalette.normalizedAssetName(pet.color)
         )
     }
     
@@ -73,6 +75,10 @@ final class CoreDataPetRepository: PetRepositoryProtocol {
         do {
             try context.save()
         } catch {
+            let NSError = error as NSError
+            
+            print(NSError)
+            
             context.rollback()
             throw error
         }

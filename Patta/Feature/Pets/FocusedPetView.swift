@@ -11,6 +11,8 @@ import CoreData
 struct FocusedPetView: View {
     
     @Environment(VaccineRegistryViewModel.self) private var vaccineRegistryViewModel
+    @Environment(PetListStore.self) private var petListStore
+    @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
     
     let pet: PetModel
     let viewModel: PetViewModel
@@ -18,9 +20,18 @@ struct FocusedPetView: View {
     @State private var selectedTab: PetTab = .info
     @Binding var navPath: [PetRoute]
     
+    private var currentPet: PetModel {
+            petListStore.pets.first { storedPet in
+                storedPet.id == pet.id
+            } ?? pet
+        }
+    
+    
     var body: some View {
         
         @Bindable var vaccineViewModelBind = vaccineRegistryViewModel
+        
+        
         
         ZStack {
             if let image = pet.image, let UIImage = UIImage(data: image) {
@@ -43,9 +54,9 @@ struct FocusedPetView: View {
                         .padding(.bottom, 10)
                     
                     if selectedTab == .info {
-                        PetInformationView(pet: pet, viewModel: viewModel)
+                        PetInformationView(pet: currentPet, viewModel: viewModel)
                     } else {
-                        VaccineListView(pet: pet)
+                        VaccineListView(pet: currentPet)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -59,7 +70,7 @@ struct FocusedPetView: View {
                 VStack(alignment: .trailing) {
                     Button {
                         vaccineRegistryViewModel.prepareNewRegistry()
-                        vaccineRegistryViewModel.activePetForSheet = pet
+                        vaccineRegistryViewModel.activePetForSheet = currentPet
                     }label: {
                         Image(systemName: "plus")
                             .font(.title2)
@@ -78,18 +89,21 @@ struct FocusedPetView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                NavigationLink(value: PetRoute.edit(pet)) {
+                NavigationLink(value: PetRoute.edit(currentPet)) {
                     Text("Editar")
                 }
             }
         }
         .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            vaccineRegistryListStore.refresh(for: pet.id)
+        }
     }
 }
 
 struct PetInformationView: View {
     
-    @ObservedObject var pet: PetModel
+    let pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
@@ -142,12 +156,6 @@ struct PetInformationView: View {
 }
 
 struct VaccineListView: View {
-<<<<<<< HEAD
-=======
-    @ObservedObject var pet: PetModel
-    @FetchRequest private var registries: FetchedResults<VaccineRegistry>
->>>>>>> Dev
-    
     @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
     
     let pet: PetModel

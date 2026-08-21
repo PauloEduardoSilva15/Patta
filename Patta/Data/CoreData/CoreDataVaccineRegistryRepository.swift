@@ -8,6 +8,29 @@
 import Foundation
 import CoreData
 
+enum VaccineRegistryRepositoryError: LocalizedError {
+    case missingPetId
+    case petNotFound(UUID)
+    case vaccineNotFound(UUID)
+    case registryNotFound(UUID)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingPetId:
+            return "O registro não possui um Pet."
+
+        case .petNotFound:
+            return "O Pet do registro não foi encontrado."
+
+        case .vaccineNotFound:
+            return "A vacina selecionada não foi encontrada."
+
+        case .registryNotFound:
+            return "O registro de vacina não foi encontrado."
+        }
+    }
+}
+
 final class CoreDataVaccineRegistryRepository: VaccineRegistryRepositoryProtocol {
     
     private let context: NSManagedObjectContext
@@ -16,9 +39,23 @@ final class CoreDataVaccineRegistryRepository: VaccineRegistryRepositoryProtocol
         self.context = context
     }
     
-    func fetchAll(forPetId: UUID) throws -> [VaccineRegistryModel] {
+    func fetchAll(
+        forPetId: UUID
+    ) throws -> [VaccineRegistryModel] {
         let request = VaccineRegistry.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: true)]
+
+        request.predicate = NSPredicate(
+            format: "pet.id == %@",
+            forPetId as CVarArg
+        )
+
+        request.sortDescriptors = [
+            NSSortDescriptor(
+                keyPath: \VaccineRegistry.applicationDate,
+                ascending: false
+            )
+        ]
+
         return try context.fetch(request).compactMap(mapToModel)
     }
     
@@ -28,8 +65,16 @@ final class CoreDataVaccineRegistryRepository: VaccineRegistryRepositoryProtocol
         try save()
     }
     
-    func update(_ model: VaccineRegistryModel) throws {
-        guard let vaccineRegistry = try fetchManagedObject(id: model.id) else { return }
+    func update(
+        _ model: VaccineRegistryModel
+    ) throws {
+        guard let vaccineRegistry = try fetchManagedObject(
+            id: model.id
+        ) else {
+            throw VaccineRegistryRepositoryError
+                .registryNotFound(model.id)
+        }
+
         try apply(model, to: vaccineRegistry)
         try save()
     }
@@ -40,11 +85,30 @@ final class CoreDataVaccineRegistryRepository: VaccineRegistryRepositoryProtocol
         try save()
     }
     
-    private func apply(_ model: VaccineRegistryModel, to vaccineRegistry: VaccineRegistry) throws {
+    private func apply(
+        _ model: VaccineRegistryModel,
+        to vaccineRegistry: VaccineRegistry
+    ) throws {
+        guard let petId = model.petId else {
+            throw VaccineRegistryRepositoryError.missingPetId
+        }
+
+        guard let pet = try fetchPet(id: petId) else {
+            throw VaccineRegistryRepositoryError
+                .petNotFound(petId)
+        }
+
+        guard let vaccine = try fetchVaccine(
+            id: model.vaccine.id
+        ) else {
+            throw VaccineRegistryRepositoryError
+                .vaccineNotFound(model.vaccine.id)
+        }
+
         vaccineRegistry.id = model.id
         vaccineRegistry.applicationDate = model.applicationDate
-        vaccineRegistry.vaccine = try fetchVaccine(id: model.vaccine.id)
-        vaccineRegistry.pet = try fetchPet(id: model.petId ?? UUID())
+        vaccineRegistry.vaccine = vaccine
+        vaccineRegistry.pet = pet
     }
     
     private func fetchManagedObject(id: UUID) throws -> VaccineRegistry? {

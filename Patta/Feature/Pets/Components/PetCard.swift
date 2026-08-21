@@ -10,7 +10,7 @@ import CoreData
 
 struct PetCard: View {
     
-    @ObservedObject var pet: PetModel
+    let pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
@@ -23,7 +23,7 @@ struct PetCard: View {
                     .scaledToFill()
                 
             } else {
-                Color(pet.color ?? PetViewModel.defaultColorName)
+                PetColorPalette.color(for: pet.color)
             }
         }
         .frame(maxWidth: .infinity)
@@ -36,7 +36,7 @@ struct PetCard: View {
                     .frame(width: 24)
                 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(pet.name ?? "Pet sem nome")
+                    Text(pet.name.isEmpty ? "Pet sem nome" : pet.name)
                         .font(.headline)
                         .fontWeight(.bold)
                         .lineLimit(2)

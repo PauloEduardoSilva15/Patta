@@ -21,12 +21,12 @@ final class PetViewModel {
     var medicalConditions = ""
     var errorMessage: String?
     
-    var petBeingEdited: Pet?
+    private var petBeingEditedId: UUID?
     
     private let store: PetListStore
     
     var isEditing: Bool {
-        petBeingEdited != nil
+        petBeingEditedId != nil
     }
     
     var formTitle: String {
@@ -37,30 +37,29 @@ final class PetViewModel {
 
     var selectedColorName = PetViewModel.defaultColorName
     
-    init(context: NSManagedObjectContext) {
-        self.context = context
+    init(name: String = "", store: PetListStore) {
+        self.name = name
+        self.weight = nil
+        self.breed = ""
+        self.birthdate = nil
+        self.store = store
     }
     
     func prepareNewPet() {
         resetForm()
     }
     
-    func prepareToEdit(_ pet: Pet) {
-        guard pet.managedObjectContext === context else {
-            errorMessage = "Erro ao carregar o pet"
-            return
-        }
-        
-        petBeingEdited = pet
-        
-        name = pet.name ?? ""
-        weight = pet.weight?.decimalValue
+    func prepareToEdit(_ pet: PetModel) {
+        petBeingEditedId = pet.id
+        name = pet.name
+        weight = pet.weight
         breed = pet.breed ?? ""
         birthdate = pet.birthdate
-        medicalConditions = pet.med_cond ?? ""
+        medicalConditions = pet.medicalConditions ?? ""
         petImage = pet.image
-        selectedColorName = PetColorPalette.normalizedAssetName(pet.color)
-        
+        selectedColorName = PetColorPalette.normalizedAssetName(
+            pet.color
+        )
         errorMessage = nil
     }
     
@@ -79,37 +78,28 @@ final class PetViewModel {
             return false
         }
 
-        let petToSave: Pet
-
-        if let petBeingEdited {
-            guard petBeingEdited.managedObjectContext === context else {
-                errorMessage = """
-                O pet e a ViewModel estão usando contextos diferentes
-                """
-                return false
-            }
-
-            petToSave = petBeingEdited
-        } else {
-            petToSave = Pet(context: context)
-            petToSave.id = UUID()
-        }
-
-        applyFormData(
-            to: petToSave,
-            treatedName: treatedName
+        let petToSave = PetModel(
+            id: petBeingEditedId ?? UUID(),
+            name: treatedName,
+            weight: weight,
+            breed: breed.trimmingCharacters(in: .whitespacesAndNewlines),
+            birthdate: birthdate,
+            medicalConditions: medicalConditions.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            ),
+            image: petImage,
+            color: PetColorPalette.normalizedAssetName(selectedColorName)
         )
 
         do {
-            if context.hasChanges {
-                try context.save()
+            if !isEditing {
+                try store.add(petToSave)
+            } else {
+                try store.update(petToSave)
             }
-
             resetForm()
             return true
         } catch {
-            context.rollback()
-
             let nsError = error as NSError
             errorMessage = """
             Erro ao salvar o pet: \(nsError.localizedDescription)
@@ -119,26 +109,16 @@ final class PetViewModel {
         }
     }
     
-    func deletePet(_ pet: Pet) -> Bool {
-        guard pet.managedObjectContext === context else {
-            errorMessage = "O pet e a viewmodel estao usando contextos diferentes"
-            return false
-        }
-        
-        let wasBeingEdited = petBeingEdited?.objectID == pet.objectID
-        
-        context.delete(pet)
-        
+    func deletePet(id: UUID) -> Bool {
         do {
-            try context.save()
-            if wasBeingEdited {
+            try store.delete(id: id)
+            if petBeingEditedId == id {
                 resetForm()
             } else {
                 errorMessage = nil
             }
             return true
         } catch {
-            context.rollback()
             let nsError = error as NSError
             errorMessage = "Erro ao excluir o pet: \(nsError.localizedDescription)"
             return false
@@ -183,30 +163,8 @@ final class PetViewModel {
         resetForm()
     }
     
-    func applyFormData(
-        to pet: Pet,
-        treatedName: String
-    ) {
-        pet.name = treatedName
-        pet.weight = weight.map {
-            NSDecimalNumber(decimal: $0)
-        }
-        pet.breed = breed.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
-        pet.birthdate = birthdate
-        pet.med_cond = medicalConditions.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
-        pet.image = petImage
-
-        pet.color = PetColorPalette.normalizedAssetName(
-            selectedColorName
-        )
-    }
-    
     private func resetForm() {
-        petBeingEdited = nil
+        petBeingEditedId = nil
         
         petImage = nil
         name = ""
@@ -219,97 +177,3 @@ final class PetViewModel {
         errorMessage = nil
     }
 }
-//
-//
-////    ===============
-//    func getAge(birthdate: Date) -> String {
-//        let calendar = Calendar.current
-//        let ageComponents = calendar.dateComponents([.year], from: birthdate, to: Date())
-//        return String(ageComponents.year!)
-//    }
-//    
-//    func addNewPet() throws {
-//        
-//        guard !name.isEmpty else {
-//            throw ValidationError.emptyProperty
-//        }
-//        
-//        let newPet = Pet(context: context)
-//        
-//        newPet.id = UUID()
-//        
-//        insertData(pet: newPet)
-//        trySaveChanges()
-//        clearForm()
-//    }
-//    
-//    func updatePet(_ editingPet: Pet) throws {
-//        
-////        guard context.hasChanges else { return }
-//        
-//        guard !name.isEmpty else { throw ValidationError.emptyProperty }
-//        
-//        insertData(pet: editingPet)
-//        trySaveChanges()
-//        clearForm()
-//    }
-//    
-//    func deletePet(_ pet: Pet) {
-//        context.delete(pet)
-//        
-//        trySaveChanges()
-//    }
-//    
-//    private func insertData(pet: Pet) {
-//        pet.name = name
-//        pet.weight = NSDecimalNumber(integerLiteral: weight ?? 0)
-//        pet.breed = breed
-//        pet.birthdate = birthdate
-//        pet.med_cond = medicalConditions
-//        pet.image = petImage ?? nil
-//    }
-//    
-//    private func trySaveChanges() {
-//        do {
-//            try saveChanges()
-//        } catch let error as ValidationError {
-//            errorMessage = error.localizedDescription
-//            print(error.localizedDescription)
-//        } catch {
-//            errorMessage = error.localizedDescription
-//            print(error.localizedDescription)
-//        }
-//    }
-//    
-//    private func saveChanges() throws {
-//        do {
-//            try context.save()
-//            clearForm()
-//        } catch {
-//            context.rollback()
-//            throw ValidationError.saveFailed(description: error)
-//        }
-//    }
-//    
-//    func loadImage(from image: PhotosPickerItem?) async -> Data? {
-//        errorMessage = ""
-//        
-//        do {
-//            return try await image?.loadTransferable(type: Data.self)
-//        } catch {
-//            errorMessage = "Não foi possível carregar a foto. Tente novamente."
-//        }
-//        
-//        return nil
-//    }
-//    
-//    func clearForm() {
-//        name = ""
-//        weight = nil
-//        petImage = nil
-//        breed = ""
-//        birthdate = nil
-//        medicalConditions = ""
-//        errorMessage = ""
-//    }
-//}
