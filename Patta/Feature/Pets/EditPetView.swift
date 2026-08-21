@@ -124,6 +124,20 @@ struct EditPetView: View {
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
                     
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Cor do pet:")
+                            .font(.headline)
+
+                        PetColorPicker(
+                            selection: $viewModelBind.selectedColorName
+                        )
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        .regularMaterial,
+                        in: RoundedRectangle(cornerRadius: 20)
+                    )
                     
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Vacinas:")

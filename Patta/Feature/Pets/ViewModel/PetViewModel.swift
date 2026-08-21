@@ -33,7 +33,7 @@ final class PetViewModel {
         isEditing ? "Editar Pet" : "Adicionar Pet"
     }
     
-    static let defaultColorName = "petAzul"
+    static let defaultColorName = PetColorPalette.defaultAssetName
 
     var selectedColorName = PetViewModel.defaultColorName
     
@@ -59,71 +59,62 @@ final class PetViewModel {
         birthdate = pet.birthdate
         medicalConditions = pet.med_cond ?? ""
         petImage = pet.image
-        selectedColorName = pet.color ?? PetViewModel.defaultColorName
+        selectedColorName = PetColorPalette.normalizedAssetName(pet.color)
         
         errorMessage = nil
     }
     
     func savePet() -> Bool {
-        let treatedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+        let treatedName = name.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
         guard !treatedName.isEmpty else {
             errorMessage = "O nome do pet não pode ser vazio"
             return false
         }
-        
+
         if let birthdate, birthdate > Date() {
             errorMessage = "A data de nascimento não pode ser futura"
             return false
         }
-        
+
         let petToSave: Pet
-        
-        print("Está editando:", petBeingEdited != nil)
-        print("Nome recebido:", treatedName)
-        
+
         if let petBeingEdited {
             guard petBeingEdited.managedObjectContext === context else {
-                errorMessage = "O pet e a viewmodel estao usando contextos diferentes"
+                errorMessage = """
+                O pet e a ViewModel estão usando contextos diferentes
+                """
                 return false
             }
-            
+
             petToSave = petBeingEdited
         } else {
             petToSave = Pet(context: context)
             petToSave.id = UUID()
         }
-        
-            petToSave.name = treatedName
-            petToSave.image = petImage
-            petToSave.breed = breed
-            petToSave.birthdate = birthdate
-            petToSave.med_cond = medicalConditions
 
-            if let weight {
-                petToSave.weight = NSDecimalNumber(decimal: weight)
-            } else {
-                petToSave.weight = nil
-            }
-        
+        applyFormData(
+            to: petToSave,
+            treatedName: treatedName
+        )
+
         do {
             if context.hasChanges {
                 try context.save()
-                print(
-                    "Pet salvo:",
-                    petToSave.objectID.uriRepresentation()
-                )
             }
+
             resetForm()
             return true
         } catch {
             context.rollback()
-            
+
             let nsError = error as NSError
-            print("Erro Core Data:", nsError)
-            print("Detalhes:", nsError.userInfo)
-            
-            errorMessage = "Erro ao salvar o pet: \(nsError.localizedDescription)"
+            errorMessage = """
+            Erro ao salvar o pet: \(nsError.localizedDescription)
+            """
+
             return false
         }
     }
@@ -192,15 +183,26 @@ final class PetViewModel {
         resetForm()
     }
     
-    func applyFormData(to pet: Pet, treatedName: String) {
+    func applyFormData(
+        to pet: Pet,
+        treatedName: String
+    ) {
         pet.name = treatedName
-        pet.weight = weight.map { NSDecimalNumber(decimal: $0) }
-        pet.breed = breed.trimmingCharacters(in: .whitespacesAndNewlines)
+        pet.weight = weight.map {
+            NSDecimalNumber(decimal: $0)
+        }
+        pet.breed = breed.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
         pet.birthdate = birthdate
-        pet.med_cond = medicalConditions.trimmingCharacters(in: .whitespacesAndNewlines)
+        pet.med_cond = medicalConditions.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
         pet.image = petImage
-        pet.color = selectedColorName
-        
+
+        pet.color = PetColorPalette.normalizedAssetName(
+            selectedColorName
+        )
     }
     
     private func resetForm() {

@@ -77,27 +77,42 @@ struct TaskView:View {
                     .tag(nil as Pet?)
 
                 ForEach(allPets, id: \.objectID) { pet in
-                    Text(pet.name ?? "Sem Nome")
+                    Text(pet.name ?? "Sem nome")
                         .tag(Optional(pet))
                 }
             }
             .pickerStyle(.inline)
         } label: {
-            Label("Filtrar", systemImage: isPetFilterActive ? "pawprint.fill": "pawprint")
-                .labelStyle(.titleAndIcon)
-                .foregroundStyle(
-                    isPetFilterActive
-                    ? Color(selectedPet?.color ?? PetViewModel.defaultColorName)
-                    : Color.primary
-                )
-                .padding(6)
+            Label(
+                "Filtrar",
+                systemImage: isPetFilterActive
+                ? "pawprint.fill"
+                : "pawprint"
+            )
+            .labelStyle(.titleAndIcon)
+            .foregroundStyle(
+                isPetFilterActive
+                ? petFilterColor
+                : Color.primary
+            )
+            .padding(6)
         }
         .menuStyle(.button)
         .buttonStyle(.plain)
+        .tint(
+            isPetFilterActive
+            ? petFilterColor
+            : Color.primary
+        )
     }
     
     private var petFilterMenu: some View {
         petFilterButton
+    }
+    private var petFilterColor: Color {
+        PetColorPalette.color(
+            for: selectedPet?.color
+        )
     }
     
     var body: some View {

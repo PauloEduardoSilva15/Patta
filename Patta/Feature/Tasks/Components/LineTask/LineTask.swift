@@ -43,6 +43,23 @@ struct LineTask: View {
         }
     }
     
+    @ViewBuilder
+    private var petBadge: some View {
+        if task.appliesToAllPets {
+            PetNameBadge(
+                name: "Todos",
+                colorName: PetColorPalette.defaultAssetName
+            )
+        } else if let pet = task.pet {
+            ObservedPetBadge(pet: pet)
+        } else {
+            PetNameBadge(
+                name: "Pet indisponível",
+                colorName: PetColorPalette.defaultAssetName
+            )
+        }
+    }
+    
     var body: some View {
         HStack(spacing: 0) {
             
@@ -61,16 +78,7 @@ struct LineTask: View {
                         
                         HStack (spacing: 4){
                             
-                            Text(petName)
-                                .font(.caption2)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                                .truncationMode(.tail)
-                                .padding(.horizontal, 12)
-                                .frame(minWidth: 70, maxWidth: 80)
-                                .frame(height: 20)
+                           petBadge
                                 .background {
                                     Capsule()
                                         .fill(Color(task.pet?.color ?? "petAzul"))
@@ -123,6 +131,43 @@ struct LineTask: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(uiColor: .secondarySystemGroupedBackground))
         }
+    }
+}
+
+private struct ObservedPetBadge: View {
+    @ObservedObject var pet: Pet
+
+    var body: some View {
+        PetNameBadge(
+            name: pet.name ?? "Pet sem nome",
+            colorName: pet.color
+        )
+    }
+}
+
+private struct PetNameBadge: View {
+    let name: String
+    let colorName: String?
+
+    var body: some View {
+        Text(name)
+            .font(.caption2)
+            .fontWeight(.semibold)
+            .foregroundStyle(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .truncationMode(.tail)
+            .padding(.horizontal, 12)
+            .frame(minWidth: 70, maxWidth: 80)
+            .frame(height: 20)
+            .background {
+                Capsule()
+                    .fill(
+                        PetColorPalette.color(
+                            for: colorName
+                        )
+                    )
+            }
     }
 }
 

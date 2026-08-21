@@ -114,6 +114,30 @@ struct PetInformationView: View {
         Text((pet.med_cond ?? "").isEmpty ? "Condições Médicas" : pet.med_cond ?? "")
             .foregroundStyle((pet.med_cond ?? "").isEmpty ? .secondary : .primary)
             .padding(12)
+        
+        Divider()
+
+        HStack {
+            Text("Cor")
+
+            Spacer()
+
+            Circle()
+                .fill(
+                    PetColorPalette.color(
+                        for: pet.color
+                    )
+                )
+                .frame(width: 24, height: 24)
+
+            Text(
+                PetColorPalette.title(
+                    for: pet.color
+                )
+            )
+        }
+        .padding(12)
+        .accessibilityElement(children: .combine)
     }
 }
 
