@@ -10,14 +10,13 @@ import CoreData
 
 struct PetView: View {
     
-    @Environment(PetViewModel.self) private var viewModel: PetViewModel
+    @Environment(PetViewModel.self) private var viewModel
+    @Environment(PetListStore.self) private var petListStore
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     
     @State private var showSheet: Bool = false
     
     @State private var navPath = [PetRoute]()
-    
-    @FetchRequest(sortDescriptors: []) private var pets: FetchedResults<Pet>
     
     let columns = [
         GridItem(.flexible(), spacing: 5),
@@ -37,7 +36,7 @@ struct PetView: View {
                 VStack {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 10) {
-                            ForEach(pets) { pet in
+                            ForEach(petListStore.pets) { pet in
                                 NavigationLink(value: PetRoute.detail(pet)) {
                                     PetCard(pet: pet, viewModel: viewModel)
                                         .frame(height: 180)
@@ -81,7 +80,9 @@ struct PetView: View {
 #Preview {
     
     let context = DataController.shared.container.viewContext
-    let viewModel = PetViewModel(name: "", context: context)
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
     let registryViewModel = VaccineRegistryViewModel(context: context)
     
     PetView()

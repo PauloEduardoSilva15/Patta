@@ -31,28 +31,22 @@ extension ValidationError: LocalizedError {
 class PetViewModel {
     var petImage: Data?
     var name: String
-    var weight: Int?
+    var weight: Double?
     var breed: String
     var birthdate: Date?
     var medicalConditions: String
     var errorMessage = ""
     
-    private let context: NSManagedObjectContext
+    private let store: PetListStore
     
-    init(petImage: Data? = nil, name: String, weight: Int? = nil, breed: String = "", birthdate: Date? = nil, medicalConditions: String = "", context: NSManagedObjectContext) {
+    init(petImage: Data? = nil, name: String, weight: Double? = nil, breed: String = "", birthdate: Date? = nil, medicalConditions: String = "", store: PetListStore) {
         self.petImage = petImage
         self.name = name
         self.weight = weight
         self.breed = breed
         self.birthdate = birthdate
         self.medicalConditions = medicalConditions
-        self.context = context
-    }
-    
-    func getAge(birthdate: Date) -> String {
-        let calendar = Calendar.current
-        let ageComponents = calendar.dateComponents([.year], from: birthdate, to: Date())
-        return String(ageComponents.year!)
+        self.store = store
     }
     
     func addNewPet() throws {
@@ -61,60 +55,37 @@ class PetViewModel {
             throw ValidationError.emptyProperty
         }
         
-        let newPet = Pet(context: context)
+        let newPet = PetModel(id: UUID(), name: name, weight: weight, breed: breed, birthdate: birthdate, medicalConditions: medicalConditions, image: petImage)
         
-        newPet.id = UUID()
-        
-        insertData(pet: newPet)
-        trySaveChanges()
-        clearForm()
-    }
-    
-    func updatePet(_ editingPet: Pet) throws {
-        
-        guard context.hasChanges else { return }
-        
-        guard !name.isEmpty else { throw ValidationError.emptyProperty }
-        
-        insertData(pet: editingPet)
-        trySaveChanges()
-        clearForm()
-    }
-    
-    func deletePet(_ pet: Pet) {
-        context.delete(pet)
-        
-        trySaveChanges()
-    }
-    
-    private func insertData(pet: Pet) {
-        pet.name = name
-        pet.weight = NSDecimalNumber(integerLiteral: weight ?? 0)
-        pet.breed = breed
-        pet.birthdate = birthdate
-        pet.med_cond = medicalConditions
-        pet.image = petImage ?? nil
-    }
-    
-    private func trySaveChanges() {
         do {
-            try saveChanges()
-        } catch let error as ValidationError {
-            errorMessage = error.localizedDescription
-            print(error.localizedDescription)
+            try store.add(newPet)
+            clearForm()
         } catch {
             errorMessage = error.localizedDescription
-            print(error.localizedDescription)
+            throw ValidationError.saveFailed(description: error)
         }
     }
     
-    private func saveChanges() throws {
+    func updatePet(id: UUID) throws {
+        
+        guard !name.isEmpty else { throw ValidationError.emptyProperty }
+        
+        let updatedPet = PetModel(id: id, name: name, weight: weight, breed: breed, birthdate: birthdate, medicalConditions: medicalConditions, image: petImage)
+        
         do {
-            try context.save()
+            try store.update(updatedPet)
             clearForm()
         } catch {
-            context.rollback()
+            errorMessage = error.localizedDescription
             throw ValidationError.saveFailed(description: error)
+        }
+    }
+    
+    func deletePet(id: UUID) {
+        do {
+            try store.delete(id: id)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
@@ -128,6 +99,12 @@ class PetViewModel {
         }
         
         return nil
+    }
+    
+    func getAge(birthdate: Date) -> String {
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: birthdate, to: Date())
+        return String(ageComponents.year!)
     }
     
     func clearForm() {

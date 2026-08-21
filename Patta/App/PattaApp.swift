@@ -15,12 +15,18 @@ struct PattaApp: App {
     @State private var taskViewModel: TaskViewModel
     @State private var vaccineRegistryViewModel: VaccineRegistryViewModel
     @State private var vaccineViewModel: VaccineViewModel
+    @State private var petListStore: PetListStore
     
     init() {
         let controller = DataController.shared
         let context = controller.container.viewContext
+        
+        let petRepository = CoreDataPetRepository(context: context)
+        let petStore = PetListStore(repository: petRepository)
+        
         _dataController = .init(initialValue: controller)
-        _petViewModel = .init(initialValue: PetViewModel(name: "", context: context))
+        _petListStore = .init(initialValue: petStore)
+        _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
         _taskViewModel = .init(initialValue: TaskViewModel(context: context))
         _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(context: context))
         _vaccineViewModel = .init(initialValue: VaccineViewModel(context: context))
@@ -34,6 +40,7 @@ struct PattaApp: App {
                 .environment(petViewModel)
                 .environment(vaccineViewModel)
                 .environment(vaccineRegistryViewModel)
+                .environment(petListStore)
                 .environment(\.managedObjectContext, dataController.container.viewContext)
         }
     }

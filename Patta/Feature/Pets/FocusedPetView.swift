@@ -12,7 +12,7 @@ struct FocusedPetView: View {
     
     @Environment(VaccineRegistryViewModel.self) private var vaccineRegistryViewModel
     
-    let pet: Pet
+    let pet: PetModel
     let viewModel: PetViewModel
     
     @State private var selectedTab: PetTab = .info
@@ -89,12 +89,12 @@ struct FocusedPetView: View {
 
 struct PetInformationView: View {
     
-    let pet: Pet
+    let pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
-        Text((pet.name ?? "").isEmpty ? "Nome" : pet.name ?? "")
-            .foregroundStyle((pet.name ?? "").isEmpty ? .secondary : .primary)
+        Text(pet.name.isEmpty ? "Nome" : pet.name)
+            .foregroundStyle(pet.name.isEmpty ? .secondary : .primary)
             .padding(12)
         
         Divider()
@@ -111,21 +111,21 @@ struct PetInformationView: View {
         
         Divider()
         
-        Text((pet.med_cond ?? "").isEmpty ? "Condições Médicas" : pet.med_cond ?? "")
-            .foregroundStyle((pet.med_cond ?? "").isEmpty ? .secondary : .primary)
+        Text((pet.medicalConditions ?? "").isEmpty ? "Condições Médicas" : pet.medicalConditions ?? "")
+            .foregroundStyle((pet.medicalConditions ?? "").isEmpty ? .secondary : .primary)
             .padding(12)
     }
 }
 
 struct VaccineListView: View {
-    let pet: Pet
+    let pet: PetModel
     @FetchRequest private var registries: FetchedResults<VaccineRegistry>
     
-    init(pet: Pet) {
+    init(pet: PetModel) {
         self.pet = pet
         _registries = FetchRequest(
             sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)],
-            predicate: NSPredicate(format: "pet == %@", pet)
+            predicate: NSPredicate(format: "pet == %@", pet as! CVarArg)
         )
     }
     
@@ -152,19 +152,21 @@ struct VaccineListView: View {
 #Preview {
     @Previewable @State var navPath: [PetRoute] = []
     let context = DataController.shared.container.viewContext
-    let pet = Pet(context: context)
-    
-    pet.name = "Toto"
-    pet.breed = "Beagle"
+    let name = "Toto"
+    let breed = "Beagle"
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    pet.birthdate = myPetBirthdate
+    let birthdate = myPetBirthdate
     
     if let uiImage = UIImage(named: "ImageTest") {
-        pet.image = uiImage.pngData()
+        let image = uiImage.pngData()
     }
     
-    let viewModel = PetViewModel(name: "", context: context)
+    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
     
-    return FocusedPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
+    
+    FocusedPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
         .environment(VaccineRegistryViewModel(context: context))
 }

@@ -10,7 +10,7 @@ import CoreData
 
 struct PetCard: View {
     
-    let pet: Pet
+    let pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
@@ -37,7 +37,7 @@ struct PetCard: View {
                         .font(.system(size: 30))
                     
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(pet.name ?? "")
+                        Text(pet.name)
                             .font(.title2.bold())
                         
                         HStack {
@@ -77,18 +77,21 @@ struct PetCard: View {
 
 #Preview {
     let context = DataController.shared.container.viewContext
-    let pet = Pet(context: context)
     
-    pet.name = "Toto"
-    pet.breed = "Beagle"
+    let name = "Toto"
+    let breed = "Beagle"
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    pet.birthdate = myPetBirthdate
+    let birthdate = myPetBirthdate
     
     if let uiImage = UIImage(named: "ImageTest") {
-        pet.image = uiImage.pngData()
+        let image = uiImage.pngData()
     }
     
-    let viewModel = PetViewModel(name: "", context: context)
+    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
     
-    return PetCard(pet: pet, viewModel: viewModel)
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
+    
+    PetCard(pet: pet, viewModel: viewModel)
 }

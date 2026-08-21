@@ -13,7 +13,7 @@ struct EditPetView: View {
     
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     
-    let pet: Pet
+    let pet: PetModel
     let viewModel: PetViewModel
     
     @State private var selectedImage: PhotosPickerItem?
@@ -25,11 +25,11 @@ struct EditPetView: View {
     @FetchRequest private var registries: FetchedResults<VaccineRegistry>
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Vaccine.title, ascending: true)]) private var vaccines: FetchedResults<Vaccine>
     
-    init(pet: Pet, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
+    init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
         self.pet = pet
         self.viewModel = viewModel
         _navPath = navPath
-        _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet))
+        _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet as! CVarArg))
     }
     
     var body: some View {
@@ -173,7 +173,7 @@ struct EditPetView: View {
                         }
                         .confirmationDialog("Deseja realmente excluir o pet?", isPresented: $confirmDelete, titleVisibility: .visible) {
                             Button("Deletar", role: .destructive) {
-                                viewModel.deletePet(pet)
+                                viewModel.deletePet(id: pet.id)
                                 
                                 navPath.removeAll()
                             }
@@ -209,9 +209,9 @@ struct EditPetView: View {
             .onAppear() {
                 if let petImage = pet.image {
                     viewModel.petImage = petImage
-                    viewModel.name = pet.name ?? ""
+                    viewModel.name = pet.name
                     viewModel.breed = pet.breed ?? ""
-                    viewModel.medicalConditions = pet.med_cond ?? ""
+                    viewModel.medicalConditions = pet.medicalConditions ?? ""
                     viewModel.birthdate = pet.birthdate ?? Date.now
                 }
             }
@@ -221,19 +221,21 @@ struct EditPetView: View {
 #Preview {
     @Previewable @State var navPath: [PetRoute] = []
     let context = DataController.shared.container.viewContext
-    let pet = Pet(context: context)
-    
-    pet.name = "Totó"
-    pet.breed = "Beagle"
+    let name = "Toto"
+    let breed = "Beagle"
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    pet.birthdate = myPetBirthdate
+    let birthdate = myPetBirthdate
     
     if let uiImage = UIImage(named: "ImageTest") {
-        pet.image = uiImage.pngData()
+        let image = uiImage.pngData()
     }
     
-    let viewModel = PetViewModel(name: "", context: context)
+    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
     
-    return EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
+    
+    EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
         .environment(VaccineRegistryViewModel(context: context))
 }

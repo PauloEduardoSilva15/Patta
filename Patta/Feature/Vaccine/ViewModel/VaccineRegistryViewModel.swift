@@ -17,7 +17,7 @@ final class VaccineRegistryViewModel {
     var selectedVaccine: Vaccine?
     var errorMessage: String?
     
-    var activePetForSheet: Pet?
+    var activePetForSheet: PetModel?
     
     var isEditing: Bool {
         registryBeingEdited != nil
@@ -54,7 +54,7 @@ final class VaccineRegistryViewModel {
         errorMessage = nil
     }
     
-    func saveRegistry(pet: Pet) -> Bool {
+    func saveRegistry(pet: PetModel) -> Bool {
         
         guard let selectedVaccine else {
             errorMessage = "Selecione uma vacina"
@@ -85,7 +85,7 @@ final class VaccineRegistryViewModel {
         vaccineRegistry.vaccine = selectedVaccine
         vaccineRegistry.applicationDate = applicationDate
         
-        vaccineRegistry.pet = pet
+//        vaccineRegistry.pet = pet
         
         do {
             try context.save()
