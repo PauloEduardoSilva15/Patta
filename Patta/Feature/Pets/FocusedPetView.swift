@@ -150,21 +150,29 @@ struct VaccineListView: View {
 }
 
 #Preview {
-    @Previewable @State var navPath: [PetRoute] = []
-    let context = DataController.shared.container.viewContext
-    let pet = Pet(context: context)
+    FocusedPetPreview()
+}
+
+private struct FocusedPetPreview: View {
+    @State private var navPath: [PetRoute] = []
     
-    pet.name = "Toto"
-    pet.breed = "Beagle"
-    let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    pet.birthdate = myPetBirthdate
+    private let context = DataController.shared.container.viewContext
     
-    if let uiImage = UIImage(named: "ImageTest") {
-        pet.image = uiImage.pngData()
+    var body: some View {
+        FocusedPetView(pet: makePet(), viewModel: PetViewModel(context: context), navPath: $navPath)
+            .environment(VaccineRegistryViewModel(context: context))
     }
     
-    let viewModel = PetViewModel(name: "", context: context)
-    
-    return FocusedPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
-        .environment(VaccineRegistryViewModel(context: context))
+    private func makePet() -> Pet {
+        let pet = Pet(context: context)
+        pet.name = "Toto"
+        pet.breed = "Beagle"
+        pet.birthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
+        
+        if let uiImage = UIImage(named: "ImageTest") {
+            pet.image = uiImage.pngData()
+        }
+        
+        return pet
+    }
 }

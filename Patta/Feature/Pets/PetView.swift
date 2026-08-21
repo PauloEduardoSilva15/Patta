@@ -40,7 +40,6 @@ struct PetView: View {
                             ForEach(pets) { pet in
                                 NavigationLink(value: PetRoute.detail(pet)) {
                                     PetCard(pet: pet, viewModel: viewModel)
-                                        .frame(height: 180)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -60,6 +59,7 @@ struct PetView: View {
                             showSheet.toggle()
                         }) {
                             Image(systemName: "plus")
+                                .foregroundStyle(.white)
                         }
                         .buttonStyle(.glassProminent)
                     }
@@ -81,7 +81,7 @@ struct PetView: View {
 #Preview {
     
     let context = DataController.shared.container.viewContext
-    let viewModel = PetViewModel(name: "", context: context)
+    let viewModel = PetViewModel(context: context)
     let registryViewModel = VaccineRegistryViewModel(context: context)
     
     PetView()

@@ -20,12 +20,13 @@ struct SheetAddPet: View {
     var body: some View {
         
         @Bindable var viewModelBind = viewModel
+        let petImage = viewModel.petImage
         
         NavigationStack {
             VStack {
                 PhotosPicker(selection: $selectedImage, matching: .images) {
                     VStack(spacing: 20) {
-                        if let image = viewModel.petImage, let uiImage = UIImage(data: image) {
+                        if let image = petImage, let uiImage = UIImage(data: image) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
@@ -46,11 +47,7 @@ struct SheetAddPet: View {
                         Text("Adicionar Imagem")
                             .fontWeight(.medium)
                         
-                        if viewModel.errorMessage != "" {
-                            Text(viewModel.errorMessage)
-                                .foregroundStyle(.red)
-                                .bold()
-                        }
+                       
                     }
                     .padding(.bottom, 20)
                 }
@@ -111,18 +108,15 @@ struct SheetAddPet: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .confirm) {
-                        do {
-                            try viewModel.addNewPet()
+                        if viewModel.savePet() {
                             dismiss()
-                        } catch {
-                            
                         }
                     }
                 }
             }
         }
         .onDisappear {
-            viewModel.clearForm()
+            viewModel.cancelEditing()
         }
     }
 }
@@ -130,7 +124,7 @@ struct SheetAddPet: View {
 #Preview {
     
     let context = DataController.shared.container.viewContext
-    let viewModel = PetViewModel(name: "", context: context)
+    let viewModel = PetViewModel(context: context)
     
     SheetAddPet()
         .environment(viewModel)
