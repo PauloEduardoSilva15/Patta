@@ -85,8 +85,12 @@ struct TaskView:View {
         } label: {
             Label("Filtrar", systemImage: isPetFilterActive ? "pawprint.fill": "pawprint")
                 .labelStyle(.titleAndIcon)
-            .foregroundStyle(isPetFilterActive ? Color.blue : Color.primary)
-            .padding(6)
+                .foregroundStyle(
+                    isPetFilterActive
+                    ? Color(selectedPet?.color ?? PetViewModel.defaultColorName)
+                    : Color.primary
+                )
+                .padding(6)
         }
         .menuStyle(.button)
         .buttonStyle(.plain)

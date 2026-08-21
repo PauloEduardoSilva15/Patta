@@ -10,7 +10,7 @@ import CoreData
 
 struct PetCard: View {
     
-    let pet: Pet
+    @ObservedObject var pet: Pet
     let viewModel: PetViewModel
     
     var body: some View {
@@ -23,7 +23,7 @@ struct PetCard: View {
                     .scaledToFill()
                 
             } else {
-                Color.accentColor
+                Color(pet.color ?? PetViewModel.defaultColorName)
             }
         }
         .frame(maxWidth: .infinity)

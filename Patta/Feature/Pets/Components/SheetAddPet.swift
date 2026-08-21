@@ -90,6 +90,12 @@ struct SheetAddPet: View {
                             .transition(.opacity)
                         }
                     }
+                    
+                    Section("Cor do pet") {
+                        PetColorPicker(
+                            selection: $viewModelBind.selectedColorName
+                        )
+                    }
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .animation(.snappy, value: willSetBirthdate)
@@ -97,6 +103,7 @@ struct SheetAddPet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(role: .cancel) {
+                        viewModel.cancelEditing()
                         dismiss()
                     }
                 }
@@ -115,8 +122,20 @@ struct SheetAddPet: View {
                 }
             }
         }
-        .onDisappear {
-            viewModel.cancelEditing()
+        .alert(
+            "Não foi possível salvar",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.errorMessage = nil
+                    }
+                }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
     }
 }

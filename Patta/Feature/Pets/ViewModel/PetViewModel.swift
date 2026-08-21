@@ -33,6 +33,10 @@ final class PetViewModel {
         isEditing ? "Editar Pet" : "Adicionar Pet"
     }
     
+    static let defaultColorName = "petAzul"
+
+    var selectedColorName = PetViewModel.defaultColorName
+    
     init(context: NSManagedObjectContext) {
         self.context = context
     }
@@ -55,6 +59,7 @@ final class PetViewModel {
         birthdate = pet.birthdate
         medicalConditions = pet.med_cond ?? ""
         petImage = pet.image
+        selectedColorName = pet.color ?? PetViewModel.defaultColorName
         
         errorMessage = nil
     }
@@ -73,6 +78,9 @@ final class PetViewModel {
         }
         
         let petToSave: Pet
+        
+        print("Está editando:", petBeingEdited != nil)
+        print("Nome recebido:", treatedName)
         
         if let petBeingEdited {
             guard petBeingEdited.managedObjectContext === context else {
@@ -101,6 +109,10 @@ final class PetViewModel {
         do {
             if context.hasChanges {
                 try context.save()
+                print(
+                    "Pet salvo:",
+                    petToSave.objectID.uriRepresentation()
+                )
             }
             resetForm()
             return true
@@ -108,6 +120,8 @@ final class PetViewModel {
             context.rollback()
             
             let nsError = error as NSError
+            print("Erro Core Data:", nsError)
+            print("Detalhes:", nsError.userInfo)
             
             errorMessage = "Erro ao salvar o pet: \(nsError.localizedDescription)"
             return false
@@ -185,6 +199,7 @@ final class PetViewModel {
         pet.birthdate = birthdate
         pet.med_cond = medicalConditions.trimmingCharacters(in: .whitespacesAndNewlines)
         pet.image = petImage
+        pet.color = selectedColorName
         
     }
     
@@ -197,6 +212,7 @@ final class PetViewModel {
         breed = ""
         birthdate = nil
         medicalConditions = ""
+        selectedColorName = PetViewModel.defaultColorName
         
         errorMessage = nil
     }

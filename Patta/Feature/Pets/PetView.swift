@@ -56,7 +56,8 @@ struct PetView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
-                            showSheet.toggle()
+                            viewModel.prepareNewPet()
+                            showSheet = true
                         }) {
                             Image(systemName: "plus")
                                 .foregroundStyle(.white)

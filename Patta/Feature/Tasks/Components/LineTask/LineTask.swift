@@ -73,7 +73,7 @@ struct LineTask: View {
                                 .frame(height: 20)
                                 .background {
                                     Capsule()
-                                        .fill(.blue)
+                                        .fill(Color(task.pet?.color ?? "petAzul"))
                                 }
                             if task.usesCustomDate {
                                 Capsule()

@@ -89,7 +89,7 @@ struct FocusedPetView: View {
 
 struct PetInformationView: View {
     
-    let pet: Pet
+    @ObservedObject var pet: Pet
     let viewModel: PetViewModel
     
     var body: some View {
@@ -118,7 +118,7 @@ struct PetInformationView: View {
 }
 
 struct VaccineListView: View {
-    let pet: Pet
+    @ObservedObject var pet: Pet
     @FetchRequest private var registries: FetchedResults<VaccineRegistry>
     
     init(pet: Pet) {
