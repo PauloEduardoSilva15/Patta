@@ -39,7 +39,6 @@ struct PetView: View {
                             ForEach(petListStore.pets) { pet in
                                 NavigationLink(value: PetRoute.detail(pet)) {
                                     PetCard(pet: pet, viewModel: viewModel)
-                                        .frame(height: 180)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -56,9 +55,11 @@ struct PetView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: {
-                            showSheet.toggle()
+                            viewModel.prepareNewPet()
+                            showSheet = true
                         }) {
                             Image(systemName: "plus")
+                                .foregroundStyle(.white)
                         }
                         .buttonStyle(.glassProminent)
                     }
