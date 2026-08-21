@@ -16,7 +16,7 @@ struct VaccineRegistrySheet: View {
     
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Vaccine.title, ascending: true)]) private var vaccines: FetchedResults<Vaccine>
     
-    let pet: Pet
+    let pet: PetModel
     
     @State private var errorMessage = ""
     @State private var showAlert = false
@@ -88,18 +88,22 @@ struct VaccineRegistrySheet: View {
 
 #Preview {
     let context = DataController.shared.container.viewContext
-    let pet = Pet(context: context)
-    
-    pet.name = "Toto"
-    pet.breed = "Beagle"
+    let name = "Toto"
+    let breed = "Beagle"
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    pet.birthdate = myPetBirthdate
+    let birthdate = myPetBirthdate
     
     if let uiImage = UIImage(named: "ImageTest") {
-        pet.image = uiImage.pngData()
+        let image = uiImage.pngData()
     }
     
-    return VaccineRegistrySheet(pet: pet)
+    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
+    
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
+    
+    VaccineRegistrySheet(pet: pet)
         .environment(\.managedObjectContext, context)
         .environment(VaccineRegistryViewModel(context: context))
 }

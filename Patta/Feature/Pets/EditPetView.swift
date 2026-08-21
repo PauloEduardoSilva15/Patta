@@ -14,7 +14,7 @@ struct EditPetView: View {
     @Environment(\.managedObjectContext) private var context
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     
-    let pet: Pet
+    let pet: PetModel
     let viewModel: PetViewModel
     
     @State private var selectedImage: PhotosPickerItem?
@@ -32,12 +32,12 @@ struct EditPetView: View {
         calendar.locale = portugueseBrazilLocale
         return calendar
     }
-    
-    init(pet: Pet, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
+  
+    init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
         self.pet = pet
         self.viewModel = viewModel
         _navPath = navPath
-        _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet))
+        _registries = FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \VaccineRegistry.applicationDate, ascending: false)], predicate: NSPredicate(format: "pet == %@", pet as! CVarArg))
     }
     
     var body: some View {
@@ -175,7 +175,7 @@ struct EditPetView: View {
                     }
                     .confirmationDialog("Deseja realmente excluir o pet?", isPresented: $confirmDelete, titleVisibility: .visible) {
                         Button("Deletar", role: .destructive) {
-                            if viewModel.deletePet(pet) {
+                            if viewModel.deletePet(id: pet.id) {
                                 
                                 navPath.removeAll()
                             }
@@ -266,30 +266,23 @@ private struct EditableVaccineRegistryRow: View {
 
 
 #Preview {
-    EditPetPreview()
-}
-
-private struct EditPetPreview: View {
-    @State private var navPath: [PetRoute] = []
+    @Previewable @State var navPath: [PetRoute] = []
+    let context = DataController.shared.container.viewContext
+    let name = "Toto"
+    let breed = "Beagle"
+    let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
+    let birthdate = myPetBirthdate
     
-    private let context = DataController.shared.container.viewContext
-    
-    var body: some View {
-        EditPetView(pet: makePet(), viewModel: PetViewModel(context: context), navPath: $navPath)
-            .environment(\.managedObjectContext, context)
-            .environment(VaccineRegistryViewModel(context: context))
+    if let uiImage = UIImage(named: "ImageTest") {
+        let image = uiImage.pngData()
     }
     
-    private func makePet() -> Pet {
-        let pet = Pet(context: context)
-        pet.name = "Totó"
-        pet.breed = "Beagle"
-        pet.birthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-        
-        if let uiImage = UIImage(named: "ImageTest") {
-            pet.image = uiImage.pngData()
-        }
-        
-        return pet
-    }
+    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
+    
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
+    
+    EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+        .environment(VaccineRegistryViewModel(context: context))
 }

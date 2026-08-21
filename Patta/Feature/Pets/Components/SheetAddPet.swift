@@ -143,7 +143,9 @@ struct SheetAddPet: View {
 #Preview {
     
     let context = DataController.shared.container.viewContext
-    let viewModel = PetViewModel(context: context)
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
     
     SheetAddPet()
         .environment(viewModel)
