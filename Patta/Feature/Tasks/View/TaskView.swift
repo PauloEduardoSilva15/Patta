@@ -16,11 +16,9 @@ struct TaskView:View {
     @State var selectedPet: Pet?
     @State var selectedTab = 0
     
-    @FetchRequest(
-        entity: Task.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Task.id, ascending: true)],
-        
-    ) var tasks: FetchedResults<Task>
+    @FetchRequest(entity: Task.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)], predicate: NSPredicate(format: "isComplete == NO"), animation: .default) private var fetchedPendingTasks: FetchedResults<Task>
+    
+    @FetchRequest(entity: Task.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Task.completedAt, ascending: false)], predicate: NSPredicate(format: "isComplete == YES"), animation: .default) private var fetchedCompletedTasks: FetchedResults<Task>
     
     @FetchRequest(
         entity: Pet.entity(),
@@ -36,43 +34,36 @@ struct TaskView:View {
         return items
     }
     
-    private var tasksFilteredByDateAndPet: [Task] {
+    private func filteredByDateAndPet(_ source: FetchedResults<Task> ) -> [Task] {
         let calendar = Calendar.current
-        
-        return tasks.filter { task in
+
+        return source.filter { task in
             guard let taskDate = task.date else {
                 return false
             }
-            
+
             guard calendar.isDate(
                 taskDate,
                 inSameDayAs: selectedDate
             ) else {
                 return false
             }
-            
+
             guard let selectedPet else {
                 return true
             }
-            
-            return task.appliesToAllPets || task.pet?.objectID == selectedPet.objectID
+
+            return task.appliesToAllPets ||
+                task.pet?.objectID == selectedPet.objectID
         }
     }
     
     private var pendingTasks: [Task] {
-        tasksFilteredByDateAndPet
-            .filter { !$0.isComplete }
-            .sorted {
-                ($0.date ?? .distantFuture) < ($1.date ?? .distantFuture)
-            }
+        filteredByDateAndPet(fetchedPendingTasks)
     }
     
     private var completedTasks: [Task] {
-        tasksFilteredByDateAndPet
-            .filter { $0.isComplete }
-            .sorted {
-                ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast)
-            }
+        filteredByDateAndPet(fetchedCompletedTasks)
     }
     
     private var isPetFilterActive: Bool {
@@ -86,23 +77,42 @@ struct TaskView:View {
                     .tag(nil as Pet?)
 
                 ForEach(allPets, id: \.objectID) { pet in
-                    Text(pet.name ?? "Sem Nome")
+                    Text(pet.name ?? "Sem nome")
                         .tag(Optional(pet))
                 }
             }
             .pickerStyle(.inline)
         } label: {
-            Label("Filtrar", systemImage: isPetFilterActive ? "pawprint.fill": "pawprint")
-                .labelStyle(.titleAndIcon)
-            .foregroundStyle(isPetFilterActive ? Color.blue : Color.primary)
+            Label(
+                "Filtrar",
+                systemImage: isPetFilterActive
+                ? "pawprint.fill"
+                : "pawprint"
+            )
+            .labelStyle(.titleAndIcon)
+            .foregroundStyle(
+                isPetFilterActive
+                ? petFilterColor
+                : Color.primary
+            )
             .padding(6)
         }
         .menuStyle(.button)
         .buttonStyle(.plain)
+        .tint(
+            isPetFilterActive
+            ? petFilterColor
+            : Color.primary
+        )
     }
     
     private var petFilterMenu: some View {
         petFilterButton
+    }
+    private var petFilterColor: Color {
+        PetColorPalette.color(
+            for: selectedPet?.color
+        )
     }
     
     var body: some View {
