@@ -9,8 +9,8 @@ import SwiftUI
 import CoreData
 
 enum PetRoute: Hashable {
-    case detail(Pet)
-    case edit(Pet)
+    case detail(PetModel)
+    case edit(PetModel)
 }
 
 struct Navigation: View {

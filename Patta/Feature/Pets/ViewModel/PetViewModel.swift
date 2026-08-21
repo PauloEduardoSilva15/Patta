@@ -14,16 +14,16 @@ import _PhotosUI_SwiftUI
 @Observable
 final class PetViewModel {
     var petImage: Data?
-    var name = ""
-    var weight: Decimal?
-    var breed = ""
+    var name: String
+    var weight: Double?
+    var breed: String
     var birthdate: Date?
     var medicalConditions = ""
     var errorMessage: String?
     
     var petBeingEdited: Pet?
     
-    private let context: NSManagedObjectContext
+    private let store: PetListStore
     
     var isEditing: Bool {
         petBeingEdited != nil

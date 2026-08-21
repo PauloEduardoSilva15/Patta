@@ -10,7 +10,7 @@ import CoreData
 
 struct PetCard: View {
     
-    @ObservedObject var pet: Pet
+    @ObservedObject var pet: PetModel
     let viewModel: PetViewModel
     
     var body: some View {
@@ -81,26 +81,22 @@ struct PetCard: View {
     }
 }
 #Preview {
-    PetCardPreview()
-}
-
-private struct PetCardPreview: View {
-    private let context = DataController.shared.container.viewContext
+    let context = DataController.shared.container.viewContext
     
-    var body: some View {
-        PetCard(pet: makePet(), viewModel: PetViewModel(context: context))
+    let name = "Toto"
+    let breed = "Beagle"
+    let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
+    let birthdate = myPetBirthdate
+    
+    if let uiImage = UIImage(named: "ImageTest") {
+        let image = uiImage.pngData()
     }
     
-    private func makePet() -> Pet {
-        let pet = Pet(context: context)
-        pet.name = "Toto"
-        pet.breed = "Beagle"
-        pet.birthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-        
-        if let uiImage = UIImage(named: "ImageTest") {
-            pet.image = uiImage.pngData()
-        }
-        
-        return pet
-    }
+    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
+    
+    let repository = CoreDataPetRepository(context: context)
+    let store = PetListStore(repository: repository)
+    let viewModel = PetViewModel(name: "", store: store)
+    
+    PetCard(pet: pet, viewModel: viewModel)
 }

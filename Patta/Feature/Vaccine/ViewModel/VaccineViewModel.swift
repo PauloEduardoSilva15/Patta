@@ -14,20 +14,20 @@ final class VaccineViewModel {
     var title = ""
     var errorMessage: String?
     
-    var vaccineBeingEdited: Vaccine?
+    var vaccineBeingEditedId: UUID?
     
-    private let context: NSManagedObjectContext
+    private let store: VaccineListStore
     
     var isEditing: Bool {
-        vaccineBeingEdited != nil
+        vaccineBeingEditedId != nil
     }
     
     var formTitle: String {
         isEditing ? "Editar vacina" : "Nova vacina"
     }
     
-    init(context: NSManagedObjectContext) {
-        self.context = context
+    init(store: VaccineListStore) {
+        self.store = store
     }
     
     func createVaccine() -> Bool {
@@ -38,58 +38,53 @@ final class VaccineViewModel {
             return false
         }
         
-        let vaccine: Vaccine
-        
-        if let vaccineBeingEdited {
-            vaccine = vaccineBeingEdited
-        } else {
-            vaccine = Vaccine(context: context)
-            vaccine.id = UUID()
-        }
-        vaccine.title = titleTreated
+        let model = VaccineModel (
+            id: vaccineBeingEditedId ?? UUID(),
+            title: title
+        )
         
         do {
-            try context.save()
-            
+            if vaccineBeingEditedId != nil {
+                 try store.update(model)
+            } else {
+                try store.add(model)
+            }
             clearForm()
             errorMessage = nil
             return true
         } catch {
-            context.rollback()
             errorMessage = "Não foi possível salvar a vacina: \(error.localizedDescription)"
             return false
         }
     }
     
-    func deleteVaccine(_ vaccine: Vaccine) {
-        context.delete(vaccine)
+    func deleteVaccine(id: UUID) {
         do {
-            try context.save()
+            try store.delete(id: id)
             
-            if vaccineBeingEdited == vaccine {
+            if vaccineBeingEditedId == id {
                 clearForm()
             }
             errorMessage = nil
         } catch {
-            context.rollback()
             errorMessage = "Não foi possível excluir a vacina: \(error.localizedDescription)"
         }
     }
     
     func clearForm() {
-        vaccineBeingEdited = nil
+        vaccineBeingEditedId = nil
         title = ""
     }
     
     func prepareNewVaccine() {
-        vaccineBeingEdited = nil
+        vaccineBeingEditedId = nil
         title = ""
         errorMessage = nil
     }
     
-    func prepareToEdit(_ vaccine: Vaccine) {
-        vaccineBeingEdited = vaccine
-        title = vaccine.title ?? "Sem título"
+    func prepareToEdit(_ vaccine: VaccineModel) {
+        vaccineBeingEditedId = vaccine.id
+        title = vaccine.title
         errorMessage = nil
         
     }

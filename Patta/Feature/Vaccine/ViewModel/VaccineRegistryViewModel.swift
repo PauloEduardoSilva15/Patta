@@ -13,113 +13,82 @@ import Observation
 final class VaccineRegistryViewModel {
     
     var applicationDate = Date()
-    var registryBeingEdited: VaccineRegistry?
-    var selectedVaccine: Vaccine?
+    var selectedVaccine: VaccineModel?
     var errorMessage: String?
     
-    var activePetForSheet: Pet?
+    private var registryBeingEditedId: UUID?
+    var activePetForSheet: PetModel?
     
     var isEditing: Bool {
-        registryBeingEdited != nil
+        registryBeingEditedId != nil
     }
     
     var formTitle: String {
         isEditing ? "Editar Vacina" : "Adicionar Vacina"
     }
     
-    private let context: NSManagedObjectContext
+    private let store: VaccineRegistryListStore
     
-    init(context: NSManagedObjectContext) {
-        self.context = context
+    init(store: VaccineRegistryListStore) {
+        self.store = store
     }
     
     func prepareNewRegistry() {
         applicationDate = Date()
-        registryBeingEdited = nil
+        registryBeingEditedId = nil
         selectedVaccine = nil
         errorMessage = nil
     }
     
-    func prepareForEditing(registry: VaccineRegistry) {
-        
-        guard registry.managedObjectContext === context else {
-            errorMessage = "O registro e a viewModel estão usando contextos diferentes"
-            return
-        }
+    func prepareForEditing(registry: VaccineRegistryModel) {
         guard let savedApplicationDate = registry.applicationDate else { return }
         
         applicationDate = savedApplicationDate
         selectedVaccine = registry.vaccine
-        registryBeingEdited = registry
+        registryBeingEditedId = registry.id
         errorMessage = nil
     }
     
-    func saveRegistry(pet: Pet) -> Bool {
+    func saveRegistry(petId: UUID) -> Bool {
         
         guard let selectedVaccine else {
             errorMessage = "Selecione uma vacina"
             return false
         }
         
-        guard selectedVaccine.managedObjectContext === context else {
-            errorMessage = "A vacina selecionada não pertence ao contexto"
-            return false
-        }
-        
-       let vaccineRegistry: VaccineRegistry
-        
-        if let registryBeingEdited {
-            guard registryBeingEdited.managedObjectContext === context else {
-                
-                errorMessage = "O Registro e a viewModel estão usando contextos diferentes"
-                print("Contextos diferentes")
-                return false
-            }
-            vaccineRegistry = registryBeingEdited
-            
-        } else {
-            vaccineRegistry = VaccineRegistry(context: context)
-            vaccineRegistry.id = UUID()
-            
-        }
-        vaccineRegistry.vaccine = selectedVaccine
-        vaccineRegistry.applicationDate = applicationDate
-        
-        vaccineRegistry.pet = pet
+        let model = VaccineRegistryModel (
+            id: registryBeingEditedId ?? UUID(),
+            applicationDate: applicationDate,
+            vaccine: selectedVaccine,
+            petId: petId
+        )
         
         do {
-            try context.save()
-            
+            if registryBeingEditedId != nil {
+                try store.update(model)
+            } else {
+                try store.add(model)
+            }
             return true
         } catch {
-            context.rollback()
             let nsError = error as NSError
-            print("Erro Core Data: \(nsError), \(nsError.userInfo)")
+            print("Erro: \(nsError), detalhes: \(nsError.userInfo)")
             errorMessage = "Não foi possível salvar o registro: \(error.localizedDescription)"
             return false
         }
-    }
-    
-    func deleteRegistry(_ registry: VaccineRegistry) {
         
-        guard registry.managedObjectContext === context else {
-            errorMessage = "O Registro e a viewModel estão usando contextos diferentes"
-            return
+        func deleteRegistry(id: UUID) {
+            do {
+                try store.delete(id: id)
+                errorMessage = nil
+                registryBeingEditedId = nil
+            } catch {
+                errorMessage = "Não foi possível excluir o registro: \(error.localizedDescription)"
+            }
         }
-        context.delete(registry)
         
-        do {
-            try context.save()
-            errorMessage = nil
-            registryBeingEdited = nil
-        } catch {
-            context.rollback()
-            errorMessage = "Não foi possível excluir o registro: \(error.localizedDescription)"
-            
+        func cancelEditing() {
+            prepareNewRegistry()
         }
-    }
-    
-    func cancelEditing() {
-        prepareNewRegistry()
     }
 }

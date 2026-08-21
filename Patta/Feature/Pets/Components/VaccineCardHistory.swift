@@ -10,7 +10,7 @@ import CoreData
 
 struct VaccineCardHistory: View {
     
-    let vaccineRegistry: VaccineRegistry
+    let vaccineRegistry: VaccineRegistryModel
     
     var body: some View {
         HStack(spacing: 20) {
@@ -18,7 +18,7 @@ struct VaccineCardHistory: View {
                 .font(.title)
             
             VStack(alignment: .leading) {
-                Text("Vacina \(vaccineRegistry.vaccine?.title ?? "")")
+                Text("Vacina \(vaccineRegistry.vaccine.title)")
                     .font(.body.bold())
                 
                 Text(vaccineRegistry.applicationDate?.formatted(date: .numeric, time: .omitted) ?? "")
@@ -30,15 +30,8 @@ struct VaccineCardHistory: View {
 
 #Preview {
     let context = DataController.shared.container.viewContext
-    let vaccineRegistry = VaccineRegistry(context: context)
-    let vaccine = Vaccine(context: context)
+    let vaccine = VaccineModel(id: UUID(), title: "Antirrábica")
+    let vaccineRegistry = VaccineRegistryModel(id: UUID(), vaccine: vaccine)
     
-    vaccine.title = "Antirrábica"
-    
-    vaccineRegistry.vaccine = vaccine
-    vaccineRegistry.applicationDate = Date()
-    
-    
-    
-    return VaccineCardHistory(vaccineRegistry: vaccineRegistry)
+    VaccineCardHistory(vaccineRegistry: vaccineRegistry)
 }
