@@ -17,6 +17,7 @@ struct EditPetView: View {
     
     let pet: PetModel
     let viewModel: PetViewModel
+    @Environment(\.dismiss) private var dismiss
     
     @State private var selectedImage: PhotosPickerItem?
     @State private var confirmDelete: Bool = false
@@ -29,11 +30,14 @@ struct EditPetView: View {
         return calendar
     }
     
-    init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>) {
+    init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>, isDismiss: Bool) {
         self.pet = pet
         self.viewModel = viewModel
         _navPath = navPath
+        self.isDimmiss = isDismiss
     }
+    
+    @State var isDimmiss: Bool
     
     var body: some View {
         
@@ -224,6 +228,10 @@ struct EditPetView: View {
                     ) {
                         Button("Deletar", role: .destructive) {
                             if viewModel.deletePet(id: pet.id) {
+                                if isDimmiss{
+                                    dismiss()
+                                    return
+                                }
                                 navPath.removeAll()
                             }
                         }
@@ -247,14 +255,14 @@ struct EditPetView: View {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancelar", role: .cancel) {
                     viewModel.cancelEditing()
-                    navPath.removeLast()
+                    dismiss()
                 }
             }
             
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     if viewModel.savePet() {
-                        navPath.removeLast()
+                        dismiss()
                     }
                 } label: {
                     Text("Salvar")
@@ -287,8 +295,9 @@ struct EditPetView: View {
     let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
     let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
     
-    EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath)
+    EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath, isDismiss: false)
         .environment(VaccineRegistryViewModel(store: vaccineRegistryStore))
         .environment(vaccineRegistryStore)
         .environment(vaccineStore)
 }
+

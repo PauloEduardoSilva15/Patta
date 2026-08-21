@@ -71,7 +71,7 @@ struct PetView: View {
                 case .detail(let petToView):
                     FocusedPetView(pet: petToView, viewModel: viewModel, navPath: $navPath)
                 case .edit(let petToEdit):
-                    EditPetView(pet: petToEdit, viewModel: viewModel, navPath: $navPath)
+                    EditPetView(pet: petToEdit, viewModel: viewModel, navPath: $navPath, isDismiss: false)
                 }
             }
         }

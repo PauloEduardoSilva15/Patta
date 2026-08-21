@@ -39,7 +39,8 @@ struct Navigation: View {
 }
 
 #Preview {
-    Navigation()
+   // Navigation()
+        
 }
 
 
