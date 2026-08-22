@@ -21,11 +21,11 @@ enum PetColorPalette {
 
     static let options = [
         PetColorOption(assetName: "petAbobora", title: "Abóbora"),
-        PetColorOption(assetName: "petAmarelo", title: "Amarelo"),
+        PetColorOption(assetName: "petVinho", title: "Vinho"),
         PetColorOption(assetName: "petAzul", title: "Azul"),
         PetColorOption(assetName: "petBebe", title: "Bebê"),
         PetColorOption(assetName: "petCereja", title: "Cereja"),
-        PetColorOption(assetName: "petCinza", title: "Cinza"),
+        PetColorOption(assetName: "petDourado", title: "Dourado"),
         PetColorOption(assetName: "petLilas", title: "Lilás"),
         PetColorOption(assetName: "petMarrom", title: "Marrom"),
         PetColorOption(assetName: "petRoxo", title: "Roxo"),
