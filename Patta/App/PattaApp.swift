@@ -9,6 +9,7 @@ import CoreData
 import SwiftUI
 
 @main
+@MainActor
 struct PattaApp: App {
     @State private var dataController: DataController
     //Pet
@@ -16,6 +17,7 @@ struct PattaApp: App {
     @State private var petListStore: PetListStore
     //Task
     @State private var taskViewModel: TaskViewModel
+    @State private var taskListStore: TaskListStore
     //Vaccine
     @State private var vaccineViewModel: VaccineViewModel
     @State private var vaccineListStore: VaccineListStore
@@ -30,6 +32,9 @@ struct PattaApp: App {
         let petRepository = CoreDataPetRepository(context: context)
         let petStore = PetListStore(repository: petRepository)
         
+        let taskRepository = CoreDataTaskRepository(context: context)
+        let taskStore = TaskListStore(repository: taskRepository)
+        
         let vaccineRepository = CoreDataVaccineRepository(context: context)
         let vaccineStore = VaccineListStore(repository: vaccineRepository)
         
@@ -39,7 +44,8 @@ struct PattaApp: App {
         _dataController = .init(initialValue: controller)
         _petListStore = .init(initialValue: petStore)
         _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
-        _taskViewModel = .init(initialValue: TaskViewModel(context: context))
+        _taskListStore = .init(initialValue: taskStore)
+        _taskViewModel = .init(initialValue: TaskViewModel(store: taskStore))
         _vaccineListStore = .init(initialValue: vaccineStore)
         _vaccineRegistryListStore = .init(initialValue: vaccineRegistryStore)
         _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(store: vaccineRegistryStore))
@@ -51,6 +57,7 @@ struct PattaApp: App {
             ContentView()
                 .environment(dataController)
                 .environment(taskViewModel)
+                .environment(taskListStore)
                 .environment(petViewModel)
                 .environment(vaccineViewModel)
                 .environment(vaccineRegistryViewModel)

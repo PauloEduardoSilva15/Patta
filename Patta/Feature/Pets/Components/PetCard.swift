@@ -88,11 +88,17 @@ struct PetCard: View {
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
     let birthdate = myPetBirthdate
     
-    if let uiImage = UIImage(named: "ImageTest") {
-        let image = uiImage.pngData()
-    }
-    
-    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
+    let image = UIImage(
+        named: "ImageTest"
+    )?.pngData()
+
+    let pet = PetModel(
+        id: UUID(),
+        name: name,
+        breed: breed,
+        birthdate: birthdate,
+        image: image
+    )
     
     let repository = CoreDataPetRepository(context: context)
     let store = PetListStore(repository: repository)

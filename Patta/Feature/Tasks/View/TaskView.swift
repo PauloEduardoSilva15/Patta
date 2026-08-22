@@ -6,113 +6,77 @@
 //
 
 import SwiftUI
-import CoreData
 
-struct TaskView:View {
+
+struct TaskView: View {
     @Environment(TaskViewModel.self) private var viewModel
+    @Environment(TaskListStore.self) private var taskListStore
+    @Environment(PetListStore.self) private var petListStore
+    
     @State private var showTaskSheet: Bool = false
-    @State private var showSheetFilter: Bool = false
     @State var selectedDate = Date()
-    @State var selectedPet: Pet?
+    @State var selectedPet: PetModel?
     @State var selectedTab = 0
     
-    @FetchRequest(entity: Task.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Task.date, ascending: true)], predicate: NSPredicate(format: "isComplete == NO"), animation: .default) private var fetchedPendingTasks: FetchedResults<Task>
-    
-    @FetchRequest(entity: Task.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Task.completedAt, ascending: false)], predicate: NSPredicate(format: "isComplete == YES"), animation: .default) private var fetchedCompletedTasks: FetchedResults<Task>
-    
-    @FetchRequest(
-        entity: Pet.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)],
-        
-    ) var pets: FetchedResults<Pet>
-    
-    var allPets: [Pet]{
-        var items: [Pet] = []
-        for pet in pets {
-            items.append(pet)
-        }
-        return items
-    }
-    
-    private func filteredByDateAndPet(_ source: FetchedResults<Task> ) -> [Task] {
+    private func filteredByDateAndPet(_ source: [TaskModel] ) -> [TaskModel] {
         let calendar = Calendar.current
-
+        
         return source.filter { task in
             guard let taskDate = task.date else {
                 return false
             }
-
-            guard calendar.isDate(
-                taskDate,
-                inSameDayAs: selectedDate
-            ) else {
+            
+            guard calendar.isDate(taskDate, inSameDayAs: selectedDate) else {
                 return false
             }
-
+            
             guard let selectedPet else {
                 return true
             }
-
-            return task.appliesToAllPets ||
-                task.pet?.objectID == selectedPet.objectID
+            
+            return task.appliesToAllPets || task.pet?.id == selectedPet.id
         }
     }
     
-    private var pendingTasks: [Task] {
-        filteredByDateAndPet(fetchedPendingTasks)
+    private var pendingTasks: [TaskModel] {
+        let pending = taskListStore.tasks.filter { !$0.isCompleted}.sorted { ($0.date ?? .distantFuture) < ($1.date ?? .distantFuture)}
+        return filteredByDateAndPet(pending)
     }
     
-    private var completedTasks: [Task] {
-        filteredByDateAndPet(fetchedCompletedTasks)
+    private var completedTasks: [TaskModel] {
+        let completed = taskListStore.tasks.filter { $0.isCompleted}.sorted{ ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast)}
+        return filteredByDateAndPet(completed)
     }
     
     private var isPetFilterActive: Bool {
         selectedPet != nil
     }
-
+    
+    private var petFilterColor: Color {
+        PetColorPalette.color(for: selectedPet?.color)
+    }
+    
     private var petFilterButton: some View {
         Menu {
             Picker("Pets", selection: $selectedPet) {
                 Text("Todos")
-                    .tag(nil as Pet?)
-
-                ForEach(allPets, id: \.objectID) { pet in
-                    Text(pet.name ?? "Sem nome")
+                    .tag(nil as PetModel?)
+                
+                ForEach(petListStore.pets) { pet in
+                    Text(pet.name)
                         .tag(Optional(pet))
                 }
             }
             .pickerStyle(.inline)
         } label: {
-            Label(
-                "Filtrar",
-                systemImage: isPetFilterActive
-                ? "pawprint.fill"
-                : "pawprint"
-            )
-            .labelStyle(.titleAndIcon)
-            .foregroundStyle(
-                isPetFilterActive
-                ? petFilterColor
-                : Color.primary
-            )
-            .padding(6)
+            Label("Filtrar",systemImage: isPetFilterActive ? "pawprint.fill" : "pawprint")
+                .labelStyle(.titleAndIcon)
+                .foregroundStyle(isPetFilterActive ? petFilterColor : Color.primary)
+                .padding(6)
         }
         .menuStyle(.button)
         .buttonStyle(.plain)
-        .tint(
-            isPetFilterActive
-            ? petFilterColor
-            : Color.primary
-        )
-    }
-    
-    private var petFilterMenu: some View {
-        petFilterButton
-    }
-    private var petFilterColor: Color {
-        PetColorPalette.color(
-            for: selectedPet?.color
-        )
+        .tint(isPetFilterActive ? petFilterColor : Color.primary)
     }
     
     var body: some View {
@@ -148,9 +112,9 @@ struct TaskView:View {
         .navigationTitle("Tarefa")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                petFilterMenu
+                petFilterButton
             }
-              
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     viewModel.prepareNewTask()
@@ -162,20 +126,26 @@ struct TaskView:View {
             }
         }
         .sheet(isPresented: $showTaskSheet) {
-            NavigationStack{
-                TaskSheet()
-                    .environment(viewModel)
+            TaskSheet()
+        }
+        .onAppear {
+            viewModel.loadTasks()
+        }
+        .alert("Não foi possível concluir a operação", isPresented: Binding(
+            get: {
+                viewModel.errorMessage != nil
+            },
+            set: { isPresented in
+                if !isPresented {
+                    viewModel.errorMessage = nil
+                }
             }
+        ))
+        {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
     }
 }
-#Preview {
-    
-    let dataController = DataController.shared
-    let context = dataController.container.viewContext
-    let taskViewModel = TaskViewModel(context: context)
-    
-    TaskView()
-        .environment(taskViewModel)
-        .environment(\.managedObjectContext, context)
-}
+
