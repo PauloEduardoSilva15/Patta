@@ -18,9 +18,13 @@ struct PetCard: View {
             if let imageData = pet.image,
                let uiImage = UIImage(data: imageData) {
                 
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
+                GeometryReader { geo in
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: geo.size.width)
+                        .clipped()
+                }
                 
             } else {
                 PetColorPalette.color(for: pet.color)
@@ -91,7 +95,7 @@ struct PetCard: View {
     let image = UIImage(
         named: "ImageTest"
     )?.pngData()
-
+    
     let pet = PetModel(
         id: UUID(),
         name: name,

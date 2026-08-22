@@ -62,7 +62,7 @@ struct EditPetView: View {
                 VStack {
                     PhotosPicker(selection: $selectedImage, matching: .images) {
                         VStack(spacing: 20) {
-                            Text("Adicionar Imagem")
+                            Text("Alterar Imagem")
                                 .fontWeight(.medium)
                                 .padding()
                                 .glassEffect(.regular.interactive())
@@ -83,8 +83,15 @@ struct EditPetView: View {
                             .font(.headline)
                             .padding(.bottom, 10)
                         
-                        TextField("Nome", text: $viewModelBind.name)
-                            .padding(12)
+                        VStack(alignment: .leading, spacing: 10) {
+                            
+                            Text("Nome")
+                                .font(.headline.bold())
+                            
+                            TextField("", text: $viewModelBind.name)
+                                .font(.subheadline)
+                        }
+                        .padding(.vertical, 12)
                         
                         Divider()
                         
@@ -95,29 +102,51 @@ struct EditPetView: View {
                                 set: { viewModelBind.birthdate = $0 }
                             ),
                             in: ...Date.now,
-                            displayedComponents: .date
+                            displayedComponents: .date,
                         )
-                        .padding(12)
+                        .padding(.vertical, 12)
+                        .datePickerStyle(.compact)
+                        .environment(\.locale, portugueseBrazilLocale)
+                        .environment(\.calendar, portugueseBrazilCalendar)
                         
                         Divider()
                         
-                        TextField("Peso", value: $viewModelBind.weight, format: .number)
-                            .keyboardType(.decimalPad)
-                            .padding(12)
-                            .overlay(alignment: .trailing) {
-                                Text("kg")
-                                    .foregroundStyle(.secondary)
-                            }
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Peso")
+                                .font(.headline.bold())
+                            
+                            TextField("Não Informado", value: $viewModelBind.weight, format: .number)
+                                .font(.subheadline)
+                                .keyboardType(.decimalPad)
+                                .overlay(alignment: .trailing) {
+                                    Text("kg")
+                                        .foregroundStyle(.secondary)
+                                }
+                        }
+                        .padding(.vertical, 12)
                         
                         Divider()
                         
-                        TextField("Raça", text: $viewModelBind.breed)
-                            .padding(12)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Raça")
+                                .font(.headline.bold())
+                            
+                            TextField("Não Informado", text: $viewModelBind.breed)
+                                .font(.subheadline)
+                        }
+                        .padding(.vertical, 12)
                         
                         Divider()
                         
-                        TextField("Condições Médicas", text: $viewModelBind.medicalConditions)
-                            .padding(12)
+                        VStack(alignment: .leading, spacing: 10) {
+                            
+                            Text("Condições Médicas")
+                                .font(.headline.bold())
+                            
+                            TextField("Não Informado", text: $viewModelBind.medicalConditions)
+                                .font(.subheadline)
+                        }
+                        .padding(.vertical, 12)
                     }
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
@@ -169,13 +198,15 @@ struct EditPetView: View {
                                             Text(
                                                 registry.applicationDate?
                                                     .formatted(
-                                                        date: .abbreviated,
+                                                        date: .numeric,
                                                         time: .omitted
                                                     )
                                                 ?? "Data não informada"
                                             )
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
+                                            .environment(\.locale, portugueseBrazilLocale)
+                                            .environment(\.calendar, portugueseBrazilCalendar)
                                         }
 
                                         Spacer()
@@ -249,8 +280,6 @@ struct EditPetView: View {
             .frame(maxHeight: 420)
             .scrollIndicators(.hidden)
         }
-        .environment(\.locale, portugueseBrazilLocale)
-        .environment(\.calendar, portugueseBrazilCalendar)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancelar", role: .cancel) {
@@ -268,6 +297,7 @@ struct EditPetView: View {
                     Text("Salvar")
                         .foregroundStyle(.white)
                 }
+                .buttonStyle(.glassProminent)
             }
         }
         .navigationBarBackButtonHidden(true)
