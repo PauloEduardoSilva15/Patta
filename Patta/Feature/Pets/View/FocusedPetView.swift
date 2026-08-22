@@ -26,15 +26,12 @@ struct FocusedPetView: View {
             } ?? pet
         }
     
-    
     var body: some View {
         
         @Bindable var vaccineViewModelBind = vaccineRegistryViewModel
         
-        
-        
         ZStack {
-            if let image = pet.image, let UIImage = UIImage(data: image) {
+            if let image = currentPet.image, let UIImage = UIImage(data: image) {
                 GeometryReader { geo in
                     Image(uiImage: UIImage)
                         .resizable()
