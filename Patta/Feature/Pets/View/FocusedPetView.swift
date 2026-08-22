@@ -104,32 +104,64 @@ struct PetInformationView: View {
     let viewModel: PetViewModel
     
     var body: some View {
-        Text(pet.name.isEmpty ? "Nome" : pet.name)
-            .foregroundStyle(pet.name.isEmpty ? .secondary : .primary)
-            .padding(12)
+        HStack {
+            
+            Text("Nome")
+                .font(.headline.bold())
+            
+            Spacer()
+            
+            Text(pet.name)
+                .font(.subheadline)
+        }
+        .padding(.vertical, 12)
         
         Divider()
         
-        Text(pet.birthdate == nil ? "Idade" : viewModel.getAge(birthdate: pet.birthdate ?? Date.now) + " anos")
-            .foregroundStyle(pet.birthdate == nil ? .secondary : .primary)
-            .padding(12)
+        HStack {
+            
+            Text("Idade")
+                .font(.headline.bold())
+            
+            Spacer()
+            
+            Text(viewModel.getAge(birthdate: pet.birthdate ?? Date.now) + " anos")
+                .font(.subheadline)
+        }
+        .padding(.vertical, 12)
         
         Divider()
         
-        Text((pet.breed ?? "").isEmpty ? "Raça" : pet.breed ?? "")
-            .foregroundStyle((pet.breed ?? "").isEmpty ? .secondary : .primary)
-            .padding(12)
+        HStack {
+            
+            Text("Raça")
+                .font(.headline.bold())
+            
+            Spacer()
+            
+            Text((pet.breed ?? "").isEmpty ? "Não Informado" : pet.breed ?? "")
+                .font(.subheadline)
+        }
+        .padding(.vertical, 12)
         
         Divider()
         
-        Text((pet.medicalConditions ?? "").isEmpty ? "Condições Médicas" : pet.medicalConditions ?? "")
-            .foregroundStyle((pet.medicalConditions ?? "").isEmpty ? .secondary : .primary)
-            .padding(12)
+        HStack {
+            Text("Condições Médicas")
+                .font(.headline.bold())
+            
+            Spacer()
+            
+            Text((pet.medicalConditions ?? "").isEmpty ? "Não Informado" : pet.medicalConditions ?? "")
+                .font(.subheadline)
+        }
+        .padding(.vertical, 12)
         
         Divider()
 
         HStack {
             Text("Cor")
+                .font(.headline.bold())
 
             Spacer()
 
@@ -147,7 +179,7 @@ struct PetInformationView: View {
                 )
             )
         }
-        .padding(12)
+        .padding(.vertical, 12)
         .accessibilityElement(children: .combine)
     }
 }

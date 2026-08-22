@@ -44,7 +44,7 @@ struct VaccineRegistrySheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) {
+                    Button(role: .cancel) {
                         registryViewModel.cancelEditing()
                         registryViewModel.activePetForSheet = nil
                     }
@@ -56,7 +56,7 @@ struct VaccineRegistrySheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Salvar") {
+                    Button(role: .confirm) {
                         if registryViewModel.saveRegistry(
                             petId: pet.id
                         ) {
