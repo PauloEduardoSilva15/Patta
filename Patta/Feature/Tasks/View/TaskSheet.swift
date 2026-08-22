@@ -60,10 +60,14 @@ struct TaskSheet: View {
                     Toggle("Repetir diariamente", isOn:$taskViewModel.isRecurring)
                         .tint(.accent)
                     
+                    
                     if taskViewModel.isRecurring {
-                        Label("Recorrência diária", systemImage: "repeat")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                       
+                        Toggle("Limitar recorrência", isOn: $taskViewModel.hasRecurrenceLimit)
+                            .tint(.accent)
+                        if taskViewModel.hasRecurrenceLimit {
+                            Stepper("Duração: \(taskViewModel.recurrenceDays) dias", value: $taskViewModel.recurrenceDays, in: 1...12, step: 1)
+                        }
                     }
                 } header: {
                     Text("Recorrência")
