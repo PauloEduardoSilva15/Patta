@@ -19,6 +19,8 @@ final class TaskViewModel {
     var selectedPet: Pet?
     var isPriority = false
     var isRecurring = false
+    var hasRecurrenceLimit = false
+    var recurrenceDays = 7
     
     var taskBeingEdited: Task?
     
@@ -85,6 +87,23 @@ final class TaskViewModel {
         task.isPriority = isPriority
         task.isRecurring = isRecurring
         
+        if !isRecurring || !hasRecurrenceLimit {
+            task.recurrenceEndDate = nil
+        } else {
+            guard let startDate = task.date else {
+                errorMessage = "Data inválida."
+                return false
+            }
+            let daysToAdd = recurrenceDays
+            
+            guard let endDate = Calendar.current.date(byAdding: .day, value: daysToAdd, to: startDate) else {
+                errorMessage = "Não foi possível calcular o final da recorrência."
+                return false
+            }
+            task.recurrenceEndDate = endDate
+            
+        }
+        
         do {
             try context.save()
             resetForm()
@@ -128,6 +147,30 @@ final class TaskViewModel {
         usesCustomDate = task.usesCustomDate
         isPriority = task.isPriority
         isRecurring = task.isRecurring
+        hasRecurrenceLimit = task.recurrenceEndDate != nil
+        if let startDate = task.date,
+           let endDate = task.recurrenceEndDate {
+            
+            let calendar = Calendar.current
+            
+            let normalizedStartDate = calendar.startOfDay(
+                for: startDate
+            )
+            
+            let normalizedEndDate = calendar.startOfDay(
+                for: endDate
+            )
+            
+            let difference = calendar.dateComponents(
+                [.day],
+                from: normalizedStartDate,
+                to: normalizedEndDate
+            ).day ?? 0
+            
+            recurrenceDays = max(difference + 1, 1)
+        } else {
+            recurrenceDays = 7
+        }
         errorMessage = nil
     }
     
@@ -163,6 +206,8 @@ final class TaskViewModel {
         usesCustomDate = false
         isPriority = false
         isRecurring = false
+        hasRecurrenceLimit = false
+        recurrenceDays = 7
         errorMessage = nil
     }
     
@@ -185,32 +230,41 @@ final class TaskViewModel {
             errorMessage = "A tarefa e a ViewModel estão usando contextos diferentes."
             return
         }
-
+        
         let now = Date()
-
+        
         if task.isComplete {
             task.isComplete = false
             task.completedAt = nil
-
+            
         } else if task.isRecurring {
             
+            
             let currentDate = task.date ?? now
-
+            
             guard let nextDate = nextDailyDate(after: currentDate, relativeTo: now) else {
                 errorMessage = "Não foi possível calcular a próxima data."
                 return
             }
-
-            task.date = nextDate
-            task.isComplete = false
-            task.completedAt = nil
-
+            
+            if let endDate = task.recurrenceEndDate, nextDate > endDate {
+                task.isComplete = true
+                task.completedAt = now
+                task.isRecurring = false
+                task.recurrenceEndDate = nil
+            } else {
+                
+                task.date = nextDate
+                task.isComplete = false
+                task.completedAt = nil
+            }
+            
         } else {
             
             task.isComplete = true
             task.completedAt = now
         }
-
+        
         do {
             try context.save()
             errorMessage = nil
@@ -220,6 +274,6 @@ final class TaskViewModel {
         }
     }
     
-  
+    
     
 }
