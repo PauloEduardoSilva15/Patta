@@ -4,143 +4,264 @@
 //
 //  Created by Pedro Canute on 18/08/26.
 //
-import CoreData
 import SwiftUI
+import CoreData
 
 struct TaskSheet: View {
-    
-    @Environment(\.dismiss) var dismiss
-    @Environment(TaskViewModel.self) var taskViewModel
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Pet.name, ascending: true)]) var pets: FetchedResults<Pet>
+    @Environment(\.dismiss) private var dismiss
+
+    @Environment(TaskViewModel.self) private var taskViewModel
+
+    @Environment(PetListStore.self) private var petListStore
+
     @State private var isShowingDeleteConfirmation = false
-    
+
     var body: some View {
-        @Bindable var taskViewModel = taskViewModel
-        
-        NavigationStack{
+        @Bindable var taskViewModelBind = taskViewModel
+
+        NavigationStack {
             Form {
-                TextField("Título", text: $taskViewModel.title)
-                TextField("Descrição", text: $taskViewModel.description)
-                
-                Section {
-                    Picker(selection: $taskViewModel.selectedPet, label: Text("Pets")) {
-                        
-                        Text("Todos")
-                            .tag(nil as Pet?)
-                        
-                        ForEach(pets, id: \.self) { pet in
-                            Text(pet.name ?? "Pet sem nome")
-                                .tag(Optional(pet))
-                        }
-                    }
-                }
-                
-                Section {
-                    Toggle("Agendar Tarefa", isOn: $taskViewModel.usesCustomDate)
-                        .tint(.accent)
-                    if taskViewModel.usesCustomDate {
-                        DatePicker("Data", selection: $taskViewModel.date)
-                            .environment(\.locale, Locale(identifier: "pt_BR"))
-                    }
-                }
-                
-                Section {
-                    Toggle(isOn: $taskViewModel.isPriority) {
-                        
-                        Text("Tarefa Prioritária")
-                        
-                    }
-                    .tint(.accent)
-                    
-                } footer: {
-                    Text("Use esta opção para destacar tarefas importantes.")
-                }
-                
-                Section {
-                    Toggle("Repetir diariamente", isOn:$taskViewModel.isRecurring)
-                        .tint(.accent)
-                    
-                    
-                    if taskViewModel.isRecurring {
-                       
-                        Toggle("Limitar recorrência", isOn: $taskViewModel.hasRecurrenceLimit)
-                            .tint(.accent)
-                        if taskViewModel.hasRecurrenceLimit {
-                            Stepper("Duração: \(taskViewModel.recurrenceDays) dias", value: $taskViewModel.recurrenceDays, in: 1...12, step: 1)
-                        }
-                    }
-                } header: {
-                    Text("Recorrência")
-                } footer: {
-                    if taskViewModel.isRecurring {
-                        Text(
-                            """
-                            Quando esta tarefa for concluída, ela será \
-                            reagendada automaticamente para o próximo dia.
-                            """
-                        )
-                    } else {
-                        Text(
-                            "Ative esta opção para repetir a tarefa todos os dias."
-                        )
-                    }
-                }
-                if let task = taskViewModel.taskBeingEdited {
-                    Section {
-                        Button("Deletar Tarefa", role: .destructive) {
-                            isShowingDeleteConfirmation = true
-                        }
-                    }
-                    .confirmationDialog("Deletar tarefa?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
-                        Button("Deletar Tarefa", role: .destructive) {
-                            if taskViewModel.deleteTask(task) {
-                                dismiss()
-                            }
-                        }
-                        
-                        Button("Cancelar", role: .cancel) { }
-                    } message: {
-                        Text("Esta ação não pode ser desfeita.")
-                    }
-                }
+                TextField("Título",text: $taskViewModelBind.title)
+
+                TextField("Descrição", text: $taskViewModelBind.description)
+
+                petSection(taskViewModelBind: $taskViewModelBind)
+
+                dateSection(taskViewModelBind: $taskViewModelBind)
+
+                prioritySection(taskViewModelBind: $taskViewModelBind)
+
+                recurrenceSection(taskViewModelBind: $taskViewModelBind)
+
+                deleteSection
             }
             .navigationTitle(taskViewModel.formTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                    }
+                cancellationButton
+                confirmationButton
+            }
+            .confirmationDialog("Deletar tarefa?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
+                Button("Deletar Tarefa", role: .destructive) {
+                    deleteCurrentTask()
                 }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        if taskViewModel.saveTask() {
-                            dismiss()
+
+                Button("Cancelar",role: .cancel) {}
+            } message: {
+                Text(
+                    """
+                    Esta ação não pode \
+                    ser desfeita.
+                    """
+                )
+            }
+            .alert("Não foi possível concluir a operação", isPresented: Binding(
+                    get: {
+                        taskViewModel
+                            .errorMessage != nil
+                    },
+                    set: { isPresented in
+                        if !isPresented {
+                            taskViewModel
+                                .errorMessage = nil
                         }
-                    } label: {
-                        Image(systemName: "checkmark")
-                            .foregroundStyle(.white)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.accent)
-                    
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(taskViewModel.errorMessage ?? "")
+            }
+        }
+        .onAppear {
+            petListStore.refresh()
+        }
+    }
+
+    private func petSection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
+        Section {
+            Picker("Pets", selection: taskViewModelBind.selectedPet) {
+                Text("Todos")
+                    .tag(nil as PetModel?)
+
+                ForEach(petListStore.pets) { pet in
+                    Text(pet.name)
+                        .tag(Optional(pet))
+                }
+            }
+        } header: {
+            Text("Aplicar tarefa a")
+        }
+    }
+
+    private func dateSection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
+        Section {
+            Toggle("Agendar Tarefa",isOn: taskViewModelBind.usesCustomDate)
+            .tint(.accent)
+
+            if taskViewModel
+                .usesCustomDate {
+
+                DatePicker("Data",selection: taskViewModelBind.date)
+                .environment(\.locale, Locale(identifier: "pt_BR"))
+            }
+        }
+    }
+
+    private func prioritySection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
+        Section {
+            Toggle("Tarefa Prioritária",isOn: taskViewModelBind.isPriority)
+            .tint(.accent)
+        } footer: {
+            Text(
+                """
+                Use esta opção para destacar \
+                tarefas importantes.
+                """
+            )
+        }
+    }
+
+    private func recurrenceSection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
+        Section {
+            Toggle("Repetir diariamente",isOn: taskViewModelBind.isRecurring)
+            .tint(.accent)
+
+            if taskViewModel.isRecurring {
+                Toggle("Limitar recorrência",isOn:taskViewModelBind.hasRecurrenceLimit)
+                .tint(.accent)
+
+                if taskViewModel.hasRecurrenceLimit {
+
+                    Stepper(
+                        """
+                        Duração: \
+                        \(taskViewModel.recurrenceDays) dias
+                        """,
+                        value: taskViewModelBind.recurrenceDays,
+                        in: 1...12,
+                        step: 1)
+                }
+            }
+        } header: {
+            Text("Recorrência")
+        } footer: {
+            recurrenceFooter
+        }
+    }
+
+    @ViewBuilder
+    private var recurrenceFooter: some View {
+        if taskViewModel.isRecurring {
+            Text(
+                """
+                Quando esta tarefa for concluída, \
+                ela será reagendada automaticamente \
+                para o próximo dia.
+                """
+            )
+        } else {
+            Text(
+                """
+                Ative esta opção para repetir \
+                a tarefa todos os dias.
+                """
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var deleteSection: some View {
+        if taskViewModel.taskBeingEdited != nil {
+            Section {
+                Button(
+                    "Deletar Tarefa",
+                    role: .destructive
+                ) {
+                    isShowingDeleteConfirmation =
+                        true
                 }
             }
         }
     }
+
+    @ToolbarContentBuilder
+    private var cancellationButton:
+        some ToolbarContent {
+
+        ToolbarItem(
+            placement: .cancellationAction
+        ) {
+            Button {
+                taskViewModel.cancelEditing()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+            }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var confirmationButton:
+        some ToolbarContent {
+
+        ToolbarItem(placement: .confirmationAction) {
+            Button {
+                if taskViewModel.saveTask() {
+                    dismiss()
+                }
+            } label: {
+                Image(systemName: "checkmark")
+                    .foregroundStyle(.white)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.accent)
+        }
+    }
+
+    private func deleteCurrentTask() {
+        guard let task =
+            taskViewModel.taskBeingEdited
+        else {
+            return
+        }
+
+        if taskViewModel.deleteTask(task) {
+            dismiss()
+        }
+    }
 }
+
 #Preview {
-    let dataController = DataController.shared
-    let context = dataController.container.viewContext
-    let pet1 = Pet(context: context)
-    pet1.name = "Goku"
-    let pet2 = Pet(context: context)
-    pet2.name = "Nami"
-    
-    return TaskSheet()
-        .environment(TaskViewModel(context: context))
-        .environment(\.managedObjectContext, context)
+    let controller = DataController.shared
+    let context = controller.container.viewContext
+
+    let taskRepository =
+        CoreDataTaskRepository(
+            context: context
+        )
+
+    let taskStore =
+        TaskListStore(
+            repository: taskRepository
+        )
+
+    let taskViewModel =
+        TaskViewModel(
+            store: taskStore
+        )
+
+    let petRepository =
+        CoreDataPetRepository(
+            context: context
+        )
+
+    let petStore =
+        PetListStore(
+            repository: petRepository
+        )
+
+    TaskSheet()
+        .environment(taskViewModel)
+        .environment(petStore)
 }

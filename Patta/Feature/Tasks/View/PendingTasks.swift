@@ -9,15 +9,16 @@ import SwiftUI
 import CoreData
 
 struct PendingTasks: View {
-    @State private var showTaskSheet: Bool = false
     @Environment(TaskViewModel.self) private var viewModel
-    let tasks: [Task]
+    @State private var showTaskSheet: Bool = false
     
-    private var priorityTasks: [Task] {
+    let tasks: [TaskModel]
+    
+    private var priorityTasks: [TaskModel] {
         tasks.filter { $0.isPriority }
     }
     
-    private var nonPriorityTasks: [Task] {
+    private var nonPriorityTasks: [TaskModel] {
         tasks.filter { !$0.isPriority }
     }
     
@@ -37,59 +38,8 @@ struct PendingTasks: View {
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
             } else {
-                if !priorityTasks.isEmpty {
-                    Section {
-                        ForEach(priorityTasks, id: \.objectID) { task in
-                            LineTask(task: task, onOpenDetails: {
-                                viewModel.prepareToEdit(task)
-                                showTaskSheet = true
-                            }, onComplete: {
-                                viewModel.toggleTaskCompletion(task)
-                            })
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button (role: .destructive){
-                                    if viewModel.deleteTask(task) {
-                                        print("Deleted")
-                                    }
-                                } label: {
-                                    Label("Deletar", systemImage: "trash")
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Tarefas prioritárias: \(priorityTasksCount)")
-                    }
-                }
-                
-                if !nonPriorityTasks.isEmpty {
-                    Section {
-                        ForEach(nonPriorityTasks, id: \.objectID) { task in
-                            LineTask(task: task, onOpenDetails: {
-                                viewModel.prepareToEdit(task)
-                                showTaskSheet = true
-                            }, onComplete: {
-                                viewModel.toggleTaskCompletion(task)
-                            })
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button (role: .destructive){
-                                    if viewModel.deleteTask(task) {
-                                        print("Deleted")
-                                    }
-                                } label: {
-                                    Label("Deletar", systemImage: "trash")
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Tarefas Pendentes: \(nonPriorityTasksCount)")
-                    }
-                }
+                prioritySection
+                nonPrioritySection
             }
         }
         .listStyle(.plain)
@@ -98,4 +48,65 @@ struct PendingTasks: View {
             TaskSheet()
         }
     }
-}
+    
+    @ViewBuilder
+    private var prioritySection: some View {
+        if !priorityTasks.isEmpty {
+            Text("Tarefas Prioritárias: \(priorityTasksCount)")
+                .font(.footnote)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+
+            ForEach(priorityTasks) { task in
+                taskRow(task)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var nonPrioritySection: some View {
+        if !nonPriorityTasks.isEmpty {
+            Text("Tarefas pendentes: \(nonPriorityTasksCount)")
+                .font(.footnote)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+
+            ForEach(nonPriorityTasks) { task in
+                taskRow(task)
+            }
+        }
+    }
+    
+    private func taskRow(_ task: TaskModel) -> some View {
+        LineTask(task: task,onOpenDetails: {
+                       viewModel.prepareToEdit(task)
+                       showTaskSheet = true
+                   },
+                   onComplete: {
+                       viewModel.toggleTaskCompletion(task)
+                   }
+               )
+               .listRowSeparator(.hidden)
+               .listRowBackground(Color.clear)
+               .listRowInsets(EdgeInsets(top: 4,leading: 12, bottom: 4, trailing: 12))
+               .swipeActions(
+                   edge: .trailing,
+                   allowsFullSwipe: true
+               ) {
+                   Button(role: .destructive) {
+                       _ = viewModel.deleteTask(task)
+                   } label: {
+                       Label(
+                           "Deletar",
+                           systemImage: "trash"
+                       )
+                   }
+               }
+           }
+       }

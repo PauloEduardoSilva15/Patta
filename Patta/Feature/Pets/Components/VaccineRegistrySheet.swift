@@ -83,26 +83,56 @@ struct VaccineRegistrySheet: View {
 }
 
 #Preview {
-    let context = DataController.shared.container.viewContext
-    let name = "Toto"
-    let breed = "Beagle"
-    let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
-    let birthdate = myPetBirthdate
-    
-    if let uiImage = UIImage(named: "ImageTest") {
-        let image = uiImage.pngData()
-    }
-    
-    let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
-    
-    let repository = CoreDataPetRepository(context: context)
-    let store = PetListStore(repository: repository)
-    let viewModel = PetViewModel(name: "", store: store)
-    let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
-    let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
-    
+    let context =
+        DataController.shared
+            .container
+            .viewContext
+
+    let pet = PetModel(
+        id: UUID(),
+        name: "Toto",
+        breed: "Beagle",
+        birthdate: Calendar.current.date(
+            from: DateComponents(
+                year: 2023,
+                month: 5,
+                day: 10
+            )
+        ),
+        image: nil
+    )
+
+    let vaccineRepository =
+        CoreDataVaccineRepository(
+            context: context
+        )
+
+    let vaccineStore =
+        VaccineListStore(
+            repository: vaccineRepository
+        )
+
+    let registryRepository =
+        CoreDataVaccineRegistryRepository(
+            context: context
+        )
+
+    let registryStore =
+        VaccineRegistryListStore(
+            repository:
+                registryRepository
+        )
+
     VaccineRegistrySheet(pet: pet)
-        .environment(\.managedObjectContext, context)
-        .environment(VaccineRegistryViewModel(store: vaccineRegistryStore))
+        .environment(
+            VaccineRegistryViewModel(
+                store: registryStore
+            )
+        )
+        .environment(vaccineStore)
+        .environment(
+            \.managedObjectContext,
+            context
+        )
 }
 

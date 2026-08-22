@@ -29,7 +29,6 @@ struct VaccineCardHistory: View {
 }
 
 #Preview {
-    let context = DataController.shared.container.viewContext
     let vaccine = VaccineModel(id: UUID(), title: "Antirrábica")
     let vaccineRegistry = VaccineRegistryModel(id: UUID(), vaccine: vaccine)
     

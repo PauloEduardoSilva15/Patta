@@ -4,8 +4,7 @@
 //
 //  Created by Pedro Canute on 17/08/26.
 //
-
-import CoreData
+import Foundation
 import Observation
 
 @MainActor
@@ -16,15 +15,14 @@ final class TaskViewModel {
     var errorMessage: String?
     var date = Date()
     var usesCustomDate = false
-    var selectedPet: Pet?
+    var selectedPet: PetModel?
     var isPriority = false
     var isRecurring = false
     var hasRecurrenceLimit = false
     var recurrenceDays = 7
     
-    var taskBeingEdited: Task?
-    
-    private let context: NSManagedObjectContext
+    private(set) var taskBeingEdited: TaskModel?
+    private let store: TaskListStore
     
     var isEditing: Bool {
         taskBeingEdited != nil
@@ -34,8 +32,17 @@ final class TaskViewModel {
         isEditing ? "Editar Tarefa" : "Nova Tarefa"
     }
     
-    init(context: NSManagedObjectContext) {
-        self.context = context
+    init(store: TaskListStore) {
+        self.store = store
+    }
+    
+    func loadTasks() {
+        do {
+            try store.refresh()
+            errorMessage = nil
+        } catch {
+            errorMessage = "Falha ao carregar as tarefas."
+        }
     }
     
     func saveTask() -> Bool {
@@ -46,79 +53,56 @@ final class TaskViewModel {
             return false
         }
         let now = Date()
-        let task: Task
-        
-        if let taskBeingEdited {
-            guard taskBeingEdited.managedObjectContext === context else {
-                errorMessage =
-                "A tarefa e a ViewModel estão usando contextos diferentes."
-                
-                print("Contextos diferentes")
-                return false
-            }
-            task = taskBeingEdited
-        } else {
-            
-            task = Task(context: context)
-            task.id = UUID()
-            task.createdAt = now
-        }
-        
-        task.title = treatedTitle
-        task.desc = description.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if let selectedPet {
-            guard selectedPet.managedObjectContext === context else {
-                errorMessage = "O pet e a ViewModel estão usando contextos diferentes."
-                return false
-            }
-        }
-        task.appliesToAllPets = selectedPet == nil
-        task.pet = selectedPet
-        task.usesCustomDate = usesCustomDate
+        let createdAt = taskBeingEdited?.createdAt ?? now
+        let taskDate: Date
         
         if usesCustomDate {
-            task.date = date
+            taskDate = date
         } else {
-            task.date = task.createdAt ?? now
-            
+            taskDate = createdAt
         }
         
-        task.isPriority = isPriority
-        task.isRecurring = isRecurring
+        let recurrenceEndDate: Date?
         
-        if !isRecurring || !hasRecurrenceLimit {
-            task.recurrenceEndDate = nil
+        if isRecurring && hasRecurrenceLimit {
+            let daysToAdd = max(recurrenceDays - 1, 0)
+            
+            guard let calculatedEndDate = Calendar.current.date(byAdding: .day, value: daysToAdd, to: taskDate) else {
+                errorMessage = "Falha ao calcular a data de término."
+                return false
+            }
+            recurrenceEndDate = calculatedEndDate
+            
         } else {
-            guard let startDate = task.date else {
-                errorMessage = "Data inválida."
-                return false
-            }
-            let daysToAdd = recurrenceDays
-            
-            guard let endDate = Calendar.current.date(byAdding: .day, value: daysToAdd, to: startDate) else {
-                errorMessage = "Não foi possível calcular o final da recorrência."
-                return false
-            }
-            task.recurrenceEndDate = endDate
-            
+            recurrenceEndDate = nil
         }
+        
+        let model = TaskModel(
+            id: taskBeingEdited?.id ?? UUID(),
+            title: treatedTitle,
+            description: description.trimmingCharacters(in: .whitespacesAndNewlines),
+            createdAt: createdAt,
+            date: taskDate,
+            completedAt:taskBeingEdited?.completedAt,
+            usesCustomDate: usesCustomDate,
+            isPriority: isPriority,
+            isRecurring: isRecurring,
+            recurrenceEndDate: recurrenceEndDate,
+            isCompleted: taskBeingEdited?.isCompleted ?? false,
+            pet: selectedPet
+        )
         
         do {
-            try context.save()
+            if isEditing {
+                try store.update(model)
+            } else {
+                try store.add(model)
+            }
             resetForm()
+            
             return true
-            
         } catch {
-            context.rollback()
-            
-            let error = error as NSError
-            errorMessage = error.localizedDescription
-            
-            print("Erro Core Data:", error)
-            print("Código:", error.code)
-            print("Informações:", error.userInfo)
-            
+            errorMessage = "Não foi possivel salvar a tarefa."
             return false
         }
     }
@@ -127,45 +111,27 @@ final class TaskViewModel {
         resetForm()
     }
     
-    func prepareToEdit(_ task: Task) {
-        
-        guard task.managedObjectContext === context else {
-            errorMessage = "A tarefa e a ViewModel estão usando contextos diferentes."
-            return
-        }
-        
-        if task.appliesToAllPets {
-            selectedPet = nil
-        } else {
-            selectedPet = task.pet
-        }
+    func prepareToEdit(_ task: TaskModel) {
         
         taskBeingEdited = task
-        title = task.title ?? ""
-        description = task.desc ?? ""
+        title = task.title
+        description = task.description
         date = task.date ?? Date()
-        usesCustomDate = task.usesCustomDate
+        usesCustomDate = task.usesCustomDate ?? false
+        selectedPet = task.pet
         isPriority = task.isPriority
         isRecurring = task.isRecurring
         hasRecurrenceLimit = task.recurrenceEndDate != nil
+        
         if let startDate = task.date,
            let endDate = task.recurrenceEndDate {
             
             let calendar = Calendar.current
             
-            let normalizedStartDate = calendar.startOfDay(
-                for: startDate
-            )
+            let normalizedStartDate = calendar.startOfDay(for: startDate)
+            let normalizedEndDate = calendar.startOfDay(for: endDate)
             
-            let normalizedEndDate = calendar.startOfDay(
-                for: endDate
-            )
-            
-            let difference = calendar.dateComponents(
-                [.day],
-                from: normalizedStartDate,
-                to: normalizedEndDate
-            ).day ?? 0
+            let difference = calendar.dateComponents([.day], from: normalizedStartDate, to: normalizedEndDate).day ?? 0
             
             recurrenceDays = max(difference + 1, 1)
         } else {
@@ -178,20 +144,19 @@ final class TaskViewModel {
         resetForm()
     }
     
-    func deleteTask(_ task: Task) -> Bool {
-        context.delete(task)
+    func deleteTask(_ task: TaskModel) -> Bool {
         
         do {
-            try context.save()
+            try store.delete(id: task.id)
             
-            if taskBeingEdited?.objectID == task.objectID {
+            if taskBeingEdited?.id == task.id {
                 resetForm()
+            } else {
+                errorMessage = nil
             }
-            
-            errorMessage = nil
+           
             return true
         } catch {
-            context.rollback()
             errorMessage = "Não foi possível apagar a tarefa: \(error.localizedDescription)"
             return false
         }
@@ -225,55 +190,46 @@ final class TaskViewModel {
         return nextDate
     }
     
-    func toggleTaskCompletion(_ task: Task) {
-        guard task.managedObjectContext === context else {
-            errorMessage = "A tarefa e a ViewModel estão usando contextos diferentes."
-            return
-        }
+    func toggleTaskCompletion(_ task: TaskModel) {
+       
+        var updatedTask = task
         
         let now = Date()
         
-        if task.isComplete {
-            task.isComplete = false
-            task.completedAt = nil
-            
-        } else if task.isRecurring {
-            
-            
-            let currentDate = task.date ?? now
+        if updatedTask.isCompleted {
+            updatedTask.isCompleted = false
+            updatedTask.completedAt = nil
+        } else if updatedTask.isRecurring {
+            let currentDate = updatedTask.date ?? now
             
             guard let nextDate = nextDailyDate(after: currentDate, relativeTo: now) else {
                 errorMessage = "Não foi possível calcular a próxima data."
                 return
             }
             
-            if let endDate = task.recurrenceEndDate, nextDate > endDate {
-                task.isComplete = true
-                task.completedAt = now
-                task.isRecurring = false
-                task.recurrenceEndDate = nil
-            } else {
+            if let endDate = updatedTask.recurrenceEndDate, nextDate > endDate {
+                updatedTask.isCompleted = true
+                updatedTask.completedAt = now
+                updatedTask.isRecurring = false
+                updatedTask.recurrenceEndDate = nil
                 
-                task.date = nextDate
-                task.isComplete = false
-                task.completedAt = nil
+            } else {
+                updatedTask.date = nextDate
+                updatedTask.isCompleted = false
+                updatedTask.completedAt = nil
             }
             
         } else {
-            
-            task.isComplete = true
-            task.completedAt = now
+            updatedTask.isCompleted = true
+            updatedTask.completedAt = now
         }
         
         do {
-            try context.save()
+            try store.update(updatedTask)
             errorMessage = nil
         } catch {
-            context.rollback()
-            errorMessage = "Não foi possível atualizar a tarefa: \(error.localizedDescription)"
+            errorMessage = "Não foi possível atualizar a tarefa. Por favor, tente novamente."
         }
     }
-    
-    
     
 }

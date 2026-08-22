@@ -109,6 +109,48 @@ struct Search: View {
         }
     }
     
+    private func taskModel(from task: Task) -> TaskModel? {
+        guard let id = task.id,
+              let title = task.title,
+              let createdAt = task.createdAt else {
+            return nil
+        }
+        
+        return TaskModel(
+            id: id,
+            title: title,
+            description: task.desc ?? "",
+            createdAt: createdAt,
+            date: task.date,
+            completedAt: task.completedAt,
+            usesCustomDate: task.usesCustomDate,
+            isPriority: task.isPriority,
+            isRecurring: task.isRecurring,
+            recurrenceEndDate: task.recurrenceEndDate,
+            isCompleted: task.isComplete,
+            pet: petModel(from: task.pet)
+        )
+    }
+    
+    private func petModel(from pet: Pet?) -> PetModel? {
+        guard let pet,
+              let id = pet.id,
+              let name = pet.name else {
+            return nil
+        }
+        
+        return PetModel(
+            id: id,
+            name: name,
+            weight: pet.weight?.doubleValue,
+            breed: pet.breed,
+            birthdate: pet.birthdate,
+            medicalConditions: pet.med_cond,
+            image: pet.image,
+            color: PetColorPalette.normalizedAssetName(pet.color)
+        )
+    }
+    
 
     public var body: some View {
         NavigationStack{
@@ -119,8 +161,9 @@ struct Search: View {
                     if allTasksTitle.contains(search) {
                         Button {
                             allTasks.forEach { task in
-                                if task.title == search {
-                                    viewTaskModel.prepareToEdit(task)
+                                if task.title == search,
+                                   let taskModel = taskModel(from: task) {
+                                    viewTaskModel.prepareToEdit(taskModel)
                                 }
                             }
                             showTaskSheet.toggle()
@@ -174,4 +217,3 @@ struct Search: View {
             
     }
 }
-
