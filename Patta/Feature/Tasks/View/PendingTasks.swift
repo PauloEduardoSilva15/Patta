@@ -58,7 +58,7 @@ struct PendingTasks: View {
                 .foregroundStyle(.secondary)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
 
             ForEach(priorityTasks) { task in
                 taskRow(task)
@@ -75,7 +75,7 @@ struct PendingTasks: View {
                 .foregroundStyle(.secondary)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
+                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
 
             ForEach(nonPriorityTasks) { task in
                 taskRow(task)
@@ -94,7 +94,7 @@ struct PendingTasks: View {
                )
                .listRowSeparator(.hidden)
                .listRowBackground(Color.clear)
-               .listRowInsets(EdgeInsets(top: 4,leading: 12, bottom: 4, trailing: 12))
+               .listRowInsets(EdgeInsets(top: 4,leading: 0, bottom: 4, trailing: 0))
                .swipeActions(
                    edge: .trailing,
                    allowsFullSwipe: true

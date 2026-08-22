@@ -82,7 +82,6 @@ struct TaskView: View {
     var body: some View {
         VStack {
             WeekCalendar(selectedDate: $selectedDate)
-                .padding(.horizontal,12)
             
             
             Picker("Tarefas agendadas", selection: $selectedTab) {
@@ -92,7 +91,7 @@ struct TaskView: View {
                     .tag(1)
             }
             .pickerStyle(.segmented)
-            .padding(12)
+            
             
             switch selectedTab {
             case 0:
@@ -105,6 +104,7 @@ struct TaskView: View {
                 PendingTasks(tasks: pendingTasks)
             }
         }
+        .padding(.horizontal,24)
         .background {
             Color(.background)
                 .ignoresSafeArea()

@@ -32,7 +32,7 @@ struct WeekCalendar: View {
         VStack(spacing: 10) {
             HStack {
                 Text(selectedDate.formatted(.dateTime.month(.abbreviated).locale(Locale(identifier: "pt_BR"))).capitalized + " " + selectedDate.formatted(.dateTime.year()))
-                    .font(.title3.bold())
+                    .font(.headline)
                 
                 Spacer()
                 
@@ -59,13 +59,13 @@ struct WeekCalendar: View {
                 }
             }
             
+            
             TabView(selection: $currentWeekOffset) {
                 ForEach(weekOffsetRange, id: \.self) { offset in
                     WeekRow(
                         days: daysOfTheWeek(offset: offset),
                         selectedDate: $selectedDate
                     )
-                    .padding(.horizontal, 4)
                     .tag(offset)
                 }
             }
