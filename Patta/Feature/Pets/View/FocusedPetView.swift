@@ -40,6 +40,9 @@ struct FocusedPetView: View {
                         .clipped()
                         .ignoresSafeArea()
                 }
+            } else {
+                PetColorPalette.color(for: currentPet.color)
+                    .ignoresSafeArea()
             }
             
             VStack {

@@ -21,6 +21,7 @@ struct EditPetView: View {
     
     @State private var selectedImage: PhotosPickerItem?
     @State private var confirmDelete: Bool = false
+    @State private var actualPetColorSelected = ""
     @Binding var navPath: [PetRoute]
     
     private let portugueseBrazilLocale = Locale(identifier: "pt_BR")
@@ -35,6 +36,10 @@ struct EditPetView: View {
         self.viewModel = viewModel
         _navPath = navPath
         self.isDimmiss = isDismiss
+        
+        if pet.color != nil {
+            actualPetColorSelected = pet.color ?? PetColorPalette.defaultAssetName
+        }
     }
     
     @State var isDimmiss: Bool
@@ -53,6 +58,9 @@ struct EditPetView: View {
                         .clipped()
                         .ignoresSafeArea()
                 }
+            } else {
+                PetColorPalette.color(for: actualPetColorSelected)
+                    .ignoresSafeArea()
             }
             
             Color.clear
@@ -158,6 +166,9 @@ struct EditPetView: View {
                         PetColorPicker(
                             selection: $viewModelBind.selectedColorName
                         )
+                        .onChange(of: viewModel.selectedColorName) {
+                            actualPetColorSelected = viewModel.selectedColorName
+                        }
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
