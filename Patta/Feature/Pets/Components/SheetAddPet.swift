@@ -17,13 +17,6 @@ struct SheetAddPet: View {
     @State private var willSetBirthdate = false
     @State private var selectedImage: PhotosPickerItem?
     
-    private let portugueseBrazilLocale = Locale(identifier: "pt_BR")
-    private var portugueseBrazilCalendar: Calendar {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = portugueseBrazilLocale
-        return calendar
-    }
-    
     var body: some View {
         
         @Bindable var viewModelBind = viewModel
@@ -89,7 +82,7 @@ struct SheetAddPet: View {
                             }
                         
                         if willSetBirthdate {
-                            DatePicker("",
+                            DatePicker("Data de Nascimento",
                                        selection: Binding(
                                         get: { viewModelBind.birthdate ?? Date.now },
                                         set: { viewModelBind.birthdate = $0 }
