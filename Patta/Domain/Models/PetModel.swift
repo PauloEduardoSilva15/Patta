@@ -6,14 +6,27 @@
 //
 
 import Foundation
+import SwiftData
 
-struct PetModel: Identifiable, Equatable, Hashable {
-    let id: UUID
+@Model
+class PetModel: Identifiable, Equatable, Hashable {
+    var id: UUID
     var name: String
     var weight: Double?
     var breed: String?
     var birthdate: Date?
     var medicalConditions: String?
-    var image: Data?
+    @Attribute(.externalStorage) var image: Data?
     var color: String? = PetColorPalette.defaultAssetName
+    
+    init(id: UUID, name: String, weight: Double? = nil, breed: String? = nil, birthdate: Date? = nil, medicalConditions: String? = nil, image: Data? = nil, color: String? = nil) {
+        self.id = id
+        self.name = name
+        self.weight = weight
+        self.breed = breed
+        self.birthdate = birthdate
+        self.medicalConditions = medicalConditions
+        self.image = image
+        self.color = color
+    }
 }
