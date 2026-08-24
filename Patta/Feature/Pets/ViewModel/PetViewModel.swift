@@ -34,7 +34,7 @@ final class PetViewModel {
     }
     
     static let defaultColorName = PetColorPalette.defaultAssetName
-
+    
     var selectedColorName = PetViewModel.defaultColorName
     
     init(name: String = "", store: PetListStore) {
@@ -67,17 +67,17 @@ final class PetViewModel {
         let treatedName = name.trimmingCharacters(
             in: .whitespacesAndNewlines
         )
-
+        
         guard !treatedName.isEmpty else {
             errorMessage = "O nome do pet não pode ser vazio"
             return false
         }
-
+        
         if let birthdate, birthdate > Date() {
             errorMessage = "A data de nascimento não pode ser futura"
             return false
         }
-
+        
         let petToSave = PetModel(
             id: petBeingEditedId ?? UUID(),
             name: treatedName,
@@ -90,7 +90,7 @@ final class PetViewModel {
             image: petImage,
             color: PetColorPalette.normalizedAssetName(selectedColorName)
         )
-
+        
         do {
             if !isEditing {
                 try store.add(petToSave)
@@ -104,7 +104,7 @@ final class PetViewModel {
             errorMessage = """
             Erro ao salvar o pet: \(nsError.localizedDescription)
             """
-
+            
             return false
         }
     }
@@ -150,13 +150,31 @@ final class PetViewModel {
     }
     
     func getAge(birthdate: Date) -> String {
-        guard birthdate <= Date() else {
-            return "0"
+        let yearComponent = Calendar.current.dateComponents([.year], from: birthdate, to: Date())
+        let monthComponent = Calendar.current.dateComponents([.month], from: birthdate, to: Date())
+        let dayComponent = Calendar.current.dateComponents([.day], from: birthdate, to: Date())
+        
+        if yearComponent.year! > 0 {
+            if yearComponent.year! == 1 {
+                return "\(yearComponent.year!) ano"
+            } else {
+                return "\(yearComponent.year!) anos"
+            }
+        } else if monthComponent.month! > 0 {
+            if monthComponent.month! == 1 {
+                return "\(monthComponent.month!) mês"
+            } else {
+                return "\(monthComponent.month!) meses"
+            }
+        } else if dayComponent.day! > 0 {
+            if dayComponent.day! == 1 {
+                return "\(dayComponent.day!) dia"
+            } else {
+                return "\(dayComponent.day!) dias"
+            }
+        } else {
+            return "Recém nascido"
         }
-        
-        let components = Calendar.current.dateComponents([.year], from: birthdate, to: Date())
-        return String(components.year ?? 0)
-        
     }
     
     func cancelEditing() {

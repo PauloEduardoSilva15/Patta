@@ -128,7 +128,7 @@ struct PetInformationView: View {
             
             Spacer()
             
-            Text(viewModel.getAge(birthdate: pet.birthdate ?? Date.now) + " anos")
+            Text(viewModel.getAge(birthdate: pet.birthdate ?? Date.now))
                 .font(.subheadline)
         }
         .padding(.vertical, 12)
