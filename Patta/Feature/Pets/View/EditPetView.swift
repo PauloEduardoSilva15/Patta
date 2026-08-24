@@ -24,13 +24,6 @@ struct EditPetView: View {
     @State private var actualPetColorSelected = ""
     @Binding var navPath: [PetRoute]
     
-    private let portugueseBrazilLocale = Locale(identifier: "pt_BR")
-    private var portugueseBrazilCalendar: Calendar {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = portugueseBrazilLocale
-        return calendar
-    }
-    
     init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>, isDismiss: Bool) {
         self.pet = pet
         self.viewModel = viewModel
@@ -114,8 +107,6 @@ struct EditPetView: View {
                         )
                         .padding(.vertical, 12)
                         .datePickerStyle(.compact)
-                        .environment(\.locale, portugueseBrazilLocale)
-                        .environment(\.calendar, portugueseBrazilCalendar)
                         
                         Divider()
                         
@@ -216,8 +207,6 @@ struct EditPetView: View {
                                             )
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
-                                            .environment(\.locale, portugueseBrazilLocale)
-                                            .environment(\.calendar, portugueseBrazilCalendar)
                                         }
 
                                         Spacer()
