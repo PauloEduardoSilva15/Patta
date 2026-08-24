@@ -8,28 +8,28 @@
 import Foundation
 import CoreData
 
-enum VaccineRegistryRepositoryError: LocalizedError {
-    case missingPetId
-    case petNotFound(UUID)
-    case vaccineNotFound(UUID)
-    case registryNotFound(UUID)
-
-    var errorDescription: String? {
-        switch self {
-        case .missingPetId:
-            return "O registro não possui um Pet."
-
-        case .petNotFound:
-            return "O Pet do registro não foi encontrado."
-
-        case .vaccineNotFound:
-            return "A vacina selecionada não foi encontrada."
-
-        case .registryNotFound:
-            return "O registro de vacina não foi encontrado."
-        }
-    }
-}
+//enum VaccineRegistryRepositoryError: LocalizedError {
+//    case missingPetId
+//    case petNotFound(UUID)
+//    case vaccineNotFound(UUID)
+//    case registryNotFound(UUID)
+//
+//    var errorDescription: String? {
+//        switch self {
+//        case .missingPetId:
+//            return "O registro não possui um Pet."
+//
+//        case .petNotFound:
+//            return "O Pet do registro não foi encontrado."
+//
+//        case .vaccineNotFound:
+//            return "A vacina selecionada não foi encontrada."
+//
+//        case .registryNotFound:
+//            return "O registro de vacina não foi encontrado."
+//        }
+//    }
+//}
 
 final class CoreDataVaccineRegistryRepository: VaccineRegistryRepositoryProtocol {
     

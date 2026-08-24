@@ -44,7 +44,7 @@ struct PattaApp: App {
             let vaccineRepository = CoreDataVaccineRepository(context: context)
             let vaccineStore = VaccineListStore(repository: vaccineRepository)
             
-            let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
+            let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
             let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
             
             _petListStore = .init(initialValue: petStore)
