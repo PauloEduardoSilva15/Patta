@@ -63,9 +63,7 @@ struct PetCard: View {
                         }
                         
                         if let birthdate = pet.birthdate {
-                            Text(
-                                "\(viewModel.getAge(birthdate: birthdate)) anos"
-                            )
+                            Text(viewModel.getAge(birthdate: birthdate))
                             .lineLimit(1)
                         }
                     }

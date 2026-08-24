@@ -179,7 +179,8 @@ struct Search: View {
                                     name: pet.name ?? "",
                                     breed: pet.breed ?? "",
                                     birthdate: pet.birthdate,
-                                    image: pet.image
+                                    image: pet.image,
+                                    color: pet.color
                                 )
                                 EditPetView(
                                     pet: petModel,

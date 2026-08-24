@@ -40,6 +40,9 @@ struct FocusedPetView: View {
                         .clipped()
                         .ignoresSafeArea()
                 }
+            } else {
+                PetColorPalette.color(for: currentPet.color)
+                    .ignoresSafeArea()
             }
             
             VStack {
@@ -125,7 +128,7 @@ struct PetInformationView: View {
             
             Spacer()
             
-            Text(viewModel.getAge(birthdate: pet.birthdate ?? Date.now) + " anos")
+            Text(viewModel.getAge(birthdate: pet.birthdate ?? Date.now))
                 .font(.subheadline)
         }
         .padding(.vertical, 12)
