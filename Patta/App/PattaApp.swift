@@ -41,7 +41,7 @@ struct PattaApp: App {
             let taskRepository = CoreDataTaskRepository(context: context)
             let taskStore = TaskListStore(repository: taskRepository)
             
-            let vaccineRepository = CoreDataVaccineRepository(context: context)
+            let vaccineRepository = SwiftDataVaccineRepository(context: context)
             let vaccineStore = VaccineListStore(repository: vaccineRepository)
             
             let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
