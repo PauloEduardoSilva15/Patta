@@ -12,13 +12,16 @@ import SwiftData
 class VaccineRegistryModel: Identifiable, Equatable {
     var id: UUID
     var applicationDate: Date?
-    var vaccine: VaccineModel
-    var petId: UUID?
     
-    init(id: UUID, applicationDate: Date? = nil, vaccine: VaccineModel, petId: UUID? = nil) {
+    @Relationship(deleteRule: .deny, inverse: \VaccineModel.vaccineRegistries)
+    var vaccine: VaccineModel?
+    
+    var pet: PetModel
+    
+    init(id: UUID, applicationDate: Date? = nil, vaccine: VaccineModel? = nil, pet: PetModel) {
         self.id = id
         self.applicationDate = applicationDate
         self.vaccine = vaccine
-        self.petId = petId
+        self.pet = pet
     }
 }

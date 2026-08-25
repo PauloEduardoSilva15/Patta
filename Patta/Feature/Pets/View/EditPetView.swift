@@ -194,7 +194,7 @@ struct EditPetView: View {
                                 } label: {
                                     HStack {
                                         VStack(alignment: .leading, spacing: 5) {
-                                            Text(registry.vaccine.title)
+                                            Text(registry.vaccine?.title ?? "Sem nome")
                                                 .foregroundStyle(.primary)
 
                                             Text(
@@ -259,6 +259,7 @@ struct EditPetView: View {
                     ) {
                         Button("Deletar", role: .destructive) {
                             if viewModel.deletePet(id: pet.id) {
+                                vaccineRegistryListStore.refresh()
                                 if isDimmiss{
                                     dismiss()
                                     return
@@ -333,4 +334,3 @@ struct EditPetView: View {
         .environment(vaccineStore)
         .modelContainer(container)
 }
-

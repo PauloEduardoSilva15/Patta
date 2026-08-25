@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 protocol TaskRepositoryProtocol {
     func fetchAll() throws -> [TaskModel]
     func add(_ task: TaskModel) throws

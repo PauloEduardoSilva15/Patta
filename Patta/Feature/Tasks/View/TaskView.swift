@@ -34,7 +34,7 @@ struct TaskView: View {
                 return true
             }
             
-            return task.appliesToAllPets || task.pet?.id == selectedPet.id
+            return task.appliesToAllPets == true || task.pet?.id == selectedPet.id
         }
     }
     
@@ -148,4 +148,3 @@ struct TaskView: View {
         }
     }
 }
-

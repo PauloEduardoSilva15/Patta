@@ -12,9 +12,11 @@ import SwiftData
 class VaccineModel: Identifiable, Equatable, Hashable {
     var id: UUID
     var title: String
+    var vaccineRegistries: [VaccineRegistryModel]?
     
-    init(id: UUID, title: String) {
+    init(id: UUID, title: String, vaccineRegistries: [VaccineRegistryModel]? = []) {
         self.id = id
         self.title = title
+        self.vaccineRegistries = vaccineRegistries
     }
 }

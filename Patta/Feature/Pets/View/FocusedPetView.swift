@@ -21,15 +21,14 @@ struct FocusedPetView: View {
     @Binding var navPath: [PetRoute]
     
     private var currentPet: PetModel {
-            petListStore.pets.first { storedPet in
-                storedPet.id == pet.id
-            } ?? pet
-        }
+        petListStore.pets.first { storedPet in
+            storedPet.id == pet.id
+        } ?? pet
+    }
     
     var body: some View {
         
         @Bindable var vaccineViewModelBind = vaccineRegistryViewModel
-        
         ZStack {
             if let image = currentPet.image, let UIImage = UIImage(data: image) {
                 GeometryReader { geo in
@@ -128,7 +127,7 @@ struct PetInformationView: View {
             
             Spacer()
             
-            Text(viewModel.getAge(birthdate: pet.birthdate ?? Date.now))
+            Text(viewModel.getAge(birthdate: pet.birthdate))
                 .font(.subheadline)
         }
         .padding(.vertical, 12)
@@ -161,13 +160,13 @@ struct PetInformationView: View {
         .padding(.vertical, 12)
         
         Divider()
-
+        
         HStack {
             Text("Cor")
                 .font(.headline.bold())
-
+            
             Spacer()
-
+            
             Circle()
                 .fill(
                     PetColorPalette.color(
@@ -175,7 +174,7 @@ struct PetInformationView: View {
                     )
                 )
                 .frame(width: 24, height: 24)
-
+            
             Text(
                 PetColorPalette.title(
                     for: pet.color
@@ -225,7 +224,7 @@ struct VaccineListView: View {
     let image = UIImage(
         named: "ImageTest"
     )?.pngData()
-
+    
     let pet = PetModel(
         id: UUID(),
         name: name,
