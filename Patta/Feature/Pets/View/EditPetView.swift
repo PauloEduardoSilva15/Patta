@@ -194,7 +194,7 @@ struct EditPetView: View {
                                 } label: {
                                     HStack {
                                         VStack(alignment: .leading, spacing: 5) {
-                                            Text(registry.vaccine.title)
+                                            Text(registry.vaccine?.title ?? "")
                                                 .foregroundStyle(.primary)
 
                                             Text(

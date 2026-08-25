@@ -27,6 +27,7 @@ final class SwiftDataPetRepository: PetRepositoryProtocol {
     }
     
     func update(_ model: PetModel) throws {
+        context.insert(model)
         try save()
     }
     

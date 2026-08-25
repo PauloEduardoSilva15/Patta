@@ -172,8 +172,10 @@ final class PetViewModel {
             } else {
                 return "\(dayComponent.day!) dias"
             }
-        } else {
+        } else if dayComponent.day! == 0 {
             return "Recém nascido"
+        } else {
+            return "Não Informado"
         }
     }
     

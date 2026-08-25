@@ -11,7 +11,7 @@ import Observation
 @Observable
 final class TaskViewModel {
     var title = ""
-    var description = ""
+    var taskDescription = ""
     var errorMessage: String?
     var date = Date()
     var usesCustomDate = false
@@ -80,7 +80,7 @@ final class TaskViewModel {
         let model = TaskModel(
             id: taskBeingEdited?.id ?? UUID(),
             title: treatedTitle,
-            description: description.trimmingCharacters(in: .whitespacesAndNewlines),
+            taskDescription: taskDescription.trimmingCharacters(in: .whitespacesAndNewlines),
             createdAt: createdAt,
             date: taskDate,
             completedAt:taskBeingEdited?.completedAt,
@@ -115,7 +115,7 @@ final class TaskViewModel {
         
         taskBeingEdited = task
         title = task.title
-        description = task.description
+        taskDescription = task.taskDescription
         date = task.date ?? Date()
         usesCustomDate = task.usesCustomDate ?? false
         selectedPet = task.pet
@@ -165,7 +165,7 @@ final class TaskViewModel {
     private func resetForm() {
         taskBeingEdited = nil
         title = ""
-        description = ""
+        taskDescription = ""
         selectedPet = nil
         date = Date()
         usesCustomDate = false

@@ -23,7 +23,7 @@ struct TaskSheet: View {
             Form {
                 TextField("Título",text: $taskViewModelBind.title)
 
-                TextField("Descrição", text: $taskViewModelBind.description)
+                TextField("Descrição", text: $taskViewModelBind.taskDescription)
 
                 petSection(taskViewModelBind: $taskViewModelBind)
 

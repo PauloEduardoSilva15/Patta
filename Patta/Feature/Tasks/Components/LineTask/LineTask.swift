@@ -146,7 +146,7 @@ private struct PetNameBadge: View {
             Dar comida e comprar \
             tapetinho no mercado
             """,
-        description: "",
+        taskDescription: "",
         createdAt: Date(),
         date: Date(),
         completedAt: nil,

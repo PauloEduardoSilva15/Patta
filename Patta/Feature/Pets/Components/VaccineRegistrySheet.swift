@@ -58,7 +58,7 @@ struct VaccineRegistrySheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .confirm) {
                         if registryViewModel.saveRegistry(
-                            petId: pet.id
+                            pet: pet
                         ) {
                             registryViewModel.activePetForSheet = nil
                         }

@@ -18,7 +18,7 @@ struct VaccineCardHistory: View {
                 .font(.title)
             
             VStack(alignment: .leading) {
-                Text("Vacina \(vaccineRegistry.vaccine.title)")
+                Text("Vacina \(vaccineRegistry.vaccine?.title ?? "")")
                     .font(.body.bold())
                 
                 Text(vaccineRegistry.applicationDate?.formatted(date: .numeric, time: .omitted) ?? "")
@@ -30,7 +30,8 @@ struct VaccineCardHistory: View {
 
 #Preview {
     let vaccine = VaccineModel(id: UUID(), title: "Antirrábica")
-    let vaccineRegistry = VaccineRegistryModel(id: UUID(), vaccine: vaccine)
+    let pet = PetModel(id: UUID(), name: "Teste")
+    let vaccineRegistry = VaccineRegistryModel(id: UUID(), vaccine: vaccine, pet: pet)
     
     VaccineCardHistory(vaccineRegistry: vaccineRegistry)
 }
