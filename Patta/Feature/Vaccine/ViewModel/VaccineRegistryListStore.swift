@@ -24,7 +24,14 @@ final class VaccineRegistryListStore {
     }
     
     func refresh(for petId: UUID) {
-        refresh()
+        vaccineRegistries = []
+
+        do {
+            let all = try repository.fetchAll()
+            vaccineRegistries = all.filter { $0.pet.id == petId }
+        } catch {
+            print("Erro ao buscar registros de vacina: \(error)")
+        }
     }
     
     func refresh() {
