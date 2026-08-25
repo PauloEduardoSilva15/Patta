@@ -27,7 +27,7 @@ struct Navigation: View {
             }
             Tab(role: .search){
                 NavigationStack{
-//                    Search()
+                    Search()
                 }
             }
         }
