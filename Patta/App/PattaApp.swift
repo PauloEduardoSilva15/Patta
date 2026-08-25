@@ -14,7 +14,6 @@ struct PattaApp: App {
     
     let container: ModelContainer
     
-    //    @State private var dataController: DataController
     //Pet
     @State private var petViewModel: PetViewModel
     @State private var petListStore: PetListStore
@@ -34,22 +33,6 @@ struct PattaApp: App {
         
         do {
             container = try ModelContainer(for: PetModel.self, TaskModel.self, VaccineModel.self, VaccineRegistryModel.self)
-            
-            let context = container.mainContext
-            
-            let petRepository = SwiftDataPetRepository(context: context)
-            let petStore = PetListStore(repository: petRepository)
-            
-            let taskRepository = SwiftDataTaskRepository(context: context)
-            let taskStore = TaskListStore(repository: taskRepository)
-            
-            let vaccineRepository = SwiftDataVaccineRepository(context: context)
-            let vaccineStore = VaccineListStore(repository: vaccineRepository)
-            
-            let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
-            let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
-            
-            let searchModel = SearchViewModel(petStore: petStore,taskStore: taskStore)
             
             let seedContext = ModelContext(container)
             let descriptor = FetchDescriptor<VaccineModel>()
@@ -167,6 +150,8 @@ struct PattaApp: App {
             let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
             let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
             
+            let searchModel = SearchViewModel(petStore: petStore,taskStore: taskStore)
+            
             _petListStore = .init(initialValue: petStore)
             _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
             _taskListStore = .init(initialValue: taskStore)
@@ -175,6 +160,7 @@ struct PattaApp: App {
             _vaccineRegistryListStore = .init(initialValue: vaccineRegistryStore)
             _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(store: vaccineRegistryStore))
             _vaccineViewModel = .init(initialValue: VaccineViewModel(store: vaccineStore))
+            _searchViewModel = .init(initialValue: searchModel)
         } catch {
             fatalError("Erro ao inicializar o ModelContainer: \(error.localizedDescription)")
         }
