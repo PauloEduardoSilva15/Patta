@@ -198,6 +198,7 @@ final class TaskViewModel {
     }
     
     func toggleTaskCompletion(_ task: TaskModel) {
+       
         
         let updatedTask = task
         

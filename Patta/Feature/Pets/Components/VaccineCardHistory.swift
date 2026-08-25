@@ -18,7 +18,7 @@ struct VaccineCardHistory: View {
                 .font(.title)
             
             VStack(alignment: .leading) {
-                Text("Vacina \(vaccineRegistry.vaccine?.title ?? "")")
+                Text("Vacina \(vaccineRegistry.vaccine?.title ?? "Sem nome")")
                     .font(.body.bold())
                 
                 Text(vaccineRegistry.applicationDate?.formatted(date: .numeric, time: .omitted) ?? "")
