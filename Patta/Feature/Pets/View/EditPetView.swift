@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 import PhotosUI
 
 struct EditPetView: View {
@@ -309,7 +309,9 @@ struct EditPetView: View {
 
 #Preview {
     @Previewable @State var navPath: [PetRoute] = []
-    let context = DataController.shared.container.viewContext
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: PetModel.self, VaccineModel.self, VaccineRegistryModel.self, configurations: config)
+    let context = container.mainContext
     let name = "Toto"
     let breed = "Beagle"
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
@@ -317,17 +319,18 @@ struct EditPetView: View {
     
     let pet = PetModel(id: UUID(), name: name, breed: breed, birthdate: birthdate, image: nil)
     
-    let repository = CoreDataPetRepository(context: context)
+    let repository = SwiftDataPetRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
-    let vaccineRepository = CoreDataVaccineRepository(context: context)
+    let vaccineRepository = SwiftDataVaccineRepository(context: context)
     let vaccineStore = VaccineListStore(repository: vaccineRepository)
-    let vaccineRegistryRepository = CoreDataVaccineRegistryRepository(context: context)
+    let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
     let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
     
     EditPetView(pet: pet, viewModel: viewModel, navPath: $navPath, isDismiss: false)
         .environment(VaccineRegistryViewModel(store: vaccineRegistryStore))
         .environment(vaccineRegistryStore)
         .environment(vaccineStore)
+        .modelContainer(container)
 }
 

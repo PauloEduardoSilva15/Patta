@@ -5,7 +5,7 @@
 //  Created by Pedro Canute on 17/08/26.
 //
 
-import CoreData
+import Foundation
 import Combine
 
 @MainActor

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct PetCard: View {
     
@@ -82,8 +82,11 @@ struct PetCard: View {
         )
     }
 }
+
 #Preview {
-    let context = DataController.shared.container.viewContext
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: PetModel.self, configurations: config)
+    let context = container.mainContext
     
     let name = "Toto"
     let breed = "Beagle"
@@ -102,9 +105,10 @@ struct PetCard: View {
         image: image
     )
     
-    let repository = CoreDataPetRepository(context: context)
+    let repository = SwiftDataPetRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
     
     PetCard(pet: pet, viewModel: viewModel)
+        .modelContainer(container)
 }
