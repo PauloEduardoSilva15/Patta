@@ -27,6 +27,8 @@ struct PattaApp: App {
     //VaccineRegistry
     @State private var vaccineRegistryViewModel: VaccineRegistryViewModel
     @State private var vaccineRegistryListStore: VaccineRegistryListStore
+    //Search
+    @State private var searchViewModel: SearchViewModel
     
     init() {
         
@@ -47,6 +49,8 @@ struct PattaApp: App {
             let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
             let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
             
+            let searchModel = SearchViewModel(petStore: petStore,taskStore: taskStore)
+            
             _petListStore = .init(initialValue: petStore)
             _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
             _taskListStore = .init(initialValue: taskStore)
@@ -55,6 +59,7 @@ struct PattaApp: App {
             _vaccineRegistryListStore = .init(initialValue: vaccineRegistryStore)
             _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(store: vaccineRegistryStore))
             _vaccineViewModel = .init(initialValue: VaccineViewModel(store: vaccineStore))
+            _searchViewModel = .init(initialValue: searchModel)
         } catch {
             fatalError("Erro ao inicializar o ModelContainer: \(error.localizedDescription)")
         }
@@ -71,6 +76,7 @@ struct PattaApp: App {
                 .environment(petListStore)
                 .environment(vaccineListStore)
                 .environment(vaccineRegistryListStore)
+                .environment(searchViewModel)
         }
         .modelContainer(container)
     }

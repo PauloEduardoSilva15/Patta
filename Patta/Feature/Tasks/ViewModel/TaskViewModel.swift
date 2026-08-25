@@ -80,7 +80,7 @@ final class TaskViewModel {
         let model = TaskModel(
             id: taskBeingEdited?.id ?? UUID(),
             title: treatedTitle,
-            description: description.trimmingCharacters(in: .whitespacesAndNewlines),
+            taskDescription: description.trimmingCharacters(in: .whitespacesAndNewlines),
             createdAt: createdAt,
             date: taskDate,
             completedAt:taskBeingEdited?.completedAt,
@@ -115,7 +115,7 @@ final class TaskViewModel {
         
         taskBeingEdited = task
         title = task.title
-        description = task.description
+        description = task.taskDescription
         date = task.date ?? Date()
         usesCustomDate = task.usesCustomDate ?? false
         selectedPet = task.pet
@@ -192,7 +192,7 @@ final class TaskViewModel {
     
     func toggleTaskCompletion(_ task: TaskModel) {
        
-        var updatedTask = task
+        let updatedTask = task
         
         let now = Date()
         

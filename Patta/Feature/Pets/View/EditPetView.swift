@@ -194,7 +194,7 @@ struct EditPetView: View {
                                 } label: {
                                     HStack {
                                         VStack(alignment: .leading, spacing: 5) {
-                                            Text(registry.vaccine.title)
+                                            Text(registry.vaccine?.title ?? "Sem nome")
                                                 .foregroundStyle(.primary)
 
                                             Text(
@@ -333,4 +333,3 @@ struct EditPetView: View {
         .environment(vaccineStore)
         .modelContainer(container)
 }
-

@@ -12,8 +12,7 @@ struct LineSearch: View {
     var body: some View {
         HStack{
             Text(search)
-            Spacer()
-            Image(systemName: "chevron.right")
+
         }
     }
 }
