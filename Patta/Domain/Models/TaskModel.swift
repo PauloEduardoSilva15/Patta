@@ -7,10 +7,9 @@
 import SwiftData
 import Foundation
 
-// MARK: - TaskModel
 @Model
-final class TaskModel: @unchecked Sendable {
-    @Attribute(.unique) var id: UUID
+final class TaskModel: Identifiable, Equatable, Hashable {
+    var id: UUID
     var title: String
     var taskDescription: String
     
@@ -24,7 +23,7 @@ final class TaskModel: @unchecked Sendable {
     var recurrenceEndDate: Date?
     var isCompleted: Bool
     
-    @Relationship(inverse: \PetModel.tasks) var pet: PetModel?
+    
     
     var appliesToAllPets: Bool?
     
@@ -40,7 +39,6 @@ final class TaskModel: @unchecked Sendable {
         isRecurring: Bool = false,
         recurrenceEndDate: Date? = nil,
         isCompleted: Bool = false,
-        pet: PetModel? = nil
     ) {
         self.id = id
         self.title = title
@@ -53,20 +51,7 @@ final class TaskModel: @unchecked Sendable {
         self.isRecurring = isRecurring
         self.recurrenceEndDate = recurrenceEndDate
         self.isCompleted = isCompleted
-        self.pet = pet
     }
 }
 
-// MARK: - Equatable & Hashable
-extension TaskModel: Equatable {
-    nonisolated static func == (lhs: TaskModel, rhs: TaskModel) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-extension TaskModel: Hashable {
-    nonisolated func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
 
