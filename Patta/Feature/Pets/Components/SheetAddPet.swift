@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 import PhotosUI
 
 struct SheetAddPet: View {
@@ -143,12 +143,15 @@ struct SheetAddPet: View {
 
 #Preview {
     
-    let context = DataController.shared.container.viewContext
-    let repository = CoreDataPetRepository(context: context)
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: PetModel.self, configurations: config)
+    let context = container.mainContext
+    
+    let repository = SwiftDataPetRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
     
     SheetAddPet()
         .environment(viewModel)
-        .environment(\.managedObjectContext, context)
+        .modelContainer(container)
 }

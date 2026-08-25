@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct PetView: View {
     
@@ -79,10 +79,12 @@ struct PetView: View {
 }
 
 #Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: PetModel.self, VaccineRegistryModel.self, configurations: config)
+    let context = container.mainContext
     
-    let context = DataController.shared.container.viewContext
-    let repository = CoreDataPetRepository(context: context)
-    let vaccineRepository = CoreDataVaccineRegistryRepository(context: context)
+    let repository = SwiftDataPetRepository(context: context)
+    let vaccineRepository = SwiftDataVaccineRegistryRepository(context: context)
     let store = PetListStore(repository: repository)
     let viewModel = PetViewModel(name: "", store: store)
     let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRepository)
@@ -91,5 +93,5 @@ struct PetView: View {
     PetView()
         .environment(viewModel)
         .environment(registryViewModel)
-        .environment(\.managedObjectContext, context)
+        .modelContainer(container)
 }

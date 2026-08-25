@@ -5,7 +5,7 @@
 //  Created by Pedro Canute on 18/08/26.
 //
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct TaskSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -232,36 +232,37 @@ struct TaskSheet: View {
     }
 }
 
-#Preview {
-    let controller = DataController.shared
-    let context = controller.container.viewContext
-
-    let taskRepository =
-        CoreDataTaskRepository(
-            context: context
-        )
-
-    let taskStore =
-        TaskListStore(
-            repository: taskRepository
-        )
-
-    let taskViewModel =
-        TaskViewModel(
-            store: taskStore
-        )
-
-    let petRepository =
-        CoreDataPetRepository(
-            context: context
-        )
-
-    let petStore =
-        PetListStore(
-            repository: petRepository
-        )
-
-    TaskSheet()
-        .environment(taskViewModel)
-        .environment(petStore)
-}
+//#Preview {
+//    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+//    let container = try! ModelContainer(for: TaskModel.self, configurations: config)
+//    let context = container.mainContext
+//
+//    let taskRepository =
+//        CoreDataTaskRepository(
+//            context: context
+//        )
+//
+//    let taskStore =
+//        TaskListStore(
+//            repository: taskRepository
+//        )
+//
+//    let taskViewModel =
+//        TaskViewModel(
+//            store: taskStore
+//        )
+//
+//    let petRepository =
+//        CoreDataPetRepository(
+//            context: context
+//        )
+//
+//    let petStore =
+//        PetListStore(
+//            repository: petRepository
+//        )
+//
+//    TaskSheet()
+//        .environment(taskViewModel)
+//        .environment(petStore)
+//}

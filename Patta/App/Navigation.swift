@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreData
 
 enum PetRoute: Hashable {
     case detail(PetModel)
@@ -14,7 +13,6 @@ enum PetRoute: Hashable {
 }
 
 struct Navigation: View {
-    @Environment(\.managedObjectContext) private var context
     
     var body: some View {
         TabView{
