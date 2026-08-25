@@ -27,11 +27,29 @@ struct PattaApp: App {
     //VaccineRegistry
     @State private var vaccineRegistryViewModel: VaccineRegistryViewModel
     @State private var vaccineRegistryListStore: VaccineRegistryListStore
+    //Search
+    @State private var searchViewModel: SearchViewModel
     
     init() {
         
         do {
             container = try ModelContainer(for: PetModel.self, TaskModel.self, VaccineModel.self, VaccineRegistryModel.self)
+            
+            let context = container.mainContext
+            
+            let petRepository = SwiftDataPetRepository(context: context)
+            let petStore = PetListStore(repository: petRepository)
+            
+            let taskRepository = SwiftDataTaskRepository(context: context)
+            let taskStore = TaskListStore(repository: taskRepository)
+            
+            let vaccineRepository = SwiftDataVaccineRepository(context: context)
+            let vaccineStore = VaccineListStore(repository: vaccineRepository)
+            
+            let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
+            let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
+            
+            let searchModel = SearchViewModel(petStore: petStore,taskStore: taskStore)
             
             let seedContext = ModelContext(container)
             let descriptor = FetchDescriptor<VaccineModel>()

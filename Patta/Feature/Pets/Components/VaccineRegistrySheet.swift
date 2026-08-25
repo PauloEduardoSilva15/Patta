@@ -114,4 +114,3 @@ struct VaccineRegistrySheet: View {
         .environment(vaccineStore)
         .modelContainer(container)
 }
-

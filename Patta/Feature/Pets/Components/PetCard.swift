@@ -12,6 +12,13 @@ struct PetCard: View {
     
     let pet: PetModel
     let viewModel: PetViewModel
+    let cardHeight: CGFloat
+    
+    init(pet: PetModel, viewModel: PetViewModel, cardHeight: CGFloat = 210) {
+            self.pet = pet
+            self.viewModel = viewModel
+            self.cardHeight = cardHeight
+        }
     
     var body: some View {
         Group {
@@ -31,7 +38,7 @@ struct PetCard: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 210)
+        .frame(height: cardHeight)
         .clipped()
         .overlay(alignment: .bottom) {
             HStack(spacing: 8) {
