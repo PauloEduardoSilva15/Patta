@@ -10,70 +10,50 @@ import Observation
 
 @Observable
 final class VaccineRegistryListStore {
-
+    
     private(set) var vaccineRegistries: [VaccineRegistryModel] = []
-
+    
     private let repository: VaccineRegistryRepositoryProtocol
-    private var petId: UUID?
-
+    
     init(
-        repository: VaccineRegistryRepositoryProtocol,
-        petId: UUID? = nil
+        repository: VaccineRegistryRepositoryProtocol
     ) {
         self.repository = repository
-        self.petId = petId
-
-        if petId != nil {
-            refresh()
-        }
-    }
-
-    func refresh(for petId: UUID) {
-        self.petId = petId
+        
         refresh()
     }
-
+    
+    func refresh(for petId: UUID) {
+        refresh()
+    }
+    
     func refresh() {
-        guard let petId else {
-            vaccineRegistries = []
-            return
-        }
-
+        vaccineRegistries = []
+        
         do {
-            vaccineRegistries = try repository.fetchAll(
-                forPetId: petId
-            )
+            vaccineRegistries = try repository.fetchAll()
         } catch {
             print(
                 "Erro ao buscar registros de vacina: \(error)"
             )
         }
     }
-
+    
     func add(
         _ vaccineRegistry: VaccineRegistryModel
     ) throws {
         try repository.add(vaccineRegistry)
-
-        if let registryPetId = vaccineRegistry.petId {
-            petId = registryPetId
-        }
-
+        
         refresh()
     }
-
+    
     func update(
         _ vaccineRegistry: VaccineRegistryModel
     ) throws {
-        try repository.update(vaccineRegistry)
-
-        if let registryPetId = vaccineRegistry.petId {
-            petId = registryPetId
-        }
-
+        try repository.update(vaccineRegistry)        
         refresh()
     }
-
+    
     func delete(id: UUID) throws {
         try repository.delete(id: id)
         refresh()

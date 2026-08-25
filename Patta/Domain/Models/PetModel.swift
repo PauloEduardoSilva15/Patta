@@ -19,7 +19,13 @@ class PetModel: Identifiable, Equatable, Hashable {
     @Attribute(.externalStorage) var image: Data?
     var color: String? = PetColorPalette.defaultAssetName
     
-    init(id: UUID, name: String, weight: Double? = nil, breed: String? = nil, birthdate: Date? = nil, medicalConditions: String? = nil, image: Data? = nil, color: String? = nil) {
+    @Relationship(deleteRule: .cascade, inverse: \TaskModel.pet)
+    var tasks: [TaskModel]?
+    
+    @Relationship(deleteRule: .cascade, inverse: \VaccineRegistryModel.pet)
+    var vaccineRegistries: [VaccineRegistryModel]?
+    
+    init(id: UUID, name: String, weight: Double? = nil, breed: String? = nil, birthdate: Date? = nil, medicalConditions: String? = nil, image: Data? = nil, color: String? = nil, tasks: [TaskModel]? = [], vaccineRegistries: [VaccineRegistryModel]? = []) {
         self.id = id
         self.name = name
         self.weight = weight
@@ -28,5 +34,7 @@ class PetModel: Identifiable, Equatable, Hashable {
         self.medicalConditions = medicalConditions
         self.image = image
         self.color = color
+        self.tasks = tasks
+        self.vaccineRegistries = vaccineRegistries
     }
 }

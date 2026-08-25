@@ -8,7 +8,7 @@
 import Foundation
 
 protocol VaccineRegistryRepositoryProtocol {
-    func fetchAll(forPetId: UUID) throws -> [VaccineRegistryModel]
+    func fetchAll() throws -> [VaccineRegistryModel]
     func add(_ vaccineRegistry: VaccineRegistryModel) throws
     func update(_ vaccineRegistry: VaccineRegistryModel) throws
     func delete(id: UUID) throws
