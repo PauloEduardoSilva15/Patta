@@ -39,9 +39,7 @@ final class SwiftDataVaccineRegistryRepository: VaccineRegistryRepositoryProtoco
         self.context = context
     }
     
-    func fetchAll(
-        forPetId: UUID
-    ) throws -> [VaccineRegistryModel] {
+    func fetchAll() throws -> [VaccineRegistryModel] {
         let descriptor = FetchDescriptor<VaccineRegistryModel>(sortBy: [SortDescriptor(\.applicationDate, order: .forward)])
         return try context.fetch(descriptor)
     }

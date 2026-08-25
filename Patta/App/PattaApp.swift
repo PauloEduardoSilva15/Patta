@@ -19,8 +19,8 @@ struct PattaApp: App {
     @State private var petViewModel: PetViewModel
     @State private var petListStore: PetListStore
     //Task
-//    @State private var taskViewModel: TaskViewModel
-//    @State private var taskListStore: TaskListStore
+    @State private var taskViewModel: TaskViewModel
+    @State private var taskListStore: TaskListStore
     //Vaccine
     @State private var vaccineViewModel: VaccineViewModel
     @State private var vaccineListStore: VaccineListStore
@@ -38,8 +38,8 @@ struct PattaApp: App {
             let petRepository = SwiftDataPetRepository(context: context)
             let petStore = PetListStore(repository: petRepository)
             
-//            let taskRepository = CoreDataTaskRepository(context: context)
-//            let taskStore = TaskListStore(repository: taskRepository)
+            let taskRepository = SwiftDataTaskRepository(context: context)
+            let taskStore = TaskListStore(repository: taskRepository)
             
             let vaccineRepository = SwiftDataVaccineRepository(context: context)
             let vaccineStore = VaccineListStore(repository: vaccineRepository)
@@ -49,8 +49,8 @@ struct PattaApp: App {
             
             _petListStore = .init(initialValue: petStore)
             _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
-//            _taskListStore = .init(initialValue: taskStore)
-//            _taskViewModel = .init(initialValue: TaskViewModel(store: taskStore))
+            _taskListStore = .init(initialValue: taskStore)
+            _taskViewModel = .init(initialValue: TaskViewModel(store: taskStore))
             _vaccineListStore = .init(initialValue: vaccineStore)
             _vaccineRegistryListStore = .init(initialValue: vaccineRegistryStore)
             _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(store: vaccineRegistryStore))
@@ -63,8 +63,8 @@ struct PattaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-//                .environment(taskViewModel)
-//                .environment(taskListStore)
+                .environment(taskViewModel)
+                .environment(taskListStore)
                 .environment(petViewModel)
                 .environment(vaccineViewModel)
                 .environment(vaccineRegistryViewModel)
