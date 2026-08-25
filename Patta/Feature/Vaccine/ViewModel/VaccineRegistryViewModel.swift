@@ -47,7 +47,7 @@ final class VaccineRegistryViewModel {
         errorMessage = nil
     }
 
-    func saveRegistry(petId: UUID) -> Bool {
+    func saveRegistry(pet: PetModel) -> Bool {
         guard let selectedVaccine else {
             errorMessage = "Selecione uma vacina"
             return false
@@ -57,7 +57,7 @@ final class VaccineRegistryViewModel {
             id: registryBeingEditedId ?? UUID(),
             applicationDate: applicationDate,
             vaccine: selectedVaccine,
-            petId: petId
+            pet: pet
         )
 
         do {
