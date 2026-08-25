@@ -7,10 +7,8 @@
 
 import Foundation
 import Observation
-import CoreData
 import _PhotosUI_SwiftUI
 
-@MainActor
 @Observable
 final class PetViewModel {
     var petImage: Data?
@@ -21,12 +19,12 @@ final class PetViewModel {
     var medicalConditions = ""
     var errorMessage: String?
     
-    private var petBeingEditedId: UUID?
+    private var petBeingEdited: PetModel?
     
     private let store: PetListStore
     
     var isEditing: Bool {
-        petBeingEditedId != nil
+        petBeingEdited != nil
     }
     
     var formTitle: String {
@@ -50,7 +48,7 @@ final class PetViewModel {
     }
     
     func prepareToEdit(_ pet: PetModel) {
-        petBeingEditedId = pet.id
+        petBeingEdited = pet
         name = pet.name
         weight = pet.weight
         breed = pet.breed ?? ""
@@ -78,33 +76,33 @@ final class PetViewModel {
             return false
         }
         
-        let petToSave = PetModel(
-            id: petBeingEditedId ?? UUID(),
-            name: treatedName,
-            weight: weight,
-            breed: breed.trimmingCharacters(in: .whitespacesAndNewlines),
-            birthdate: birthdate,
-            medicalConditions: medicalConditions.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            ),
-            image: petImage,
-            color: PetColorPalette.normalizedAssetName(selectedColorName)
-        )
-        
         do {
-            if !isEditing {
-                try store.add(petToSave)
+            if let petBeingEdited {
+                petBeingEdited.name = treatedName
+                petBeingEdited.weight = weight
+                petBeingEdited.breed = breed
+                petBeingEdited.birthdate = birthdate
+                petBeingEdited.medicalConditions = medicalConditions
+                petBeingEdited.image = petImage
+                petBeingEdited.color = PetColorPalette.normalizedAssetName(selectedColorName)
+                try store.update(petBeingEdited)
             } else {
-                try store.update(petToSave)
+                let newPet = PetModel(
+                    id: UUID(),
+                    name: treatedName,
+                    weight: weight,
+                    breed: breed,
+                    birthdate: birthdate,
+                    medicalConditions: medicalConditions,
+                    image: petImage,
+                    color: PetColorPalette.normalizedAssetName(selectedColorName)
+                )
+                try store.add(newPet)
             }
             resetForm()
             return true
         } catch {
-            let nsError = error as NSError
-            errorMessage = """
-            Erro ao salvar o pet: \(nsError.localizedDescription)
-            """
-            
+            errorMessage = "Erro ao salvar o pet: \(error.localizedDescription)"
             return false
         }
     }
@@ -112,15 +110,9 @@ final class PetViewModel {
     func deletePet(id: UUID) -> Bool {
         do {
             try store.delete(id: id)
-            if petBeingEditedId == id {
-                resetForm()
-            } else {
-                errorMessage = nil
-            }
             return true
         } catch {
-            let nsError = error as NSError
-            errorMessage = "Erro ao excluir o pet: \(nsError.localizedDescription)"
+            errorMessage = "Erro ao excluir o pet: \(error.localizedDescription)"
             return false
         }
     }
@@ -149,33 +141,35 @@ final class PetViewModel {
         petImage = nil
     }
     
-    func getAge(birthdate: Date) -> String {
-        let yearComponent = Calendar.current.dateComponents([.year], from: birthdate, to: Date())
-        let monthComponent = Calendar.current.dateComponents([.month], from: birthdate, to: Date())
-        let dayComponent = Calendar.current.dateComponents([.day], from: birthdate, to: Date())
-        
-        if yearComponent.year! > 0 {
-            if yearComponent.year! == 1 {
-                return "\(yearComponent.year!) ano"
-            } else {
-                return "\(yearComponent.year!) anos"
-            }
-        } else if monthComponent.month! > 0 {
-            if monthComponent.month! == 1 {
-                return "\(monthComponent.month!) mês"
-            } else {
-                return "\(monthComponent.month!) meses"
-            }
-        } else if dayComponent.day! > 0 {
-            if dayComponent.day! == 1 {
-                return "\(dayComponent.day!) dia"
-            } else {
-                return "\(dayComponent.day!) dias"
-            }
-        } else if dayComponent.day! == 0 {
-            return "Recém nascido"
+    func getAge(birthdate: Date?) -> String {
+        if birthdate == nil {
+            return "Não informado"
         } else {
-            return "Não Informado"
+            let yearComponent = Calendar.current.dateComponents([.year], from: birthdate!, to: Date())
+            let monthComponent = Calendar.current.dateComponents([.month], from: birthdate!, to: Date())
+            let dayComponent = Calendar.current.dateComponents([.day], from: birthdate!, to: Date())
+            
+            if yearComponent.year! > 0 {
+                if yearComponent.year! == 1 {
+                    return "\(yearComponent.year!) ano"
+                } else {
+                    return "\(yearComponent.year!) anos"
+                }
+            } else if monthComponent.month! > 0 {
+                if monthComponent.month! == 1 {
+                    return "\(monthComponent.month!) mês"
+                } else {
+                    return "\(monthComponent.month!) meses"
+                }
+            } else if dayComponent.day! > 0 {
+                if dayComponent.day! == 1 {
+                    return "\(dayComponent.day!) dia"
+                } else {
+                    return "\(dayComponent.day!) dias"
+                }
+            } else {
+                return "Recém nascido"
+            }
         }
     }
     
@@ -184,7 +178,7 @@ final class PetViewModel {
     }
     
     private func resetForm() {
-        petBeingEditedId = nil
+        petBeingEdited = nil
         
         petImage = nil
         name = ""

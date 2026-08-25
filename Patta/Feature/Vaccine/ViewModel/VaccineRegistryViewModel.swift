@@ -16,12 +16,12 @@ final class VaccineRegistryViewModel {
     var selectedVaccine: VaccineModel?
     var errorMessage: String?
 
-    private var registryBeingEditedId: UUID?
+    private var registryBeingEdited: VaccineRegistryModel?
 
     var activePetForSheet: PetModel?
 
     var isEditing: Bool {
-        registryBeingEditedId != nil
+        registryBeingEdited != nil
     }
 
     var formTitle: String {
@@ -41,7 +41,7 @@ final class VaccineRegistryViewModel {
     func prepareForEditing(
         registry: VaccineRegistryModel
     ) {
-        registryBeingEditedId = registry.id
+        registryBeingEdited = registry
         applicationDate = registry.applicationDate ?? Date()
         selectedVaccine = registry.vaccine
         errorMessage = nil
@@ -52,30 +52,26 @@ final class VaccineRegistryViewModel {
             errorMessage = "Selecione uma vacina"
             return false
         }
-
-        let model = VaccineRegistryModel(
-            id: registryBeingEditedId ?? UUID(),
-            applicationDate: applicationDate,
-            vaccine: selectedVaccine,
-            pet: pet
-        )
-
+        
         do {
-            if isEditing {
-                try store.update(model)
+            if let registryBeingEdited {
+                registryBeingEdited.applicationDate = applicationDate
+                registryBeingEdited.vaccine = selectedVaccine
+                registryBeingEdited.pet = pet
+                try store.update(registryBeingEdited)
             } else {
-                try store.add(model)
+                let newRegistry = VaccineRegistryModel(
+                    id: UUID(),
+                    applicationDate: applicationDate,
+                    vaccine: selectedVaccine,
+                    pet: pet
+                )
+                try store.add(newRegistry)
             }
-
+            
             resetForm()
             return true
         } catch {
-            let nsError = error as NSError
-
-            print(
-                "Erro: \(nsError), detalhes: \(nsError.userInfo)"
-            )
-
             errorMessage = """
             Não foi possível salvar o registro: \
             \(error.localizedDescription)
@@ -105,7 +101,7 @@ final class VaccineRegistryViewModel {
     }
 
     private func resetForm() {
-        registryBeingEditedId = nil
+        registryBeingEdited = nil
         applicationDate = Date()
         selectedVaccine = nil
         errorMessage = nil

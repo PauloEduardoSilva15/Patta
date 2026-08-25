@@ -31,7 +31,7 @@ struct PattaApp: App {
     init() {
         
         do {
-            container = try ModelContainer(for: PetModel.self)
+            container = try ModelContainer(for: PetModel.self, TaskModel.self, VaccineModel.self, VaccineRegistryModel.self)
             
             let context = container.mainContext
             

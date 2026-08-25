@@ -77,26 +77,33 @@ final class TaskViewModel {
             recurrenceEndDate = nil
         }
         
-        let model = TaskModel(
-            id: taskBeingEdited?.id ?? UUID(),
-            title: treatedTitle,
-            taskDescription: taskDescription.trimmingCharacters(in: .whitespacesAndNewlines),
-            createdAt: createdAt,
-            date: taskDate,
-            completedAt:taskBeingEdited?.completedAt,
-            usesCustomDate: usesCustomDate,
-            isPriority: isPriority,
-            isRecurring: isRecurring,
-            recurrenceEndDate: recurrenceEndDate,
-            isCompleted: taskBeingEdited?.isCompleted ?? false,
-            pet: selectedPet
-        )
-        
         do {
-            if isEditing {
-                try store.update(model)
+            if let taskBeingEdited {
+                taskBeingEdited.title = treatedTitle
+                taskBeingEdited.taskDescription = taskDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+                taskBeingEdited.date = taskDate
+                taskBeingEdited.usesCustomDate = usesCustomDate
+                taskBeingEdited.isPriority = isPriority
+                taskBeingEdited.isRecurring = isRecurring
+                taskBeingEdited.recurrenceEndDate = recurrenceEndDate
+                taskBeingEdited.pet = selectedPet
+                try store.update(taskBeingEdited)
             } else {
-                try store.add(model)
+                let newTask = TaskModel(
+                    id: taskBeingEdited?.id ?? UUID(),
+                    title: treatedTitle,
+                    taskDescription: taskDescription.trimmingCharacters(in: .whitespacesAndNewlines),
+                    createdAt: createdAt,
+                    date: taskDate,
+                    completedAt:taskBeingEdited?.completedAt,
+                    usesCustomDate: usesCustomDate,
+                    isPriority: isPriority,
+                    isRecurring: isRecurring,
+                    recurrenceEndDate: recurrenceEndDate,
+                    isCompleted: taskBeingEdited?.isCompleted ?? false,
+                    pet: selectedPet
+                )
+                try store.add(newTask)
             }
             resetForm()
             
@@ -154,7 +161,7 @@ final class TaskViewModel {
             } else {
                 errorMessage = nil
             }
-           
+            
             return true
         } catch {
             errorMessage = "Não foi possível apagar a tarefa: \(error.localizedDescription)"
@@ -191,8 +198,8 @@ final class TaskViewModel {
     }
     
     func toggleTaskCompletion(_ task: TaskModel) {
-       
-        var updatedTask = task
+        
+        let updatedTask = task
         
         let now = Date()
         

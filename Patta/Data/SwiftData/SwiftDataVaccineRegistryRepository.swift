@@ -50,6 +50,7 @@ final class SwiftDataVaccineRegistryRepository: VaccineRegistryRepositoryProtoco
     }
     
     func update(_ model: VaccineRegistryModel) throws {
+        context.insert(model)
         try save()
     }
     
