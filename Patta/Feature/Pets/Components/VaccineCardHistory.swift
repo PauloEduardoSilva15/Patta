@@ -28,9 +28,10 @@ struct VaccineCardHistory: View {
     }
 }
 
-//#Preview {
-//    let vaccine = VaccineModel(id: UUID(), title: "Antirrábica")
-//    let vaccineRegistry = VaccineRegistryModel(id: UUID(), vaccine: vaccine)
-//    
-//    VaccineCardHistory(vaccineRegistry: vaccineRegistry)
-//}
+#Preview {
+    let vaccine = VaccineModel(id: UUID(), title: "Antirrábica")
+    let pet = PetModel(id: UUID(), name: "Teste")
+    let vaccineRegistry = VaccineRegistryModel(id: UUID(), vaccine: vaccine, pet: pet)
+    
+    VaccineCardHistory(vaccineRegistry: vaccineRegistry)
+}

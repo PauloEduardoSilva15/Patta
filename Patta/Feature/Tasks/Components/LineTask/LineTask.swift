@@ -138,29 +138,29 @@ private struct PetNameBadge: View {
     }
 }
 
-//#Preview {
-//    let task = TaskModel(
-//        id: UUID(),
-//        title:
-//            """
-//            Dar comida e comprar \
-//            tapetinho no mercado
-//            """,
-//        description: "",
-//        createdAt: Date(),
-//        date: Date(),
-//        completedAt: nil,
-//        usesCustomDate: true,
-//        isPriority: true,
-//        isRecurring: false,
-//        recurrenceEndDate: nil,
-//        isCompleted: false,
-//        pet: nil
-//    )
-//
-//    LineTask(task: task,onOpenDetails: {},onComplete: {})
-//    .padding(8)
-//    .background {
-//        Color(.background)
-//    }
-//}
+#Preview {
+    let task = TaskModel(
+        id: UUID(),
+        title:
+            """
+            Dar comida e comprar \
+            tapetinho no mercado
+            """,
+        taskDescription: "",
+        createdAt: Date(),
+        date: Date(),
+        completedAt: nil,
+        usesCustomDate: true,
+        isPriority: true,
+        isRecurring: false,
+        recurrenceEndDate: nil,
+        isCompleted: false,
+        pet: nil
+    )
+
+    LineTask(task: task,onOpenDetails: {},onComplete: {})
+    .padding(8)
+    .background {
+        Color(.background)
+    }
+}

@@ -27,6 +27,7 @@ final class SwiftDataPetRepository: PetRepositoryProtocol {
     }
     
     func update(_ model: PetModel) throws {
+        context.insert(model)
         try save()
     }
     
@@ -35,6 +36,7 @@ final class SwiftDataPetRepository: PetRepositoryProtocol {
         let descriptor = FetchDescriptor(predicate: predicate)
         
         if let petToDelete = try context.fetch(descriptor).first {
+            petToDelete.image = nil
             context.delete(petToDelete)
             try save()
         }

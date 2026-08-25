@@ -259,6 +259,7 @@ struct EditPetView: View {
                     ) {
                         Button("Deletar", role: .destructive) {
                             if viewModel.deletePet(id: pet.id) {
+                                vaccineRegistryListStore.refresh()
                                 if isDimmiss{
                                     dismiss()
                                     return

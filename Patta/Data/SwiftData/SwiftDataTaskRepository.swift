@@ -51,6 +51,7 @@ final class SwiftDataTaskRepository: TaskRepositoryProtocol {
     }
     
     func update(_ model: TaskModel) throws {
+        context.insert(model)
         try save()
     }
     

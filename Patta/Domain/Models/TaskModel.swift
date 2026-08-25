@@ -25,7 +25,7 @@ final class TaskModel: Identifiable, Equatable, Hashable {
     
     
     
-    var appliesToAllPets: Bool?
+    var appliesToAllPets: Bool
     
     var pet: PetModel?
     
@@ -41,6 +41,7 @@ final class TaskModel: Identifiable, Equatable, Hashable {
         isRecurring: Bool = false,
         recurrenceEndDate: Date? = nil,
         isCompleted: Bool = false,
+        appliesToAllPets: Bool = false,
         pet: PetModel? = nil
     ) {
         self.id = id
@@ -54,6 +55,7 @@ final class TaskModel: Identifiable, Equatable, Hashable {
         self.isRecurring = isRecurring
         self.recurrenceEndDate = recurrenceEndDate
         self.isCompleted = isCompleted
+        self.appliesToAllPets = appliesToAllPets
         self.pet = pet
     }
 }

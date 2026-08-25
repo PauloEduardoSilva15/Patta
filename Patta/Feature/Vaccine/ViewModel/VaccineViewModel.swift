@@ -14,12 +14,12 @@ final class VaccineViewModel {
     var title = ""
     var errorMessage: String?
     
-    var vaccineBeingEditedId: UUID?
+    var vaccineBeingEdited: VaccineModel?
     
     private let store: VaccineListStore
     
     var isEditing: Bool {
-        vaccineBeingEditedId != nil
+        vaccineBeingEdited != nil
     }
     
     var formTitle: String {
@@ -38,16 +38,16 @@ final class VaccineViewModel {
             return false
         }
         
-        let model = VaccineModel (
-            id: vaccineBeingEditedId ?? UUID(),
-            title: title
-        )
-        
         do {
-            if vaccineBeingEditedId != nil {
-                 try store.update(model)
+            if let vaccineBeingEdited {
+                vaccineBeingEdited.title = title
+                try store.update(vaccineBeingEdited)
             } else {
-                try store.add(model)
+                let newVaccine = VaccineModel (
+                    id: UUID(),
+                    title: title
+                )
+                try store.add(newVaccine)
             }
             clearForm()
             errorMessage = nil
@@ -62,9 +62,7 @@ final class VaccineViewModel {
         do {
             try store.delete(id: id)
             
-            if vaccineBeingEditedId == id {
-                clearForm()
-            }
+            clearForm()
             errorMessage = nil
         } catch {
             errorMessage = "Não foi possível excluir a vacina: \(error.localizedDescription)"
@@ -72,18 +70,18 @@ final class VaccineViewModel {
     }
     
     func clearForm() {
-        vaccineBeingEditedId = nil
+        vaccineBeingEdited = nil
         title = ""
     }
     
     func prepareNewVaccine() {
-        vaccineBeingEditedId = nil
+        vaccineBeingEdited = nil
         title = ""
         errorMessage = nil
     }
     
     func prepareToEdit(_ vaccine: VaccineModel) {
-        vaccineBeingEditedId = vaccine.id
+        vaccineBeingEdited = vaccine
         title = vaccine.title
         errorMessage = nil
         
