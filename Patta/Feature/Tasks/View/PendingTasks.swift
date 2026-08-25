@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreData
 
 struct PendingTasks: View {
     @Environment(TaskViewModel.self) private var viewModel

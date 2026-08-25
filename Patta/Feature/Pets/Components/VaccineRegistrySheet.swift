@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct VaccineRegistrySheet: View {
     
@@ -49,12 +49,12 @@ struct VaccineRegistrySheet: View {
                         registryViewModel.activePetForSheet = nil
                     }
                 }
-
+                
                 ToolbarItem(placement: .principal) {
                     Text(registryViewModel.formTitle)
                         .font(.headline)
                 }
-
+                
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .confirm) {
                         if registryViewModel.saveRegistry(
@@ -83,11 +83,10 @@ struct VaccineRegistrySheet: View {
 }
 
 #Preview {
-    let context =
-        DataController.shared
-            .container
-            .viewContext
-
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: PetModel.self, VaccineModel.self, VaccineRegistryModel.self, configurations: config)
+    let context = container.mainContext
+    
     let pet = PetModel(
         id: UUID(),
         name: "Toto",
@@ -101,38 +100,18 @@ struct VaccineRegistrySheet: View {
         ),
         image: nil
     )
-
-    let vaccineRepository =
-        CoreDataVaccineRepository(
-            context: context
-        )
-
-    let vaccineStore =
-        VaccineListStore(
-            repository: vaccineRepository
-        )
-
-    let registryRepository =
-        CoreDataVaccineRegistryRepository(
-            context: context
-        )
-
-    let registryStore =
-        VaccineRegistryListStore(
-            repository:
-                registryRepository
-        )
-
+    
+    let vaccineRepository = SwiftDataVaccineRepository(context: context)
+    
+    let vaccineStore = VaccineListStore(repository: vaccineRepository)
+    
+    let registryRepository = SwiftDataVaccineRegistryRepository(context: context)
+    
+    let registryStore = VaccineRegistryListStore(repository: registryRepository)
+    
     VaccineRegistrySheet(pet: pet)
-        .environment(
-            VaccineRegistryViewModel(
-                store: registryStore
-            )
-        )
+        .environment(VaccineRegistryViewModel(store: registryStore))
         .environment(vaccineStore)
-        .environment(
-            \.managedObjectContext,
-            context
-        )
+        .modelContainer(container)
 }
 

@@ -6,10 +6,19 @@
 //
 
 import Foundation
+import SwiftData
 
-struct VaccineRegistryModel: Identifiable, Equatable {
-    let id: UUID
+@Model
+class VaccineRegistryModel: Identifiable, Equatable {
+    var id: UUID
     var applicationDate: Date?
     var vaccine: VaccineModel
     var petId: UUID?
+    
+    init(id: UUID, applicationDate: Date? = nil, vaccine: VaccineModel, petId: UUID? = nil) {
+        self.id = id
+        self.applicationDate = applicationDate
+        self.vaccine = vaccine
+        self.petId = petId
+    }
 }
