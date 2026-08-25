@@ -14,7 +14,7 @@ struct PattaApp: App {
     
     let container: ModelContainer
     
-//    @State private var dataController: DataController
+    //    @State private var dataController: DataController
     //Pet
     @State private var petViewModel: PetViewModel
     @State private var petListStore: PetListStore
@@ -33,57 +33,9 @@ struct PattaApp: App {
         do {
             container = try ModelContainer(for: PetModel.self, TaskModel.self, VaccineModel.self, VaccineRegistryModel.self)
             
-            let context = container.mainContext
-            
-            let petRepository = SwiftDataPetRepository(context: context)
-            let petStore = PetListStore(repository: petRepository)
-            
-            let taskRepository = SwiftDataTaskRepository(context: context)
-            let taskStore = TaskListStore(repository: taskRepository)
-            
-            let vaccineRepository = SwiftDataVaccineRepository(context: context)
-            let vaccineStore = VaccineListStore(repository: vaccineRepository)
-            
-            let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
-            let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
-            
-            _petListStore = .init(initialValue: petStore)
-            _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
-            _taskListStore = .init(initialValue: taskStore)
-            _taskViewModel = .init(initialValue: TaskViewModel(store: taskStore))
-            _vaccineListStore = .init(initialValue: vaccineStore)
-            _vaccineRegistryListStore = .init(initialValue: vaccineRegistryStore)
-            _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(store: vaccineRegistryStore))
-            _vaccineViewModel = .init(initialValue: VaccineViewModel(store: vaccineStore))
-            
-            seedDefaultVaccines()
-        } catch {
-            fatalError("Erro ao inicializar o ModelContainer: \(error.localizedDescription)")
-        }
-    }
-    
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(taskViewModel)
-                .environment(taskListStore)
-                .environment(petViewModel)
-                .environment(vaccineViewModel)
-                .environment(vaccineRegistryViewModel)
-                .environment(petListStore)
-                .environment(vaccineListStore)
-                .environment(vaccineRegistryListStore)
-        }
-        .modelContainer(container)
-    }
-    
-    @MainActor
-    private func seedDefaultVaccines() {
-        let context = container.mainContext
-        
-        do {
+            let seedContext = ModelContext(container)
             let descriptor = FetchDescriptor<VaccineModel>()
-            let existingCount = try context.fetchCount(descriptor)
+            let existingCount = try seedContext.fetchCount(descriptor)
             
             if existingCount == 0 {
                 let defaultVaccines = [
@@ -177,13 +129,51 @@ struct PattaApp: App {
                 
                 for title in defaultVaccines {
                     let newVaccine = VaccineModel(id: UUID(), title: title)
-                    context.insert(newVaccine)
+                    seedContext.insert(newVaccine)
                 }
                 
-                try context.save()
+                try seedContext.save()
             }
+            
+            let context = container.mainContext
+            
+            let petRepository = SwiftDataPetRepository(context: context)
+            let petStore = PetListStore(repository: petRepository)
+            
+            let taskRepository = SwiftDataTaskRepository(context: context)
+            let taskStore = TaskListStore(repository: taskRepository)
+            
+            let vaccineRepository = SwiftDataVaccineRepository(context: context)
+            let vaccineStore = VaccineListStore(repository: vaccineRepository)
+            
+            let vaccineRegistryRepository = SwiftDataVaccineRegistryRepository(context: context)
+            let vaccineRegistryStore = VaccineRegistryListStore(repository: vaccineRegistryRepository)
+            
+            _petListStore = .init(initialValue: petStore)
+            _petViewModel = .init(initialValue: PetViewModel(name: "", store: petStore))
+            _taskListStore = .init(initialValue: taskStore)
+            _taskViewModel = .init(initialValue: TaskViewModel(store: taskStore))
+            _vaccineListStore = .init(initialValue: vaccineStore)
+            _vaccineRegistryListStore = .init(initialValue: vaccineRegistryStore)
+            _vaccineRegistryViewModel = .init(initialValue: VaccineRegistryViewModel(store: vaccineRegistryStore))
+            _vaccineViewModel = .init(initialValue: VaccineViewModel(store: vaccineStore))
         } catch {
-            print("Erro ao popular vacinas padrão: \(error.localizedDescription)")
+            fatalError("Erro ao inicializar o ModelContainer: \(error.localizedDescription)")
         }
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environment(taskViewModel)
+                .environment(taskListStore)
+                .environment(petViewModel)
+                .environment(vaccineViewModel)
+                .environment(vaccineRegistryViewModel)
+                .environment(petListStore)
+                .environment(vaccineListStore)
+                .environment(vaccineRegistryListStore)
+        }
+        .modelContainer(container)
     }
 }
