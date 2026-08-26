@@ -1,0 +1,74 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.19006,0.44067,0.31104,1.00000",
+      "display-p3:0.26660,0.59473,0.33545,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 0
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.7
+      }
+    }
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass" : true,
+          "image-name" : "Ativo 4.svg",
+          "name" : "Ativo 4",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -26.710200635965634,
+              0
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "image-name" : "Ativo 3.svg",
+          "name" : "Ativo 3",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -26.71020063596552,
+              -15.09192469123036
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "image-name" : "Ativo 1 2.svg",
+          "name" : "Ativo 1 2",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              18.220102657126063,
+              39.72269515541666
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

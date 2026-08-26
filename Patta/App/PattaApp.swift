@@ -177,6 +177,7 @@ struct PattaApp: App {
                 .environment(petListStore)
                 .environment(vaccineListStore)
                 .environment(vaccineRegistryListStore)
+                .environment(searchViewModel)
         }
         .modelContainer(container)
     }
