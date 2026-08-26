@@ -9,30 +9,30 @@ import SwiftData
 
 struct TaskSheet: View {
     @Environment(\.dismiss) private var dismiss
-
+    
     @Environment(TaskViewModel.self) private var taskViewModel
-
+    
     @Environment(PetListStore.self) private var petListStore
-
+    
     @State private var isShowingDeleteConfirmation = false
-
+    
     var body: some View {
         @Bindable var taskViewModelBind = taskViewModel
-
+        
         NavigationStack {
             Form {
                 TextField("Título",text: $taskViewModelBind.title)
-
+                
                 TextField("Descrição", text: $taskViewModelBind.taskDescription)
-
+                
                 petSection(taskViewModelBind: $taskViewModelBind)
-
+                
                 dateSection(taskViewModelBind: $taskViewModelBind)
-
+                
                 prioritySection(taskViewModelBind: $taskViewModelBind)
-
+                
                 recurrenceSection(taskViewModelBind: $taskViewModelBind)
-
+                
                 deleteSection
             }
             .navigationTitle(taskViewModel.formTitle)
@@ -41,49 +41,19 @@ struct TaskSheet: View {
                 cancellationButton
                 confirmationButton
             }
-            .confirmationDialog("Deletar tarefa?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
-                Button("Deletar Tarefa", role: .destructive) {
-                    deleteCurrentTask()
-                }
-
-                Button("Cancelar",role: .cancel) {}
-            } message: {
-                Text(
-                    """
-                    Esta ação não pode \
-                    ser desfeita.
-                    """
-                )
+            .onAppear {
+                petListStore.refresh()
             }
-            .alert("Não foi possível concluir a operação", isPresented: Binding(
-                    get: {
-                        taskViewModel
-                            .errorMessage != nil
-                    },
-                    set: { isPresented in
-                        if !isPresented {
-                            taskViewModel
-                                .errorMessage = nil
-                        }
-                    }
-                )
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(taskViewModel.errorMessage ?? "")
-            }
-        }
-        .onAppear {
-            petListStore.refresh()
+            
         }
     }
-
+    
     private func petSection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
         Section {
             Picker("Pets", selection: taskViewModelBind.selectedPet) {
                 Text("Todos")
                     .tag(nil as PetModel?)
-
+                
                 ForEach(petListStore.pets) { pet in
                     Text(pet.name)
                         .tag(Optional(pet))
@@ -93,25 +63,25 @@ struct TaskSheet: View {
             Text("Aplicar tarefa a")
         }
     }
-
+    
     private func dateSection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
         Section {
             Toggle("Agendar Tarefa",isOn: taskViewModelBind.usesCustomDate)
-            .tint(.accent)
-
+                .tint(.accent)
+            
             if taskViewModel
                 .usesCustomDate {
-
+                
                 DatePicker("Data",selection: taskViewModelBind.date)
-                .environment(\.locale, Locale(identifier: "pt_BR"))
+                    .environment(\.locale, Locale(identifier: "pt_BR"))
             }
         }
     }
-
+    
     private func prioritySection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
         Section {
             Toggle("Tarefa Prioritária",isOn: taskViewModelBind.isPriority)
-            .tint(.accent)
+                .tint(.accent)
         } footer: {
             Text(
                 """
@@ -121,18 +91,18 @@ struct TaskSheet: View {
             )
         }
     }
-
+    
     private func recurrenceSection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
         Section {
             Toggle("Repetir diariamente",isOn: taskViewModelBind.isRecurring)
-            .tint(.accent)
-
+                .tint(.accent)
+            
             if taskViewModel.isRecurring {
                 Toggle("Limitar recorrência",isOn:taskViewModelBind.hasRecurrenceLimit)
-                .tint(.accent)
-
+                    .tint(.accent)
+                
                 if taskViewModel.hasRecurrenceLimit {
-
+                    
                     Stepper(
                         """
                         Duração: \
@@ -149,7 +119,7 @@ struct TaskSheet: View {
             recurrenceFooter
         }
     }
-
+    
     @ViewBuilder
     private var recurrenceFooter: some View {
         if taskViewModel.isRecurring {
@@ -169,7 +139,7 @@ struct TaskSheet: View {
             )
         }
     }
-
+    
     @ViewBuilder
     private var deleteSection: some View {
         if taskViewModel.taskBeingEdited != nil {
@@ -179,16 +149,47 @@ struct TaskSheet: View {
                     role: .destructive
                 ) {
                     isShowingDeleteConfirmation =
-                        true
+                    true
+                }
+                .confirmationDialog("Deletar tarefa?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
+                    Button("Deletar Tarefa", role: .destructive) {
+                        deleteCurrentTask()
+                    }
+                    
+                    Button("Cancelar",role: .cancel) {}
+                } message: {
+                    Text(
+                        """
+                        Esta ação não pode \
+                        ser desfeita.
+                        """
+                    )
+                }
+                .alert("Não foi possível concluir a operação", isPresented: Binding(
+                    get: {
+                        taskViewModel
+                            .errorMessage != nil
+                    },
+                    set: { isPresented in
+                        if !isPresented {
+                            taskViewModel
+                                .errorMessage = nil
+                        }
+                    }
+                )
+                ) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(taskViewModel.errorMessage ?? "")
                 }
             }
         }
     }
-
+    
     @ToolbarContentBuilder
     private var cancellationButton:
-        some ToolbarContent {
-
+    some ToolbarContent {
+        
         ToolbarItem(
             placement: .cancellationAction
         ) {
@@ -200,11 +201,11 @@ struct TaskSheet: View {
             }
         }
     }
-
+    
     @ToolbarContentBuilder
     private var confirmationButton:
-        some ToolbarContent {
-
+    some ToolbarContent {
+        
         ToolbarItem(placement: .confirmationAction) {
             Button {
                 if taskViewModel.saveTask() {
@@ -218,51 +219,16 @@ struct TaskSheet: View {
             .tint(.accent)
         }
     }
-
+    
     private func deleteCurrentTask() {
         guard let task =
-            taskViewModel.taskBeingEdited
+                taskViewModel.taskBeingEdited
         else {
             return
         }
-
+        
         if taskViewModel.deleteTask(task) {
             dismiss()
         }
     }
 }
-
-//#Preview {
-//    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//    let container = try! ModelContainer(for: TaskModel.self, configurations: config)
-//    let context = container.mainContext
-//
-//    let taskRepository =
-//        CoreDataTaskRepository(
-//            context: context
-//        )
-//
-//    let taskStore =
-//        TaskListStore(
-//            repository: taskRepository
-//        )
-//
-//    let taskViewModel =
-//        TaskViewModel(
-//            store: taskStore
-//        )
-//
-//    let petRepository =
-//        CoreDataPetRepository(
-//            context: context
-//        )
-//
-//    let petStore =
-//        PetListStore(
-//            repository: petRepository
-//        )
-//
-//    TaskSheet()
-//        .environment(taskViewModel)
-//        .environment(petStore)
-//}

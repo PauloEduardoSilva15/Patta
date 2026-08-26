@@ -99,7 +99,7 @@ final class PetViewModel {
                 )
                 try store.add(newPet)
             }
-            resetForm()
+            
             return true
         } catch {
             errorMessage = "Erro ao salvar o pet: \(error.localizedDescription)"

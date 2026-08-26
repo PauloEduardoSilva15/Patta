@@ -114,8 +114,15 @@ final class TaskViewModel {
         }
     }
     
-    func prepareNewTask() {
+    func prepareNewTask(for selectedDate: Date) {
         resetForm()
+
+        let calendar = Calendar.current
+        let currentTime = calendar.dateComponents([.hour, .minute], from: Date())
+
+        date = calendar.date(bySettingHour: currentTime.hour ?? 9, minute: currentTime.minute ?? 0,second: 0, of: selectedDate) ?? selectedDate
+
+        usesCustomDate = true
     }
     
     func prepareToEdit(_ task: TaskModel) {
