@@ -117,7 +117,7 @@ struct TaskView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    viewModel.prepareNewTask()
+                    viewModel.prepareNewTask(for: selectedDate)
                     showTaskSheet = true
                 } label: {
                     Image(systemName: "plus")

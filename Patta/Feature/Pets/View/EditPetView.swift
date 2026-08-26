@@ -21,7 +21,7 @@ struct EditPetView: View {
     
     @State private var selectedImage: PhotosPickerItem?
     @State private var confirmDelete: Bool = false
-    @State private var actualPetColorSelected = ""
+    @State private var actualPetColorSelected: String
     @Binding var navPath: [PetRoute]
     
     init(pet: PetModel, viewModel: PetViewModel, navPath: Binding<[PetRoute]>, isDismiss: Bool) {
@@ -30,9 +30,8 @@ struct EditPetView: View {
         _navPath = navPath
         self.isDimmiss = isDismiss
         
-        if pet.color != nil {
-            actualPetColorSelected = pet.color ?? PetColorPalette.defaultAssetName
-        }
+        _actualPetColorSelected = State(
+                initialValue: PetColorPalette.normalizedAssetName(pet.color))
     }
     
     @State var isDimmiss: Bool
@@ -284,8 +283,8 @@ struct EditPetView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancelar", role: .cancel) {
-                    viewModel.cancelEditing()
                     dismiss()
+                    
                 }
             }
             
@@ -304,6 +303,7 @@ struct EditPetView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear {
             viewModel.prepareToEdit(pet)
+            actualPetColorSelected = PetColorPalette.normalizedAssetName(pet.color)
         }
     }
 }

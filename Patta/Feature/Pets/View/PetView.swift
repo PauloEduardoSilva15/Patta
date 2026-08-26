@@ -34,36 +34,44 @@ struct PetView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 10) {
-                            ForEach(petListStore.pets) { pet in
-                                NavigationLink(value: PetRoute.detail(pet)) {
-                                    PetCard(pet: pet, viewModel: viewModel)
+                    if petListStore.pets.isEmpty {
+                        
+                        Text("Nenhum pet cadastrado")
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    } else {
+                        ScrollView {
+                            
+                            LazyVGrid(columns: columns, spacing: 10) {
+                                ForEach(petListStore.pets) { pet in
+                                    NavigationLink(value: PetRoute.detail(pet)) {
+                                        PetCard(pet: pet, viewModel: viewModel)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
+                            .padding()
                         }
-                        .padding()
                     }
                 }
-                .sheet(isPresented: $showSheet) {
-                    SheetAddPet()
-                }
-                .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
-                    VaccineRegistrySheet(pet: pet)
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: {
-                            viewModel.prepareNewPet()
-                            showSheet = true
-                        }) {
-                            Image(systemName: "plus")
-                                .foregroundStyle(.white)
-                        }
-                        .buttonStyle(.glassProminent)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        viewModel.prepareNewPet()
+                        showSheet = true
+                    }) {
+                        Image(systemName: "plus")
+                            .foregroundStyle(.white)
                     }
+                    .buttonStyle(.glassProminent)
                 }
+            }
+            .sheet(isPresented: $showSheet) {
+                SheetAddPet()
+            }
+            .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
+                VaccineRegistrySheet(pet: pet)
             }
             .navigationTitle("Pets")
             .navigationDestination(for: PetRoute.self) { route in
@@ -77,7 +85,6 @@ struct PetView: View {
         }
     }
 }
-
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: PetModel.self, VaccineRegistryModel.self, configurations: config)
