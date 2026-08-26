@@ -45,10 +45,8 @@ struct DayGroup: View {
             if isSelected {
                 RoundedRectangle(cornerRadius: 5)
                     .foregroundStyle(.accent)
-                
             } else {
-                
-            RoundedRectangle(cornerRadius:  5)
+                RoundedRectangle(cornerRadius:  5)
                     .fill(.quinary)
             }
         }
