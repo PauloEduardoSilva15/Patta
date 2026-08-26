@@ -14,7 +14,7 @@ struct WeekCalendar: View {
     
     private let calendar = Calendar.current
     
-    private let weekOffsetRange = 0...52
+    private let weekOffsetRange = -52...52
     
     private func goNextWeek() {
         if currentWeekOffset < weekOffsetRange.last! {
@@ -23,7 +23,7 @@ struct WeekCalendar: View {
     }
     
     private func goPreviousWeek() {
-        if currentWeekOffset != 0 {
+        if currentWeekOffset != -52 {
             currentWeekOffset -= 1
         }
     }
