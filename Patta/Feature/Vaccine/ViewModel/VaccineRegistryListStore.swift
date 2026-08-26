@@ -19,8 +19,6 @@ final class VaccineRegistryListStore {
         repository: VaccineRegistryRepositoryProtocol
     ) {
         self.repository = repository
-        
-        refresh()
     }
     
     func refresh(for petId: UUID) {
@@ -34,35 +32,26 @@ final class VaccineRegistryListStore {
         }
     }
     
-    func refresh() {
-        vaccineRegistries = []
-        
-        do {
-            vaccineRegistries = try repository.fetchAll()
-        } catch {
-            print(
-                "Erro ao buscar registros de vacina: \(error)"
-            )
-        }
-    }
-    
     func add(
         _ vaccineRegistry: VaccineRegistryModel
     ) throws {
         try repository.add(vaccineRegistry)
         
-        refresh()
+        refresh(for: vaccineRegistry.pet.id)
     }
     
     func update(
         _ vaccineRegistry: VaccineRegistryModel
     ) throws {
         try repository.update(vaccineRegistry)        
-        refresh()
+        refresh(for: vaccineRegistry.pet.id)
     }
     
     func delete(id: UUID) throws {
+        let petId = vaccineRegistries.first { $0.id == id }?.pet.id
         try repository.delete(id: id)
-        refresh()
+        if let petId {
+            refresh(for: petId)
+        }
     }
 }
