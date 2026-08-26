@@ -232,37 +232,4 @@ struct TaskSheet: View {
     }
 }
 
-//#Preview {
-//    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//    let container = try! ModelContainer(for: TaskModel.self, configurations: config)
-//    let context = container.mainContext
-//
-//    let taskRepository =
-//        CoreDataTaskRepository(
-//            context: context
-//        )
-//
-//    let taskStore =
-//        TaskListStore(
-//            repository: taskRepository
-//        )
-//
-//    let taskViewModel =
-//        TaskViewModel(
-//            store: taskStore
-//        )
-//
-//    let petRepository =
-//        CoreDataPetRepository(
-//            context: context
-//        )
-//
-//    let petStore =
-//        PetListStore(
-//            repository: petRepository
-//        )
-//
-//    TaskSheet()
-//        .environment(taskViewModel)
-//        .environment(petStore)
-//}
+

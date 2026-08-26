@@ -58,7 +58,7 @@ struct PendingTasks: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-
+            
             ForEach(priorityTasks) { task in
                 taskRow(task)
             }
@@ -75,7 +75,7 @@ struct PendingTasks: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-
+            
             ForEach(nonPriorityTasks) { task in
                 taskRow(task)
             }
@@ -84,28 +84,28 @@ struct PendingTasks: View {
     
     private func taskRow(_ task: TaskModel) -> some View {
         LineTask(task: task,onOpenDetails: {
-                       viewModel.prepareToEdit(task)
-                       showTaskSheet = true
-                   },
-                   onComplete: {
-                       viewModel.toggleTaskCompletion(task)
-                   }
-               )
-               .listRowSeparator(.hidden)
-               .listRowBackground(Color.clear)
-               .listRowInsets(EdgeInsets(top: 4,leading: 0, bottom: 4, trailing: 0))
-               .swipeActions(
-                   edge: .trailing,
-                   allowsFullSwipe: true
-               ) {
-                   Button(role: .destructive) {
-                       _ = viewModel.deleteTask(task)
-                   } label: {
-                       Label(
-                           "Deletar",
-                           systemImage: "trash"
-                       )
-                   }
-               }
-           }
-       }
+            viewModel.prepareToEdit(task)
+            showTaskSheet = true
+        },
+                 onComplete: {
+            viewModel.toggleTaskCompletion(task)
+        }
+        )
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 4,leading: 0, bottom: 4, trailing: 0))
+        .swipeActions(
+            edge: .trailing,
+            allowsFullSwipe: true
+        ) {
+            Button(role: .destructive) {
+                _ = viewModel.deleteTask(task)
+            } label: {
+                Label(
+                    "Deletar",
+                    systemImage: "trash"
+                )
+            }
+        }
+    }
+}
