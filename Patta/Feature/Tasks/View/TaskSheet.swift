@@ -44,6 +44,23 @@ struct TaskSheet: View {
             .onAppear {
                 petListStore.refresh()
             }
+            .alert(
+                "Não foi possível concluir a operação",
+                isPresented: Binding(
+                    get: {
+                        taskViewModel.errorMessage != nil
+                    },
+                    set: { isPresented in
+                        if !isPresented {
+                            taskViewModel.errorMessage = nil
+                        }
+                    }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(taskViewModel.errorMessage ?? "")
+            }
             
         }
     }
@@ -80,8 +97,26 @@ struct TaskSheet: View {
     
     private func prioritySection(taskViewModelBind: Bindable<TaskViewModel>) -> some View {
         Section {
-            Toggle("Tarefa Prioritária",isOn: taskViewModelBind.isPriority)
+            Toggle("Tarefa Prioritária", isOn: taskViewModelBind.isPriority)
                 .tint(.accent)
+                .onChange(of: taskViewModel.isPriority) {
+                    taskViewModel.handlePriorityChange()
+                }
+            
+            if taskViewModel.isPriority {
+                Toggle("Criar alerta", isOn: taskViewModelBind.isReminderEnabled)
+                    .tint(.accent)
+                    .onChange(of: taskViewModel.isReminderEnabled) {
+                        Task {
+                            await taskViewModel.handleReminderChange()
+                        }
+                    }
+                
+                if taskViewModel.isReminderEnabled {
+                    DatePicker("Data do alerta", selection: taskViewModelBind.reminderDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                        .environment(\.locale, Locale(identifier: "pt_BR"))
+                }
+            }
         } footer: {
             Text(
                 """
@@ -144,19 +179,18 @@ struct TaskSheet: View {
     private var deleteSection: some View {
         if taskViewModel.taskBeingEdited != nil {
             Section {
-                Button(
-                    "Deletar Tarefa",
-                    role: .destructive
-                ) {
-                    isShowingDeleteConfirmation =
-                    true
+                Button("Deletar Tarefa", role: .destructive) {
+                    isShowingDeleteConfirmation = true
                 }
                 .confirmationDialog("Deletar tarefa?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
-                    Button("Deletar Tarefa", role: .destructive) {
+                    Button(
+                        "Deletar Tarefa",
+                        role: .destructive
+                    ) {
                         deleteCurrentTask()
                     }
                     
-                    Button("Cancelar",role: .cancel) {}
+                    Button("Cancelar", role: .cancel) {}
                 } message: {
                     Text(
                         """
@@ -164,23 +198,6 @@ struct TaskSheet: View {
                         ser desfeita.
                         """
                     )
-                }
-                .alert("Não foi possível concluir a operação", isPresented: Binding(
-                    get: {
-                        taskViewModel
-                            .errorMessage != nil
-                    },
-                    set: { isPresented in
-                        if !isPresented {
-                            taskViewModel
-                                .errorMessage = nil
-                        }
-                    }
-                )
-                ) {
-                    Button("OK", role: .cancel) {}
-                } message: {
-                    Text(taskViewModel.errorMessage ?? "")
                 }
             }
         }
@@ -208,8 +225,10 @@ struct TaskSheet: View {
         
         ToolbarItem(placement: .confirmationAction) {
             Button {
-                if taskViewModel.saveTask() {
-                    dismiss()
+                Task {
+                    if await taskViewModel.saveTask() {
+                        dismiss()
+                    }
                 }
             } label: {
                 Image(systemName: "checkmark")
@@ -217,6 +236,7 @@ struct TaskSheet: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(.accent)
+            .disabled(taskViewModel.isSaving)
         }
     }
     
