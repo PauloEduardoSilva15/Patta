@@ -34,10 +34,16 @@ final class LocalNotificationService {
     private let notificationCenter =
         UNUserNotificationCenter.current()
     
-    func authorizationState() async
-    -> NotificationAuthorizationState {
-        let settings =
-            await notificationCenter.notificationSettings()
+    private let notificationDelegate =
+        NotificationDelegate()
+    
+    init() {
+        notificationCenter.delegate =
+            notificationDelegate
+    }
+    
+    func authorizationState() async -> NotificationAuthorizationState {
+        let settings = await notificationCenter.notificationSettings()
         
         switch settings.authorizationStatus {
         case .notDetermined:
@@ -55,16 +61,10 @@ final class LocalNotificationService {
     }
     
     func requestPermission() async throws -> Bool {
-        try await notificationCenter.requestAuthorization(
-            options: [.alert, .sound]
-        )
+        try await notificationCenter.requestAuthorization(options: [.alert, .sound])
     }
     
-    func scheduleReminder(
-        taskID: UUID,
-        taskTitle: String,
-        reminderDate: Date
-    ) async throws {
+    func scheduleReminder(taskID: UUID, taskTitle: String, reminderDate: Date) async throws {
         let authorization = await authorizationState()
         
         guard authorization == .authorized else {
@@ -80,9 +80,7 @@ final class LocalNotificationService {
         content.body = taskTitle
         content.sound = .default
         content.threadIdentifier = "task-reminders"
-        content.userInfo = [
-            "taskID": taskID.uuidString
-        ]
+        content.userInfo = ["taskID": taskID.uuidString]
         
         var dateComponents =
             Calendar.current.dateComponents(
@@ -119,9 +117,7 @@ final class LocalNotificationService {
         )
         
         notificationCenter
-            .removeDeliveredNotifications(
-                withIdentifiers: [identifier]
-            )
+            .removeDeliveredNotifications(withIdentifiers: [identifier])
         
         try await notificationCenter.add(request)
     }
@@ -132,19 +128,12 @@ final class LocalNotificationService {
         )
         
         notificationCenter
-            .removePendingNotificationRequests(
-                withIdentifiers: [identifier]
-            )
+            .removePendingNotificationRequests(withIdentifiers: [identifier])
         
-        notificationCenter
-            .removeDeliveredNotifications(
-                withIdentifiers: [identifier]
-            )
+        notificationCenter.removeDeliveredNotifications(withIdentifiers: [identifier])
     }
     
-    private func reminderIdentifier(
-        for taskID: UUID
-    ) -> String {
+    private func reminderIdentifier(for taskID: UUID) -> String {
         "task-reminder-\(taskID.uuidString)"
     }
 }

@@ -109,7 +109,7 @@ struct TaskView: View {
             Color(.background)
                 .ignoresSafeArea()
         }
-        .navigationTitle("Tarefa")
+        .navigationTitle("Tarefas")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 petFilterButton
@@ -133,7 +133,7 @@ struct TaskView: View {
         }
         .alert("Não foi possível concluir a operação", isPresented: Binding(
             get: {
-                viewModel.errorMessage != nil
+                viewModel.errorMessage != nil && !viewModel.isTaskSheetPresented
             },
             set: { isPresented in
                 if !isPresented {

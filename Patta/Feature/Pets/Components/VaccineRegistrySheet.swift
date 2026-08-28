@@ -19,6 +19,7 @@ struct VaccineRegistrySheet: View {
     
     @State private var errorMessage = ""
     @State private var showAlert = false
+    @State private var showDeleteConfirmation = false
     
     var body: some View {
         
@@ -37,9 +38,10 @@ struct VaccineRegistrySheet: View {
                         }
                     }
                     
-                    DatePicker("Data",
-                               selection: $registryViewModelBind.applicationDate,
-                               in: ...Date.now, displayedComponents: .date)
+                    DatePicker("Data", selection: $registryViewModelBind.applicationDate, in: ...Date.now, displayedComponents: .date)
+                    .environment(\.locale, Locale(identifier: "pt_BR"))
+                    
+                    deleteSection
                 }
             }
             .toolbar {
@@ -63,6 +65,7 @@ struct VaccineRegistrySheet: View {
                             registryViewModel.activePetForSheet = nil
                         }
                     }
+                    .disabled(registryViewModel.selectedVaccine == nil)
                 }
             }
         }
@@ -78,6 +81,54 @@ struct VaccineRegistrySheet: View {
                 message: Text(errorMessage),
                 dismissButton: .default(Text("OK"))
             )
+        }
+    }
+    
+    @ViewBuilder
+    private var deleteSection: some View {
+        if registryViewModel.isEditing {
+            Section {
+                Button(
+                    "Excluir registro de vacina",
+                    role: .destructive
+                ) {
+                    showDeleteConfirmation = true
+                }
+                .confirmationDialog(
+                    "Excluir registro de vacina?",
+                    isPresented:
+                        $showDeleteConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button(
+                        "Excluir",
+                        role: .destructive
+                    ) {
+                        deleteCurrentRegistry()
+                    }
+                    
+                    Button(
+                        "Cancelar",
+                        role: .cancel
+                    ) {}
+                } message: {
+                    Text(
+                        """
+                        O registro será removido do \
+                        histórico deste pet.
+                        """
+                    )
+                }
+            }
+        }
+    }
+    
+    private func deleteCurrentRegistry() {
+        if registryViewModel
+            .deleteCurrentRegistry() {
+            
+            registryViewModel
+                .activePetForSheet = nil
         }
     }
 }

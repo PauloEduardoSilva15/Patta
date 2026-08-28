@@ -14,6 +14,9 @@ final class TaskViewModel {
     var taskDescription = ""
     var errorMessage: String?
     var isSaving = false
+    var isTaskSheetPresented = false
+    var shouldOfferNotificationSettings = false
+    var shouldDisableReminderAfterAlert = false
     var date = Date()
     var usesCustomDate = false
     var selectedPet: PetModel?
@@ -269,6 +272,9 @@ final class TaskViewModel {
             return
         }
         
+        shouldOfferNotificationSettings = false
+        shouldDisableReminderAfterAlert = false
+        
         guard isPriority else {
             isReminderEnabled = false
             return
@@ -280,6 +286,8 @@ final class TaskViewModel {
             
             switch authorization {
             case .authorized:
+                shouldOfferNotificationSettings = false
+                shouldDisableReminderAfterAlert = false
                 errorMessage = nil
                 
             case .notDetermined:
@@ -288,9 +296,13 @@ final class TaskViewModel {
                         .requestPermission()
                 
                 if permissionWasGranted {
+                    shouldOfferNotificationSettings = false
+                    shouldDisableReminderAfterAlert = false
                     errorMessage = nil
                 } else {
-                    isReminderEnabled = false
+                    shouldOfferNotificationSettings = true
+                    shouldDisableReminderAfterAlert = true
+                    
                     errorMessage =
                         """
                         As notificações não foram permitidas. \
@@ -299,15 +311,20 @@ final class TaskViewModel {
                 }
                 
             case .denied:
-                isReminderEnabled = false
+                shouldOfferNotificationSettings = true
+                shouldDisableReminderAfterAlert = true
+                
                 errorMessage =
                     """
                     As notificações do Patta estão desativadas. \
                     Ative-as nos Ajustes do iPhone para criar alertas.
                     """
             }
+            
         } catch {
-            isReminderEnabled = false
+            shouldOfferNotificationSettings = false
+            shouldDisableReminderAfterAlert = true
+            
             errorMessage =
                 """
                 Não foi possível solicitar a permissão \
@@ -340,6 +357,14 @@ final class TaskViewModel {
         }
     }
     
+    func handlePetCascadeDeletion(taskIDs: [UUID]) {
+        for taskID in taskIDs {
+            notificationService.cancelReminder(for: taskID)
+        }
+        
+        loadTasks()
+    }
+    
     private func resetForm() {
         taskBeingEdited = nil
         title = ""
@@ -355,6 +380,8 @@ final class TaskViewModel {
         isRecurring = false
         hasRecurrenceLimit = false
         recurrenceDays = 7
+        shouldOfferNotificationSettings = false
+        shouldDisableReminderAfterAlert = false
         errorMessage = nil
     }
     

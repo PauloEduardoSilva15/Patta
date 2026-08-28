@@ -6,9 +6,11 @@
 //
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct TaskSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     
     @Environment(TaskViewModel.self) private var taskViewModel
     
@@ -42,26 +44,48 @@ struct TaskSheet: View {
                 confirmationButton
             }
             .onAppear {
+                taskViewModel.isTaskSheetPresented = true
                 petListStore.refresh()
             }
-            .alert(
-                "Não foi possível concluir a operação",
-                isPresented: Binding(
+            .onDisappear {
+                taskViewModel.isTaskSheetPresented = false
+            }
+            .alert(taskViewModel.shouldOfferNotificationSettings ? "Notificações desativadas" : "Não foi possível concluir a operação",isPresented: Binding(
                     get: {
                         taskViewModel.errorMessage != nil
                     },
                     set: { isPresented in
                         if !isPresented {
+                            let shouldDisableReminder =
+                                taskViewModel.shouldDisableReminderAfterAlert
+                            
                             taskViewModel.errorMessage = nil
+                            
+                            taskViewModel.shouldOfferNotificationSettings = false
+                            
+                            taskViewModel.shouldDisableReminderAfterAlert = false
+                            
+                            if shouldDisableReminder {
+                                taskViewModel.isReminderEnabled = false
+                            }
                         }
                     }
                 )
             ) {
-                Button("OK", role: .cancel) {}
+                if taskViewModel.shouldOfferNotificationSettings {
+                    
+                    Button("Abrir Ajustes") {
+                        openNotificationSettings()
+                    }
+                    
+                    Button("Agora não", role: .cancel) {}
+                    
+                } else {
+                    Button("OK",role: .cancel) {}
+                }
             } message: {
                 Text(taskViewModel.errorMessage ?? "")
             }
-            
         }
     }
     
@@ -204,8 +228,7 @@ struct TaskSheet: View {
     }
     
     @ToolbarContentBuilder
-    private var cancellationButton:
-    some ToolbarContent {
+    private var cancellationButton: some ToolbarContent {
         
         ToolbarItem(
             placement: .cancellationAction
@@ -236,7 +259,7 @@ struct TaskSheet: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(.accent)
-            .disabled(taskViewModel.isSaving)
+            .disabled(taskViewModel.title.isEmpty)
         }
     }
     
@@ -250,5 +273,12 @@ struct TaskSheet: View {
         if taskViewModel.deleteTask(task) {
             dismiss()
         }
+    }
+    private func openNotificationSettings() {
+        guard let settingsURL = URL(string: UIApplication.openNotificationSettingsURLString) else {
+            return
+        }
+        
+        openURL(settingsURL)
     }
 }

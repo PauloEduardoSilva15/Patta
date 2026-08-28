@@ -73,6 +73,7 @@ struct FocusedPetView: View {
                     }label: {
                         Image(systemName: "plus")
                             .font(.title2)
+                            .foregroundStyle(.white)
                             .fontWeight(.semibold)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())

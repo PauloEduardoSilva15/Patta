@@ -81,6 +81,19 @@ final class VaccineRegistryViewModel {
         }
     }
 
+    func deleteCurrentRegistry() -> Bool {
+        guard let registryBeingEdited else {
+            errorMessage =
+                "Nenhum registro foi selecionado para exclusão."
+            
+            return false
+        }
+        
+        return deleteRegistry(
+            id: registryBeingEdited.id
+        )
+    }
+    
     func deleteRegistry(id: UUID) -> Bool {
         do {
             try store.delete(id: id)

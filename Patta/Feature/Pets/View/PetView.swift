@@ -73,7 +73,7 @@ struct PetView: View {
             .sheet(item: $registryViewModelBind.activePetForSheet) { pet in
                 VaccineRegistrySheet(pet: pet)
             }
-            .navigationTitle("Pets")
+            .navigationTitle("Meus Pets")
             .navigationDestination(for: PetRoute.self) { route in
                 switch route {
                 case .detail(let petToView):
