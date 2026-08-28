@@ -13,6 +13,7 @@ struct EditPetView: View {
     
     @Environment(VaccineRegistryViewModel.self) private var registryViewModel
     @Environment(VaccineRegistryListStore.self) private var vaccineRegistryListStore
+    @Environment(TaskViewModel.self) private var taskViewModel
 
     
     let pet: PetModel
@@ -257,12 +258,18 @@ struct EditPetView: View {
                         titleVisibility: .visible
                     ) {
                         Button("Deletar", role: .destructive) {
+                            let deletedTaskIDs = (pet.tasks ?? []).map(\.id)
+                            
                             if viewModel.deletePet(id: pet.id) {
+                                taskViewModel.handlePetCascadeDeletion(taskIDs: deletedTaskIDs)
+                                
                                 vaccineRegistryListStore.refresh(for: pet.id)
-                                if isDimmiss{
+                                
+                                if isDimmiss {
                                     dismiss()
                                     return
                                 }
+                                
                                 navPath.removeAll()
                             }
                         }
@@ -311,8 +318,27 @@ struct EditPetView: View {
 #Preview {
     @Previewable @State var navPath: [PetRoute] = []
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: PetModel.self, VaccineModel.self, VaccineRegistryModel.self, configurations: config)
+    let container = try! ModelContainer(
+        for: PetModel.self,
+        TaskModel.self,
+        VaccineModel.self,
+        VaccineRegistryModel.self,
+        configurations: config
+    )
     let context = container.mainContext
+    let taskRepository =
+        SwiftDataTaskRepository(context: context)
+
+    let taskStore =
+        TaskListStore(repository: taskRepository)
+
+    let notificationService =
+        LocalNotificationService()
+
+    let taskViewModel = TaskViewModel(
+        store: taskStore,
+        notificationService: notificationService
+    )
     let name = "Toto"
     let breed = "Beagle"
     let myPetBirthdate = Calendar.current.date(from: DateComponents(year: 2023, month: 5, day: 10))
@@ -333,4 +359,5 @@ struct EditPetView: View {
         .environment(vaccineRegistryStore)
         .environment(vaccineStore)
         .modelContainer(container)
+        .environment(taskViewModel)
 }

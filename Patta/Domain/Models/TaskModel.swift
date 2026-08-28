@@ -23,7 +23,8 @@ final class TaskModel: Identifiable, Equatable, Hashable {
     var recurrenceEndDate: Date?
     var isCompleted: Bool
     
-    
+    var isReminderEnabled: Bool = false
+    var reminderDate: Date? = nil
     
     var appliesToAllPets: Bool
     
@@ -38,6 +39,8 @@ final class TaskModel: Identifiable, Equatable, Hashable {
         completedAt: Date? = nil,
         usesCustomDate: Bool? = nil,
         isPriority: Bool = false,
+        isReminderEnabled: Bool = false,
+        reminderDate: Date? = nil,
         isRecurring: Bool = false,
         recurrenceEndDate: Date? = nil,
         isCompleted: Bool = false,
@@ -52,6 +55,8 @@ final class TaskModel: Identifiable, Equatable, Hashable {
         self.completedAt = completedAt
         self.usesCustomDate = usesCustomDate
         self.isPriority = isPriority
+        self.isReminderEnabled = isReminderEnabled
+        self.reminderDate = reminderDate
         self.isRecurring = isRecurring
         self.recurrenceEndDate = recurrenceEndDate
         self.isCompleted = isCompleted
